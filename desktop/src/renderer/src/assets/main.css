@@ -1,0 +1,209 @@
+/* Import Bootstrap first */
+@import 'bootstrap/dist/css/bootstrap.min.css';
+
+:root {
+  /* Default Light Theme Variables */
+  --primary-color: #0d6efd;
+  --primary-gradient: linear-gradient(135deg, #0d6efd 0%, #6610f2 100%);
+  --secondary-color: #6c757d;
+  --success-color: #198754;
+  --info-color: #0dcaf0;
+  --warning-color: #ffc107;
+  --danger-color: #dc3545;
+
+  --body-bg: #f8f9fa;
+  --card-bg: #ffffff;
+  --text-color: #212529;
+  --border-color: rgba(0, 0, 0, 0.08);
+
+  --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  --card-border-radius: 1rem;
+  --btn-border-radius: 0.75rem;
+}
+
+[data-bs-theme="dark"] {
+  /* Dark Theme Overrides */
+  --body-bg: #0f172a; /* Slate 900 */
+  --card-bg: #1e293b; /* Slate 800 */
+  --text-color: #f8fafc; /* Slate 50 */
+  --border-color: rgba(255, 255, 255, 0.1);
+
+  --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+
+  /* Bootstrap overrides for dark mode consistency */
+  --bs-body-bg: var(--body-bg);
+  --bs-body-color: var(--text-color);
+  --bs-card-bg: var(--card-bg);
+  --bs-border-color: var(--border-color);
+}
+
+body {
+  background-color: var(--body-bg);
+  color: var(--text-color);
+  font-family: 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(150, 150, 150, 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(150, 150, 150, 0.5);
+}
+
+/* Navbar Customization */
+.navbar {
+  background-color: var(--card-bg) !important;
+  border-bottom: 1px solid var(--border-color);
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.navbar-brand {
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  font-size: 1.5rem;
+  background: var(--primary-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Card Styling */
+.card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--card-border-radius);
+  box-shadow: var(--card-shadow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease;
+  margin-bottom: 1.5rem;
+}
+
+.card-header {
+  background-color: transparent;
+  border-bottom: 1px solid var(--border-color);
+  padding: 1.5rem;
+  font-weight: 600;
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+.card-footer {
+  background-color: transparent;
+  border-top: 1px solid var(--border-color);
+  padding: 1rem 1.5rem;
+}
+
+/* Buttons */
+.btn {
+  border-radius: var(--btn-border-radius);
+  padding: 0.6rem 1.25rem;
+  font-weight: 600;
+  transition: all 0.2s;
+  letter-spacing: 0.3px;
+}
+
+.btn-primary {
+  background: var(--primary-gradient);
+  border: none;
+  box-shadow: 0 4px 10px rgba(13, 110, 253, 0.3);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(13, 110, 253, 0.4);
+}
+
+.btn-light {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
+}
+
+[data-bs-theme="dark"] .btn-light {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--text-color);
+}
+
+.btn-light:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-color: var(--border-color);
+}
+
+/* Form Controls */
+.form-control, .form-select, .input-group-text {
+  background-color: var(--bs-body-bg);
+  border-color: var(--border-color);
+  color: var(--text-color);
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+  background-color: var(--bs-body-bg);
+  color: var(--text-color);
+}
+
+/* Tables */
+.table {
+  --bs-table-bg: transparent;
+  --bs-table-color: var(--text-color);
+  --bs-table-border-color: var(--border-color);
+}
+
+.table th {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+  padding: 1rem;
+  color: var(--secondary-color);
+}
+
+.table td {
+  padding: 1rem;
+  vertical-align: middle;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+/* Utilities */
+.text-muted {
+  color: #adb5bd !important; /* Lighter gray for dark mode readability */
+}
+
+[data-bs-theme="light"] .text-muted {
+  color: #6c757d !important;
+}
+
+.bg-light {
+  background-color: #f8f9fa !important;
+}
+
+[data-bs-theme="dark"] .bg-light {
+  background-color: #1e293b !important; /* Match card bg */
+}
