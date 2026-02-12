@@ -1,0 +1,205 @@
+# ============================================
+# AssociaGo Backend Configuration
+# ============================================
+
+spring:
+  application:
+    name: AssociaGo
+
+  profiles:
+    active: desktop
+
+  datasource:
+    url: jdbc:sqlite:${associago.data.path}/associago.db
+    driver-class-name: org.sqlite.JDBC
+
+  jpa:
+    database-platform: org.hibernate.community.dialect.SQLiteDialect
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    generate-ddl: false
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          batch_size: 20
+        order_inserts: true
+        order_updates: true
+        # Explicitly disable hbm2ddl to prevent schema migration attempts
+        hbm2ddl:
+          auto: none
+        # Fix for SQLite "too many terms in compound SELECT" error during schema validation
+        # Using both deprecated and new property to ensure it works across versions
+        temp:
+          use_jdbc_metadata_defaults: false
+        boot:
+          allow_jdbc_metadata_access: false
+      # JPA standard properties to disable schema generation
+      jakarta:
+        persistence:
+          schema-generation:
+            database:
+              action: none
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+server:
+  port: 0
+  shutdown: graceful
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+# ============================================
+# AssociaGo Custom Properties
+# ============================================
+associago:
+  mode: desktop
+
+  # Data path is injected via System Property in AssociaGoApplication.java
+  # associago.data.path = user.home/.associago (or similar)
+  data:
+    path: ${associago.data.path}
+
+  port:
+    config-file: ${associago.data.path}/config/backend.port
+    min: 8000
+    max: 9000
+
+  assets:
+    storage-path: ${associago.data.path}/assets
+    max-file-size: -1
+    # CSV: va bene sia per @Value che per ConfigurationProperties List
+    allowed-extensions: "png,jpg,jpeg,webp,gif,pdf,txt,md,json,csv"
+
+  cors:
+    # CSV: binder -> List<String>
+    allowed-origins: "http://localhost:5173,http://localhost:*,http://127.0.0.1:*,file://*"
+    allow-credentials: true
+    max-age-seconds: 3600
+
+  # OAuth2 / OIDC (quando lo attiveremo davvero, lo userà Spring Security)
+  auth:
+    enabled: false
+    registration-id: associago
+    post-login-redirect: http://localhost:5173/
+
+# ============================================
+# Logging
+# ============================================
+logging:
+  level:
+    root: INFO
+    com.associago: DEBUG
+    org.springframework.web: INFO
+    org.hibernate.SQL: DEBUG
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: ${associago.data.path}/logs/associago.log
+    max-size: 10MB
+    max-history: 7
+
+---
+# ============================================
+# Profile: Development (standalone)
+# ============================================
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+server:
+  port: 8080
+
+associago:
+  mode: web
+  # In dev mode, we might want to override the system property to keep data local to the project
+  # data:
+  #   path: ./data-dev
+  cors:
+    allowed-origins: "http://localhost:5173,http://localhost:*,http://127.0.0.1:*,file://*"
+    allow-credentials: true
+    max-age-seconds: 3600
+  auth:
+    enabled: false
+
+logging:
+  level:
+    com.associago: TRACE
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+---
+# ============================================
+# Profile: Desktop (embedded in Electron)
+# ============================================
+spring:
+  config:
+    activate:
+      on-profile: desktop
+  jpa:
+    properties:
+      hibernate:
+        hbm2ddl:
+          auto: none
+        temp:
+          use_jdbc_metadata_defaults: false
+        boot:
+          allow_jdbc_metadata_access: false
+      jakarta:
+        persistence:
+          schema-generation:
+            database:
+              action: none
+
+server:
+  port: 0
+
+associago:
+  mode: desktop
+  cors:
+    allowed-origins: "http://localhost:5173,http://localhost:*,http://127.0.0.1:*,file://*"
+    allow-credentials: true
+    max-age-seconds: 3600
+  auth:
+    enabled: false
+
+logging:
+  level:
+    root: WARN
+    com.associago: INFO
+
+---
+# ============================================
+# Profile: Production (futuro cloud)
+# ============================================
+spring:
+  config:
+    activate:
+      on-profile: production
+
+server:
+  port: 8080
+
+associago:
+  mode: web
+  cors:
+    allowed-origins: "https://example.com"
+    allow-credentials: true
+    max-age-seconds: 3600
+  auth:
+    enabled: true
+    post-login-redirect: https://example.com/
+
+logging:
+  level:
+    root: WARN
+    com.associago: INFO

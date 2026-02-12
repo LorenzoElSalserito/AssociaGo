@@ -1,0 +1,48 @@
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### VS Code ###
+.vscode/
+
+### Standard Sensitive & System Files ###
+local.properties
+.DS_Store
+*.keystore
+*.jks
+
+### Project Specific Exclusions ###
+AssociaGo_ex_Gofiles/
+AssociaGo_PRD_Migration_v3.0.1.md
+IMPLEMENTATION_PLAN.md
+MIGRATION_ANALYSIS_AND_PLAN.md

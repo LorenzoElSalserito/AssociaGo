@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>AssociaGo Loading...</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #ffffff;
+            font-family: sans-serif;
+            flex-direction: column;
+        }
+        .logo {
+            width: 200px;
+            height: 200px;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+        }
+        .status {
+            margin-top: 15px;
+            color: #666;
+            font-size: 14px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <img src="./src/assets/5.svg" class="logo" alt="AssociaGo Logo">
+    <div class="loader"></div>
+    <div class="status" id="status">Now Loading</div>
+</body>
+</html>
