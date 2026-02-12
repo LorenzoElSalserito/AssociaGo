@@ -18,6 +18,7 @@ bin/
 
 ### IntelliJ IDEA ###
 .idea
+.claude
 *.iws
 *.iml
 *.ipr
@@ -46,3 +47,4 @@ AssociaGo_ex_Gofiles/
 AssociaGo_PRD_Migration_v3.0.1.md
 IMPLEMENTATION_PLAN.md
 MIGRATION_ANALYSIS_AND_PLAN.md
+/logs
