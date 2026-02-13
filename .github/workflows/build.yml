@@ -45,10 +45,11 @@ jobs:
         run: ./gradlew build -x test
 
       # Preparazione risorse per Electron
+      # Usiamo find per prendere solo il JAR corretto (escludendo -plain.jar) e copiarlo
       - name: Prepare Electron resources directory
         run: |
           mkdir -p desktop/resources/backend
-          cp build/libs/*.jar desktop/resources/backend/backend.jar
+          find build/libs -name "*.jar" ! -name "*-plain.jar" -exec cp {} desktop/resources/backend/backend.jar \;
 
       - name: Install Frontend Dependencies
         working-directory: ./desktop
