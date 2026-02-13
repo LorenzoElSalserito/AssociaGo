@@ -36,7 +36,7 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-          # Rimuoviamo la cache dependency path per evitare problemi con lockfile cross-platform
+          cache-dependency-path: desktop/package-lock.json
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -67,7 +67,7 @@ jobs:
           rm -rf node_modules
           npm install
 
-      # Il comando npm run build:xxx esegue automaticamente 'prebuild' che scarica il JRE
+      # Il comando npm run build:xxx esegue automaticamente 'prebuild' che scarica il JRE corretto per la piattaforma
       
       # --- LINUX ---
       - name: Build for Linux
