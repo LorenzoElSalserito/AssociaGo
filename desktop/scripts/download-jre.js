@@ -37,7 +37,7 @@ async function downloadFile(url, dest) {
             url,
             method: 'GET',
             responseType: 'stream',
-            maxRedirects: 5 // Axios segue i redirect automaticamente
+            maxRedirects: 5
         });
 
         response.data.pipe(writer);
@@ -48,9 +48,80 @@ async function downloadFile(url, dest) {
         });
     } catch (error) {
         writer.close();
-        fs.unlinkSync(dest); // Pulisci file parziale
+        if (fs.existsSync(dest)) fs.unlinkSync(dest);
         throw new Error(`Errore download: ${error.message}`);
     }
+}
+
+function findJavaBin(startDir) {
+    const binName = platform === 'windows' ? 'java.exe' : 'java';
+
+    // Check current dir
+    if (fs.existsSync(path.join(startDir, 'bin', binName))) {
+        return path.join(startDir, 'bin', binName);
+    }
+
+    // Check subdirectories (depth 1-3)
+    const queue = [startDir];
+    let depth = 0;
+
+    while (queue.length > 0 && depth < 4) {
+        const current = queue.shift();
+        try {
+            const items = fs.readdirSync(current);
+            for (const item of items) {
+                const fullPath = path.join(current, item);
+                if (fs.statSync(fullPath).isDirectory()) {
+                    // Check if this is the Home directory (macOS style) or just a root folder
+                    if (fs.existsSync(path.join(fullPath, 'bin', binName))) {
+                        return path.join(fullPath, 'bin', binName);
+                    }
+                    queue.push(fullPath);
+                }
+            }
+        } catch (e) {}
+        depth++;
+    }
+    return null;
+}
+
+function normalizeJreStructure(rootDir) {
+    // Find where 'bin/java' actually is
+    const javaBinPath = findJavaBin(rootDir);
+
+    if (!javaBinPath) {
+        throw new Error('Binario Java non trovato nella struttura estratta.');
+    }
+
+    // The "real" root is the parent of 'bin'
+    const realRoot = path.dirname(path.dirname(javaBinPath));
+
+    if (path.normalize(realRoot) === path.normalize(rootDir)) {
+        console.log('[JRE] Struttura già corretta.');
+        return;
+    }
+
+    console.log(`[JRE] Normalizzazione struttura da: ${realRoot}`);
+
+    // Move contents of realRoot to a temp dir, then to rootDir
+    const tempDir = path.join(rootDir, '_temp_move');
+    fs.renameSync(realRoot, tempDir);
+
+    // Clean rootDir (except tempDir)
+    const items = fs.readdirSync(rootDir);
+    for (const item of items) {
+        if (item !== '_temp_move') {
+            fs.rmSync(path.join(rootDir, item), { recursive: true, force: true });
+        }
+    }
+
+    // Move everything back from tempDir to rootDir
+    const tempItems = fs.readdirSync(tempDir);
+    for (const item of tempItems) {
+        fs.renameSync(path.join(tempDir, item), path.join(rootDir, item));
+    }
+
+    fs.rmdirSync(tempDir);
 }
 
 async function main() {
@@ -62,7 +133,6 @@ async function main() {
     }
     fs.mkdirSync(JRE_OUTPUT_DIR, { recursive: true });
 
-    // URL API Adoptium per scaricare JRE
     const apiUrl = `https://api.adoptium.net/v3/binary/latest/${JAVA_VERSION}/ga/${platform}/${arch}/jre/hotspot/normal/eclipse`;
 
     console.log(`[JRE] Scaricamento da: ${apiUrl}`);
@@ -70,47 +140,38 @@ async function main() {
     const archivePath = path.join(__dirname, archiveName);
 
     try {
-        // 1. Ottieni URL diretto (opzionale, axios lo fa, ma per debug è utile)
-        // In realtà axios segue i redirect, quindi usiamo direttamente apiUrl
         await downloadFile(apiUrl, archivePath);
         console.log('[JRE] Download completato. Estrazione...');
 
-        // Verifica integrità minima (dimensione > 0)
         const stats = fs.statSync(archivePath);
-        if (stats.size < 1000000) { // Meno di 1MB è sospetto per un JRE
-            throw new Error(`File scaricato troppo piccolo (${stats.size} bytes). Probabile errore di download.`);
+        if (stats.size < 1000000) {
+            throw new Error(`File scaricato troppo piccolo (${stats.size} bytes).`);
         }
 
         if (platform === 'windows') {
             try {
-                execSync(`tar -xf "${archivePath}" -C "${JRE_OUTPUT_DIR}" --strip-components=1`);
+                execSync(`tar -xf "${archivePath}" -C "${JRE_OUTPUT_DIR}"`);
             } catch (e) {
-                // Fallback powershell
                 execSync(`powershell -command "Expand-Archive -Path '${archivePath}' -DestinationPath '${JRE_OUTPUT_DIR}'"`);
-                // Move content up if nested
-                const items = fs.readdirSync(JRE_OUTPUT_DIR);
-                if (items.length === 1 && fs.lstatSync(path.join(JRE_OUTPUT_DIR, items[0])).isDirectory()) {
-                    const rootDir = path.join(JRE_OUTPUT_DIR, items[0]);
-                    const files = fs.readdirSync(rootDir);
-                    files.forEach(f => fs.renameSync(path.join(rootDir, f), path.join(JRE_OUTPUT_DIR, f)));
-                    fs.rmdirSync(rootDir);
-                }
             }
         } else {
-            execSync(`tar -xzf "${archivePath}" -C "${JRE_OUTPUT_DIR}" --strip-components=1`);
+            execSync(`tar -xzf "${archivePath}" -C "${JRE_OUTPUT_DIR}"`);
         }
 
-        console.log('[JRE] Estrazione completata.');
-        fs.unlinkSync(archivePath); // Rimuovi archivio
+        console.log('[JRE] Estrazione completata. Verifica struttura...');
 
-        // Verifica
+        // Normalize structure (handle macOS Contents/Home or nested folders)
+        normalizeJreStructure(JRE_OUTPUT_DIR);
+
+        fs.unlinkSync(archivePath);
+
+        // Final check
         const javaBin = path.join(JRE_OUTPUT_DIR, platform === 'windows' ? 'bin/java.exe' : 'bin/java');
         if (fs.existsSync(javaBin)) {
             console.log(`[JRE] Successo! Java binary: ${javaBin}`);
             if (platform !== 'windows') execSync(`chmod +x "${javaBin}"`);
         } else {
-            console.error('[JRE] Errore: binario java non trovato dopo estrazione.');
-            process.exit(1);
+            throw new Error('Binario java non trovato dopo normalizzazione.');
         }
 
     } catch (error) {

@@ -45,15 +45,23 @@ jobs:
         run: ./gradlew build -x test
 
       # Preparazione risorse per Electron
-      # Usiamo find per prendere solo il JAR corretto (escludendo -plain.jar) e copiarlo
       - name: Prepare Electron resources directory
         run: |
           mkdir -p desktop/resources/backend
           find build/libs -name "*.jar" ! -name "*-plain.jar" -exec cp {} desktop/resources/backend/backend.jar \;
 
-      - name: Install Frontend Dependencies
+      # Installazione dipendenze Frontend
+      # Su Windows usiamo 'npm install' per risolvere le dipendenze opzionali (rollup-win32)
+      # Su Linux/Mac usiamo 'npm ci' per velocità e consistenza
+      - name: Install Frontend Dependencies (Linux/Mac)
+        if: matrix.os != 'windows-latest'
         working-directory: ./desktop
         run: npm ci
+
+      - name: Install Frontend Dependencies (Windows)
+        if: matrix.os == 'windows-latest'
+        working-directory: ./desktop
+        run: npm install
 
       # Il comando npm run build:xxx esegue automaticamente 'prebuild' che scarica il JRE
       
