@@ -51,15 +51,9 @@ jobs:
           find build/libs -name "*.jar" ! -name "*-plain.jar" -exec cp {} desktop/resources/backend/backend.jar \;
 
       # Installazione dipendenze Frontend
-      # Su Windows usiamo 'npm install' per risolvere le dipendenze opzionali (rollup-win32)
-      # Su Linux/Mac usiamo 'npm ci' per velocità e consistenza
-      - name: Install Frontend Dependencies (Linux/Mac)
-        if: matrix.os != 'windows-latest'
-        working-directory: ./desktop
-        run: npm ci
-
-      - name: Install Frontend Dependencies (Windows)
-        if: matrix.os == 'windows-latest'
+      # Usiamo 'npm install' su tutte le piattaforme per gestire meglio le dipendenze opzionali native (Rollup)
+      # che spesso causano problemi con 'npm ci' cross-platform.
+      - name: Install Frontend Dependencies
         working-directory: ./desktop
         run: npm install
 
