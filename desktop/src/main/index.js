@@ -187,40 +187,32 @@ function getJavaExecutable() {
     if (isDev) return "java";
 
     // In production, look for bundled JRE
+    // Structure: resources/jre/bin/java
     const jrePath = path.join(process.resourcesPath, "jre");
     const javaBin = process.platform === "win32" ? "bin/java.exe" : "bin/java";
     const bundledJava = path.join(jrePath, javaBin);
 
     if (fs.existsSync(bundledJava)) {
+        console.log("[Main] Using bundled JRE:", bundledJava);
         return bundledJava;
     }
 
-    console.warn("[Main] Bundled JRE not found, falling back to system java");
+    console.warn("[Main] Bundled JRE not found at", bundledJava, ", falling back to system java");
     return "java";
 }
 
 function getBackendJar() {
-    // In dev mode, we might not want to spawn the backend if we are running it separately in IntelliJ
-    // But if we wanted to, we'd look in ../build/libs
     if (isDev) return null;
 
-    // In production, look for bundled JAR
-    // We configured electron-builder to put backend-libs in resources
-    const libPath = path.join(process.resourcesPath, "backend-libs");
+    // In production, look for bundled JAR in resources/backend/backend.jar
+    const jarPath = path.join(process.resourcesPath, "backend", "backend.jar");
 
-    if (!fs.existsSync(libPath)) {
-        console.error("[Main] Backend libs directory not found:", libPath);
-        return null;
+    if (fs.existsSync(jarPath)) {
+        console.log("[Main] Found backend JAR:", jarPath);
+        return jarPath;
     }
 
-    const files = fs.readdirSync(libPath);
-    const jarFile = files.find(f => f.endsWith(".jar") && !f.includes("plain")); // Avoid plain jars if any
-
-    if (jarFile) {
-        return path.join(libPath, jarFile);
-    }
-
-    console.error("[Main] No backend JAR found in:", libPath);
+    console.error("[Main] Backend JAR not found at:", jarPath);
     return null;
 }
 
@@ -745,6 +737,11 @@ ipcMain.handle("data:importDbDialog", async () => {
     } catch (e) {
         return { ok: false, error: e.message };
     }
+});
+
+// Add getAppVersion handler
+ipcMain.handle("getAppVersion", () => {
+    return app.getVersion();
 });
 
 console.log("[Main] IPC handlers registered");

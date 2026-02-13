@@ -1,23 +1,37 @@
-appId: com.electron.app
-productName: desktop
+appId: com.associago.desktop
+productName: AssociaGo
 directories:
-  buildResources: build
+  buildResources: resources
 files:
   - '!**/.vscode/*'
   - '!src/*'
   - '!electron.vite.config.{js,ts,mjs,cjs}'
   - '!{.eslintcache,eslint.config.mjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
   - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
+  - from: resources
+    to: resources
+    filter:
+      - "**/*"
+
 asarUnpack:
   - resources/**
+
 win:
-  executableName: desktop
+  executableName: AssociaGo
+  target: nsis
+  icon: resources/icon.ico
+
 nsis:
-  artifactName: ${name}-${version}-setup.${ext}
+  artifactName: ${productName}-Setup-${version}.${ext}
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
+  installerIcon: resources/icon.ico
+  uninstallerIcon: resources/icon.ico
+
 mac:
+  target: dmg
+  icon: resources/icon.icns
   entitlementsInherit: build/entitlements.mac.plist
   extendInfo:
     - NSCameraUsageDescription: Application requests access to the device's camera.
@@ -25,18 +39,24 @@ mac:
     - NSDocumentsFolderUsageDescription: Application requests access to the user's Documents folder.
     - NSDownloadsFolderUsageDescription: Application requests access to the user's Downloads folder.
   notarize: false
+
 dmg:
-  artifactName: ${name}-${version}.${ext}
+  artifactName: ${productName}-${version}.${ext}
+  icon: resources/icon.icns
+
 linux:
   target:
     - AppImage
-    - snap
     - deb
-  maintainer: electronjs.org
-  category: Utility
+  maintainer: Lorenzo DM
+  category: Office
+  executableName: AssociaGo
+  icon: resources/icon.png
+
 appImage:
-  artifactName: ${name}-${version}.${ext}
+  artifactName: ${productName}-${version}.AppImage
+
 npmRebuild: false
 publish:
   provider: generic
-  url: https://example.com/auto-updates
+  url: https://github.com/lorenzodm/AssociaGo/releases

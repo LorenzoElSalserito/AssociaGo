@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "An Electron application with React",
   "main": "./out/main/index.js",
-  "author": "example.com",
-  "homepage": "https://electron-vite.org",
+  "author": "Lorenzo DM",
+  "homepage": "https://github.com/lorenzodm/AssociaGo",
   "scripts": {
     "format": "prettier --write .",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
@@ -12,10 +12,11 @@
     "dev": "electron-vite dev",
     "build": "electron-vite build",
     "postinstall": "electron-builder install-app-deps",
-    "build:unpack": "npm run build && electron-builder --dir",
-    "build:win": "npm run build && electron-builder --win",
-    "build:mac": "npm run build && electron-builder --mac",
-    "build:linux": "npm run build && electron-builder --linux"
+    "prebuild": "node scripts/download-jre.js",
+    "build:unpack": "npm run prebuild && npm run build && electron-builder --dir",
+    "build:win": "npm run prebuild && npm run build && electron-builder --win",
+    "build:mac": "npm run prebuild && npm run build && electron-builder --mac",
+    "build:linux": "npm run prebuild && npm run build && electron-builder --linux"
   },
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.0",
@@ -31,10 +32,10 @@
     "react-bootstrap": "^2.10.2",
     "react-hook-form": "^7.50.1",
     "react-i18next": "^14.0.5",
-    "react-markdown": "^10.1.0",
+    "react-markdown": "^9.0.1",
     "react-router-dom": "^6.22.0",
     "recharts": "^2.12.0",
-    "remark-gfm": "^4.0.1",
+    "remark-gfm": "^4.0.0",
     "tailwind-merge": "^2.2.1",
     "yup": "^1.3.3",
     "zustand": "^4.5.0"

@@ -17,6 +17,7 @@ java {
 // Genera META-INF/build-info.properties
 springBoot {
     buildInfo()
+    mainClass = 'com.associago.AssociaGoApplication'
 }
 
 repositories {

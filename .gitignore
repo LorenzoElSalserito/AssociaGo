@@ -103,7 +103,11 @@ local.properties
 AssociaGo_PRD_Migration_v3.0.1.md
 .claude/
 
-# Electron Builder artifacts (redundant if dist/ is ignored, but explicit is better)
+# Electron Builder artifacts & Local Resources
 desktop/dist/
 desktop/out/
 desktop/resources/backend.jar
+desktop/resources/backend/
+desktop/resources/jre/
+desktop/scripts/jre.tar.gz
+desktop/scripts/jre.zip
