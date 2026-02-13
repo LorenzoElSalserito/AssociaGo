@@ -29,14 +29,67 @@ export default function LoginPage({ onLogin }) {
     useEffect(() => { bootstrap(); }, []);
 
     const bootstrap = async () => {
-        const list = associago.getKnownAssociations();
+        let list = associago.getKnownAssociations();
         const prefs = associago.getPreferences();
+
+        // Validate cached associations against the backend
+        let backendReachable = true;
+        if (list.length > 0) {
+            try {
+                const validationResults = await Promise.all(
+                    list.map(async (assoc) => {
+                        try {
+                            const valid = await associago.validateAssociation(assoc.id);
+                            return { assoc, valid };
+                        } catch (e) {
+                            // If the error is not a 404, the backend may be unreachable
+                            backendReachable = false;
+                            return { assoc, valid: true }; // Keep in offline mode
+                        }
+                    })
+                );
+
+                if (backendReachable) {
+                    const invalidIds = validationResults
+                        .filter(r => !r.valid)
+                        .map(r => r.assoc.id);
+                    for (const id of invalidIds) {
+                        associago.removeKnownAssociation(id);
+                    }
+                    list = associago.getKnownAssociations();
+                }
+            } catch (e) {
+                // Backend entirely unreachable, keep cache as-is
+            }
+        }
+
         setAssociations(list);
 
+        // Validate autologin association before auto-logging in
         if (prefs.autologin && list.some(a => a.id === prefs.autologin.associationId)) {
-            const target = list.find(a => a.id === prefs.autologin.associationId);
-            handleLoginSuccess(target, prefs.autologin.token);
-            return;
+            if (backendReachable) {
+                try {
+                    const autologinValid = await associago.validateAssociation(prefs.autologin.associationId);
+                    if (autologinValid) {
+                        const target = list.find(a => a.id === prefs.autologin.associationId);
+                        handleLoginSuccess(target, prefs.autologin.token);
+                        return;
+                    }
+                    // Autologin association was deleted, clear autologin pref
+                    associago.removeKnownAssociation(prefs.autologin.associationId);
+                    list = associago.getKnownAssociations();
+                    setAssociations(list);
+                } catch (e) {
+                    // Backend unreachable, proceed with autologin using cache
+                    const target = list.find(a => a.id === prefs.autologin.associationId);
+                    handleLoginSuccess(target, prefs.autologin.token);
+                    return;
+                }
+            } else {
+                const target = list.find(a => a.id === prefs.autologin.associationId);
+                handleLoginSuccess(target, prefs.autologin.token);
+                return;
+            }
         }
 
         setView(list.length === 0 ? "create" : "list");

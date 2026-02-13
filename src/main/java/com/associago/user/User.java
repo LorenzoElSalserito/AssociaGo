@@ -30,6 +30,8 @@ public class User {
     @Column(name = "birth_place")
     private String birthPlace;
 
+    private String gender;
+
     private String address;
     private String city;
 
@@ -59,6 +61,8 @@ public class User {
     public void setBirthDate(LocalDate birthDate) { this.birthDate = birthDate; }
     public String getBirthPlace() { return birthPlace; }
     public void setBirthPlace(String birthPlace) { this.birthPlace = birthPlace; }
+    public String getGender() { return gender; }
+    public void setGender(String gender) { this.gender = gender; }
     public String getAddress() { return address; }
     public void setAddress(String address) { this.address = address; }
     public String getCity() { return city; }

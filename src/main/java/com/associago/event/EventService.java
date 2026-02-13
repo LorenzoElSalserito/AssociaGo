@@ -8,8 +8,10 @@ import com.associago.stats.dto.EventSummaryDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -129,10 +131,19 @@ public class EventService {
         summary.setEvent(event);
         summary.setRegisteredParticipants(participants.size());
         
-        // Simple revenue calculation (assuming paid status)
-        // Ideally check payment status
-        // BigDecimal revenue = participants.stream().map(EventParticipant::getAmountPaid).reduce(BigDecimal.ZERO, BigDecimal::add);
-        // summary.setTotalRevenue(revenue);
+        summary.setCheckedInParticipants((int) participants.stream()
+                .filter(p -> p.getCheckInTime() != null).count());
+
+        BigDecimal revenue = participants.stream()
+                .map(EventParticipant::getAmountPaid)
+                .filter(Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        summary.setTotalRevenue(revenue);
+
+        if (summary.getRegisteredParticipants() > 0 && summary.getCheckedInParticipants() != null) {
+            summary.setAttendanceRate(
+                    (double) summary.getCheckedInParticipants() / summary.getRegisteredParticipants() * 100);
+        }
 
         return summary;
     }

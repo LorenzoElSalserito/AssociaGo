@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { associago } from '../api';
 import { Calculator } from 'lucide-react';
 
@@ -12,13 +13,10 @@ const MemberForm = ({ associationId, onSuccess, onCancel }) => {
 
   const onSubmit = async (data) => {
     try {
-      const baseUrl = await associago.getApiUrl();
-
-      // Step 1: Create User
-      const userResponse = await fetch(`${baseUrl}/v1/users`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      // Step 1: Create User (handle duplicate taxCode by finding existing)
+      let user;
+      try {
+        user = await associago.users.create({
           firstName: data.firstName,
           lastName: data.lastName,
           taxCode: data.taxCode,
@@ -30,49 +28,40 @@ const MemberForm = ({ associationId, onSuccess, onCancel }) => {
           address: data.address,
           city: data.city,
           zipCode: data.zipCode
-        }),
-      });
-
-      if (!userResponse.ok) throw new Error('Failed to create user');
-      const user = await userResponse.json();
+        });
+      } catch (userError) {
+        // If user creation fails (e.g. duplicate taxCode), try to find existing
+        const existingUsers = await associago.users.getAll();
+        user = existingUsers.find(u => u.taxCode === data.taxCode);
+        if (!user) throw userError;
+      }
 
       // Step 2: Create Membership (UserAssociation)
-      const membershipResponse = await fetch(`${baseUrl}/v1/memberships`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          user: { id: user.id },
-          association: { id: associationId },
-          role: data.role || 'MEMBER', // Use selected role
-          status: 'ACTIVE',
-          joinDate: new Date().toISOString().split('T')[0],
-          membershipCardNumber: data.cardNumber
-        }),
+      await associago.memberships.create({
+        user: { id: user.id },
+        association: { id: associationId },
+        role: data.role || 'MEMBER',
+        status: 'ACTIVE',
+        joinDate: new Date().toISOString().split('T')[0],
+        membershipCardNumber: data.cardNumber
       });
-
-      if (!membershipResponse.ok) throw new Error('Failed to create membership');
 
       // Step 3: Register Payment (if selected)
       if (data.registerPayment && data.paymentAmount > 0) {
-          const transactionResponse = await fetch(`${baseUrl}/v1/finance/transactions`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                  associationId: associationId,
-                  date: new Date().toISOString().split('T')[0],
-                  amount: data.paymentAmount,
-                  type: 'INCOME',
-                  description: `Quota associativa - ${data.firstName} ${data.lastName}`,
-                  paymentMethod: data.paymentMethod,
-                  userId: user.id,
-                  // categoryId: 1 // Assuming 1 is for membership fees, or handle dynamically
-              }),
+        try {
+          await associago.finance.createTransaction({
+            associationId: associationId,
+            date: new Date().toISOString().split('T')[0],
+            amount: data.paymentAmount,
+            type: 'INCOME',
+            description: `Quota associativa - ${data.firstName} ${data.lastName}`,
+            paymentMethod: data.paymentMethod,
+            userId: user.id,
           });
-
-          if (!transactionResponse.ok) {
-              console.warn('Membership created but payment registration failed');
-              alert('Socio creato ma errore nella registrazione del pagamento.');
-          }
+        } catch (paymentError) {
+          console.warn('Membership created but payment registration failed', paymentError);
+          alert('Socio creato ma errore nella registrazione del pagamento.');
+        }
       }
 
       onSuccess();

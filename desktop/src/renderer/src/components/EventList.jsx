@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, Table, Form, InputGroup, Badge, Spinner } from 'react-bootstrap';
+import { Card, Button, Table, Form, InputGroup, Badge, Spinner, Nav } from 'react-bootstrap';
 import { Search, Plus, Edit, Trash2, Calendar, MapPin, Eye } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { associago } from '../api';
 import EventDetail from './EventDetail';
+import CouponList from './CouponList';
 
 const EventList = ({ associationId, shell }) => {
     const { t } = useTranslation();
@@ -11,12 +12,13 @@ const EventList = ({ associationId, shell }) => {
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedEventId, setSelectedEventId] = useState(null);
+    const [activeTab, setActiveTab] = useState('events');
 
     useEffect(() => {
-        if (associationId) {
+        if (associationId && activeTab === 'events') {
             fetchEvents();
         }
-    }, [associationId]);
+    }, [associationId, activeTab]);
 
     const fetchEvents = async () => {
         setLoading(true);
@@ -59,14 +61,40 @@ const EventList = ({ associationId, shell }) => {
         );
     }
 
+    const renderHeader = () => (
+        <div className="mb-4">
+            <div className="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h2 className="fw-bold text-dark mb-1">{t('Events & Coupons')}</h2>
+                    <p className="text-muted mb-0">{t('Manage events and discounts')}</p>
+                </div>
+            </div>
+            <Nav variant="tabs" activeKey={activeTab} onSelect={(k) => setActiveTab(k)}>
+                <Nav.Item>
+                    <Nav.Link eventKey="events" className="px-4">{t('Events')}</Nav.Link>
+                </Nav.Item>
+                <Nav.Item>
+                    <Nav.Link eventKey="coupons" className="px-4">{t('Coupons')}</Nav.Link>
+                </Nav.Item>
+            </Nav>
+        </div>
+    );
+
+    if (activeTab === 'coupons') {
+        return (
+            <div className="fade-in">
+                {renderHeader()}
+                <CouponList associationId={associationId} shell={shell} />
+            </div>
+        );
+    }
+
     // --- RENDER LIST VIEW ---
     return (
         <div className="fade-in">
-            <div className="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <h2 className="fw-bold text-dark mb-1">{t('Events')}</h2>
-                    <p className="text-muted mb-0">{t('Manage one-time events')}</p>
-                </div>
+            {renderHeader()}
+
+            <div className="d-flex justify-content-end mb-3">
                 <Button variant="primary" className="d-flex align-items-center" onClick={() => shell.openModal('event-form', { associationId, onSuccess: fetchEvents })}>
                     <Plus size={18} className="me-2" />
                     {t('Add Event')}

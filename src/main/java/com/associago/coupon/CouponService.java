@@ -1,6 +1,5 @@
 package com.associago.coupon;
 
-import com.associago.activity.Activity;
 import com.associago.coupon.repository.CouponRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,19 +43,29 @@ public class CouponService {
     }
 
     public boolean isValid(Coupon coupon, BigDecimal amount, Long activityId) {
+        return isValid(coupon, amount, activityId, null);
+    }
+
+    public boolean isValid(Coupon coupon, BigDecimal amount, Long activityId, Long eventId) {
         if (!coupon.isActive()) return false;
-        
+
         LocalDate now = LocalDate.now();
         if (coupon.getStartDate() != null && now.isBefore(coupon.getStartDate())) return false;
         if (coupon.getEndDate() != null && now.isAfter(coupon.getEndDate())) return false;
-        
+
         if (coupon.getMaxUses() != null && coupon.getCurrentUses() >= coupon.getMaxUses()) return false;
-        
+
         if (amount != null && coupon.getMinAmount() != null && amount.compareTo(coupon.getMinAmount()) < 0) return false;
 
         if (activityId != null && !coupon.getApplicableActivities().isEmpty()) {
             boolean isApplicable = coupon.getApplicableActivities().stream()
                     .anyMatch(a -> a.getId().equals(activityId));
+            if (!isApplicable) return false;
+        }
+
+        if (eventId != null && !coupon.getApplicableEvents().isEmpty()) {
+            boolean isApplicable = coupon.getApplicableEvents().stream()
+                    .anyMatch(e -> e.getId().equals(eventId));
             if (!isApplicable) return false;
         }
 

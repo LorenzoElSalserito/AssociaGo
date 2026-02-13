@@ -195,6 +195,28 @@ public class FinancialService {
         return comparison;
     }
 
+    public Map<String, BigDecimal> getCustomComparison(int year1, int year2) {
+        LocalDate start1 = LocalDate.of(year1, 1, 1);
+        LocalDate end1 = LocalDate.of(year1, 12, 31);
+        
+        LocalDate start2 = LocalDate.of(year2, 1, 1);
+        LocalDate end2 = LocalDate.of(year2, 12, 31);
+
+        BigDecimal income1 = transactionRepository.sumByTypeAndDateRange(TransactionType.INCOME, start1, end1);
+        BigDecimal expense1 = transactionRepository.sumByTypeAndDateRange(TransactionType.EXPENSE, start1, end1);
+        
+        BigDecimal income2 = transactionRepository.sumByTypeAndDateRange(TransactionType.INCOME, start2, end2);
+        BigDecimal expense2 = transactionRepository.sumByTypeAndDateRange(TransactionType.EXPENSE, start2, end2);
+
+        Map<String, BigDecimal> comparison = new HashMap<>();
+        comparison.put("incomeYear1", income1 != null ? income1 : BigDecimal.ZERO);
+        comparison.put("expenseYear1", expense1 != null ? expense1 : BigDecimal.ZERO);
+        comparison.put("incomeYear2", income2 != null ? income2 : BigDecimal.ZERO);
+        comparison.put("expenseYear2", expense2 != null ? expense2 : BigDecimal.ZERO);
+        
+        return comparison;
+    }
+
     public List<JournalEntry> getJournalEntries(Long associationId, LocalDate startDate, LocalDate endDate) {
         if (associationId != null && startDate != null && endDate != null) {
             return journalEntryRepository.findByAssociationIdAndDateBetween(associationId, startDate, endDate);

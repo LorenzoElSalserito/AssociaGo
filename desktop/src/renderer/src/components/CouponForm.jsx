@@ -20,11 +20,15 @@ const CouponForm = ({ associationId, coupon, onSuccess, onCancel }) => {
   });
 
   const [activities, setActivities] = useState([]);
+  const [events, setEvents] = useState([]);
 
   useEffect(() => {
-    associago.activities.getByAssociation(associationId)
+    associago.activities.getAll(associationId)
       .then(setActivities)
       .catch(err => console.error("Failed to load activities", err));
+    associago.events.getAll()
+      .then(setEvents)
+      .catch(err => console.error("Failed to load events", err));
   }, [associationId]);
 
   const onSubmit = async (data) => {
@@ -35,7 +39,12 @@ const CouponForm = ({ associationId, coupon, onSuccess, onCancel }) => {
         discountValue: parseFloat(data.discountValue),
         minAmount: parseFloat(data.minAmount),
         maxUses: parseInt(data.maxUses),
-        applicableActivities: data.applicableActivities.map(id => ({ id: parseInt(id) }))
+        applicableActivities: data.applicableActivities
+          ? data.applicableActivities.map(id => ({ id: parseInt(id) }))
+          : [],
+        applicableEvents: data.applicableEvents
+          ? data.applicableEvents.map(id => ({ id: parseInt(id) }))
+          : []
       };
 
       if (coupon?.id) {
@@ -103,6 +112,15 @@ const CouponForm = ({ associationId, coupon, onSuccess, onCancel }) => {
         <select multiple {...register('applicableActivities')} className="form-select" style={{ height: '150px' }}>
           {activities.map(act => (
             <option key={act.id} value={act.id}>{act.name}</option>
+          ))}
+        </select>
+      </div>
+
+      <div className="mb-3">
+        <label className="form-label">{t('Applicable Events (leave empty for all)')}</label>
+        <select multiple {...register('applicableEvents')} className="form-select" style={{ height: '150px' }}>
+          {events.map(evt => (
+            <option key={evt.id} value={evt.id}>{evt.name}</option>
           ))}
         </select>
       </div>

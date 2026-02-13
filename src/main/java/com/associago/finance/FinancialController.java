@@ -102,4 +102,12 @@ public class FinancialController {
     public ResponseEntity<Map<String, BigDecimal>> getYoyComparison(@RequestParam(defaultValue = "2024") int year) {
         return ResponseEntity.ok(financialService.getYearOverYearComparison(year));
     }
+
+    @GetMapping("/comparison")
+    public ResponseEntity<Map<String, BigDecimal>> getCustomComparison(
+            @RequestParam int year1,
+            @RequestParam int year2
+    ) {
+        return ResponseEntity.ok(financialService.getCustomComparison(year1, year2));
+    }
 }

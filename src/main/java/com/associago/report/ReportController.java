@@ -2,6 +2,8 @@ package com.associago.report;
 
 import com.associago.assembly.Assembly;
 import com.associago.assembly.AssemblyService;
+import com.associago.association.Association;
+import com.associago.association.AssociationService;
 import com.associago.finance.FinancialService;
 import com.associago.finance.Transaction;
 import com.associago.member.Member;
@@ -24,18 +26,26 @@ public class ReportController {
     private final MemberService memberService;
     private final FinancialService financialService;
     private final AssemblyService assemblyService;
+    private final AssociationService associationService;
 
-    public ReportController(ReportService reportService, MemberService memberService, FinancialService financialService, AssemblyService assemblyService) {
+    public ReportController(ReportService reportService, MemberService memberService, FinancialService financialService, AssemblyService assemblyService, AssociationService associationService) {
         this.reportService = reportService;
         this.memberService = memberService;
         this.financialService = financialService;
         this.assemblyService = assemblyService;
+        this.associationService = associationService;
+    }
+
+    private Association getAssociation(Long associationId) {
+        return associationService.findById(associationId).orElse(new Association());
     }
 
     @GetMapping("/members/{id}/card")
-    public ResponseEntity<byte[]> getMembershipCard(@PathVariable Long id) throws IOException {
+    public ResponseEntity<byte[]> getMembershipCard(@PathVariable Long id, @RequestHeader(value = "X-Association-Id", required = false) Long associationId) throws IOException {
         Member member = memberService.getMemberById(id).orElseThrow(() -> new RuntimeException("Member not found"));
-        byte[] pdf = reportService.generateMembershipCard(member);
+        Association association = getAssociation(associationId != null ? associationId : 1L); // Fallback to 1 for now
+        
+        byte[] pdf = reportService.generateMembershipCard(member, association);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=tessera_" + id + ".pdf")
@@ -44,14 +54,15 @@ public class ReportController {
     }
 
     @GetMapping("/finance/transactions/{id}/receipt")
-    public ResponseEntity<byte[]> getTransactionReceipt(@PathVariable Long id) throws IOException {
+    public ResponseEntity<byte[]> getTransactionReceipt(@PathVariable Long id, @RequestHeader(value = "X-Association-Id", required = false) Long associationId) throws IOException {
         Transaction transaction = financialService.getTransactionById(id).orElseThrow(() -> new RuntimeException("Transaction not found"));
         Member member = null;
         if (transaction.getUserId() != null) {
             member = memberService.getMemberById(transaction.getUserId()).orElse(null);
         }
-        
-        byte[] pdf = reportService.generateTransactionReceipt(transaction, member);
+        Association association = getAssociation(associationId != null ? associationId : transaction.getAssociationId());
+
+        byte[] pdf = reportService.generateTransactionReceipt(transaction, member, association);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=ricevuta_" + id + ".pdf")
@@ -60,11 +71,12 @@ public class ReportController {
     }
 
     @GetMapping("/finance/year/{year}")
-    public ResponseEntity<byte[]> getFinancialReport(@PathVariable int year) throws IOException {
+    public ResponseEntity<byte[]> getFinancialReport(@PathVariable int year, @RequestHeader(value = "X-Association-Id", required = false) Long associationId) throws IOException {
         Map<String, BigDecimal> summary = financialService.getYearOverYearComparison(year);
         List<Transaction> transactions = financialService.getAllTransactions(); // Should be filtered by year ideally
-        
-        byte[] pdf = reportService.generateFinancialReport(year, summary, transactions);
+        Association association = getAssociation(associationId != null ? associationId : 1L);
+
+        byte[] pdf = reportService.generateFinancialReport(year, summary, transactions, association);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=bilancio_" + year + ".pdf")
@@ -72,13 +84,31 @@ public class ReportController {
                 .body(pdf);
     }
 
+    @GetMapping("/finance/comparison")
+    public ResponseEntity<byte[]> getComparisonReport(
+            @RequestParam int year1,
+            @RequestParam int year2,
+            @RequestHeader(value = "X-Association-Id", required = false) Long associationId
+    ) throws IOException {
+        Map<String, BigDecimal> summary = financialService.getCustomComparison(year1, year2);
+        Association association = getAssociation(associationId != null ? associationId : 1L);
+
+        byte[] pdf = reportService.generateComparisonReport(year1, year2, summary, association);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=confronto_" + year1 + "_" + year2 + ".pdf")
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(pdf);
+    }
+
     @GetMapping("/assemblies/{id}/minutes")
-    public ResponseEntity<byte[]> getAssemblyMinutes(@PathVariable Long id) throws IOException {
+    public ResponseEntity<byte[]> getAssemblyMinutes(@PathVariable Long id, @RequestHeader(value = "X-Association-Id", required = false) Long associationId) throws IOException {
         Assembly assembly = assemblyService.getAssemblyById(id).orElseThrow(() -> new RuntimeException("Assembly not found"));
         var participants = assemblyService.getParticipants(id);
         var motions = assemblyService.getMotions(id);
-        
-        byte[] pdf = reportService.generateAssemblyMinutes(assembly, participants, motions);
+        Association association = getAssociation(associationId != null ? associationId : assembly.getAssociationId());
+
+        byte[] pdf = reportService.generateAssemblyMinutes(assembly, participants, motions, association);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=verbale_" + id + ".pdf")

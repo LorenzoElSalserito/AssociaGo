@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Row, Col, Button, Table, Spinner, Badge, Form, Modal, Nav } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
-import { FileText, Download, PieChart, TrendingUp, TrendingDown, DollarSign, Mail, Filter, Edit, Trash2, X, Plus, Home, BookOpen } from 'lucide-react';
+import { FileText, Download, PieChart, TrendingUp, TrendingDown, DollarSign, Mail, Filter, Edit, Trash2, X, Plus, Home, BookOpen, BarChart2 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { associago } from '../api';
 
@@ -14,6 +14,11 @@ const FiscalDashboard = ({ associationId, shell }) => {
     const [paymentMethods, setPaymentMethods] = useState([]);
     const [members, setMembers] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    // Comparison State
+    const [comparisonData, setComparisonData] = useState(null);
+    const [year1, setYear1] = useState(new Date().getFullYear() - 1);
+    const [year2, setYear2] = useState(new Date().getFullYear());
 
     // Filters
     const [filters, setFilters] = useState({
@@ -30,6 +35,12 @@ const FiscalDashboard = ({ associationId, shell }) => {
     useEffect(() => {
         loadData();
     }, [associationId, activeTab]);
+
+    useEffect(() => {
+        if (activeTab === 'comparison') {
+            loadComparisonData();
+        }
+    }, [activeTab, year1, year2]);
 
     const loadData = async () => {
         setLoading(true);
@@ -60,6 +71,15 @@ const FiscalDashboard = ({ associationId, shell }) => {
             console.error("Error loading fiscal data:", error);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const loadComparisonData = async () => {
+        try {
+            const data = await associago.finance.getCustomComparison(year1, year2);
+            setComparisonData(data);
+        } catch (error) {
+            console.error("Error loading comparison data:", error);
         }
     };
 
@@ -151,6 +171,22 @@ const FiscalDashboard = ({ associationId, shell }) => {
         }
     };
 
+    const handleDownloadComparisonReport = async () => {
+        try {
+            const blob = await associago.reports.downloadComparisonReport(year1, year2);
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `comparison_${year1}_${year2}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+        } catch (error) {
+            console.error("Error downloading comparison report:", error);
+            alert(t('Error downloading report'));
+        }
+    };
+
     const handleDownloadReceipt = async (transactionId) => {
         try {
             const blob = await associago.reports.downloadTransactionReceipt(transactionId);
@@ -173,7 +209,7 @@ const FiscalDashboard = ({ associationId, shell }) => {
         window.location.href = `mailto:?subject=${subject}&body=${body}`;
     };
 
-    if (loading && !transactions.length && !journalEntries.length) return (
+    if (loading && !transactions.length && !journalEntries.length && activeTab !== 'comparison') return (
         <div className="d-flex justify-content-center align-items-center py-5">
             <Spinner animation="border" variant="primary" />
         </div>
@@ -189,6 +225,19 @@ const FiscalDashboard = ({ associationId, shell }) => {
             name: t('Expenses'),
             current: yoyData.expenseCurrent,
             previous: yoyData.expensePrevious
+        }
+    ] : [];
+
+    const comparisonChartData = comparisonData ? [
+        {
+            name: t('Income'),
+            year1: comparisonData.incomeYear1,
+            year2: comparisonData.incomeYear2
+        },
+        {
+            name: t('Expenses'),
+            year1: comparisonData.expenseYear1,
+            year2: comparisonData.expenseYear2
         }
     ] : [];
 
@@ -339,23 +388,26 @@ const FiscalDashboard = ({ associationId, shell }) => {
                 </Col>
             </Row>
 
-            {/* Transactions / Journal Tabs */}
+            {/* Transactions / Journal / Comparison Tabs */}
             <Card className="border-0 shadow-sm">
                 <Card.Header className="bg-white border-bottom-0 pt-0 px-0">
                     <Nav variant="tabs" className="px-3 pt-3" activeKey={activeTab} onSelect={k => setActiveTab(k)}>
                         <Nav.Item><Nav.Link eventKey="transactions" className="d-flex align-items-center gap-2"><DollarSign size={18}/> {t('Transactions')}</Nav.Link></Nav.Item>
                         <Nav.Item><Nav.Link eventKey="journal" className="d-flex align-items-center gap-2"><BookOpen size={18}/> {t('Journal Entries')}</Nav.Link></Nav.Item>
+                        <Nav.Item><Nav.Link eventKey="comparison" className="d-flex align-items-center gap-2"><BarChart2 size={18}/> {t('Custom Comparison')}</Nav.Link></Nav.Item>
                     </Nav>
                 </Card.Header>
 
                 <Card.Body>
-                    <div className="d-flex justify-content-end mb-3">
-                        <Button variant="outline-secondary" size="sm" onClick={() => setShowFilters(!showFilters)}>
-                            <Filter size={16} className="me-2" /> {t('Filter')}
-                        </Button>
-                    </div>
+                    {activeTab !== 'comparison' && (
+                        <div className="d-flex justify-content-end mb-3">
+                            <Button variant="outline-secondary" size="sm" onClick={() => setShowFilters(!showFilters)}>
+                                <Filter size={16} className="me-2" /> {t('Filter')}
+                            </Button>
+                        </div>
+                    )}
 
-                    {showFilters && (
+                    {showFilters && activeTab !== 'comparison' && (
                         <div className="bg-light p-3 rounded mb-3">
                             <Row className="g-3">
                                 <Col md={3}>
@@ -480,6 +532,86 @@ const FiscalDashboard = ({ associationId, shell }) => {
                                 )}
                             </tbody>
                         </Table>
+                    )}
+
+                    {activeTab === 'comparison' && (
+                        <div className="p-3">
+                            <Row className="mb-4 align-items-end">
+                                <Col md={4}>
+                                    <Form.Label>{t('Year 1')}</Form.Label>
+                                    <Form.Control type="number" value={year1} onChange={(e) => setYear1(parseInt(e.target.value))} />
+                                </Col>
+                                <Col md={4}>
+                                    <Form.Label>{t('Year 2')}</Form.Label>
+                                    <Form.Control type="number" value={year2} onChange={(e) => setYear2(parseInt(e.target.value))} />
+                                </Col>
+                                <Col md={4}>
+                                    <Button variant="primary" className="w-100" onClick={handleDownloadComparisonReport}>
+                                        <Download size={18} className="me-2" /> {t('Export Comparison PDF')}
+                                    </Button>
+                                </Col>
+                            </Row>
+
+                            {comparisonData && (
+                                <Row>
+                                    <Col md={12} className="mb-4">
+                                        <div style={{ height: '300px' }}>
+                                            <ResponsiveContainer width="100%" height="100%">
+                                                <BarChart data={comparisonChartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                                                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                                                    <XAxis dataKey="name" axisLine={false} tickLine={false} />
+                                                    <YAxis axisLine={false} tickLine={false} />
+                                                    <Tooltip cursor={{ fill: 'transparent' }} />
+                                                    <Legend />
+                                                    <Bar dataKey="year1" name={year1.toString()} fill="#0d6efd" radius={[4, 4, 0, 0]} barSize={40} />
+                                                    <Bar dataKey="year2" name={year2.toString()} fill="#e9ecef" radius={[4, 4, 0, 0]} barSize={40} />
+                                                </BarChart>
+                                            </ResponsiveContainer>
+                                        </div>
+                                    </Col>
+                                    <Col md={6}>
+                                        <Card className="border-0 shadow-sm">
+                                            <Card.Body>
+                                                <h6 className="fw-bold mb-3">{year1}</h6>
+                                                <div className="d-flex justify-content-between mb-2">
+                                                    <span>{t('Income')}:</span>
+                                                    <span className="text-success fw-bold">€ {comparisonData.incomeYear1.toLocaleString()}</span>
+                                                </div>
+                                                <div className="d-flex justify-content-between mb-2">
+                                                    <span>{t('Expenses')}:</span>
+                                                    <span className="text-danger fw-bold">€ {comparisonData.expenseYear1.toLocaleString()}</span>
+                                                </div>
+                                                <hr />
+                                                <div className="d-flex justify-content-between">
+                                                    <span>{t('Net Balance')}:</span>
+                                                    <span className="fw-bold">€ {(comparisonData.incomeYear1 - comparisonData.expenseYear1).toLocaleString()}</span>
+                                                </div>
+                                            </Card.Body>
+                                        </Card>
+                                    </Col>
+                                    <Col md={6}>
+                                        <Card className="border-0 shadow-sm">
+                                            <Card.Body>
+                                                <h6 className="fw-bold mb-3">{year2}</h6>
+                                                <div className="d-flex justify-content-between mb-2">
+                                                    <span>{t('Income')}:</span>
+                                                    <span className="text-success fw-bold">€ {comparisonData.incomeYear2.toLocaleString()}</span>
+                                                </div>
+                                                <div className="d-flex justify-content-between mb-2">
+                                                    <span>{t('Expenses')}:</span>
+                                                    <span className="text-danger fw-bold">€ {comparisonData.expenseYear2.toLocaleString()}</span>
+                                                </div>
+                                                <hr />
+                                                <div className="d-flex justify-content-between">
+                                                    <span>{t('Net Balance')}:</span>
+                                                    <span className="fw-bold">€ {(comparisonData.incomeYear2 - comparisonData.expenseYear2).toLocaleString()}</span>
+                                                </div>
+                                            </Card.Body>
+                                        </Card>
+                                    </Col>
+                                </Row>
+                            )}
+                        </div>
                     )}
                 </Card.Body>
             </Card>

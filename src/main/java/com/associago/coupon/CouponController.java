@@ -10,7 +10,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/coupons")
-@CrossOrigin(origins = "*")
 public class CouponController {
 
     private final CouponService couponService;
@@ -72,10 +71,11 @@ public class CouponController {
         String code = (String) payload.get("code");
         BigDecimal amount = payload.containsKey("amount") ? new BigDecimal(payload.get("amount").toString()) : null;
         Long activityId = payload.containsKey("activityId") ? ((Number) payload.get("activityId")).longValue() : null;
+        Long eventId = payload.containsKey("eventId") ? ((Number) payload.get("eventId")).longValue() : null;
 
         return couponService.findByCode(associationId, code)
                 .map(coupon -> {
-                    boolean isValid = couponService.isValid(coupon, amount, activityId);
+                    boolean isValid = couponService.isValid(coupon, amount, activityId, eventId);
                     if (isValid) {
                         BigDecimal discount = couponService.calculateDiscount(coupon, amount);
                         return ResponseEntity.ok(Map.of(

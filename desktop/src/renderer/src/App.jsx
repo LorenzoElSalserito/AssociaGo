@@ -15,7 +15,7 @@ import Modal from './components/Modal';
 
 // Page Components
 import MemberList from './components/MemberList';
-import FinancialDashboard from './components/FinancialDashboard';
+import Dashboard from './components/Dashboard';
 import ActivityList from './components/ActivityList';
 import EventList from './components/EventList';
 import FiscalDashboard from './components/FiscalDashboard';
@@ -25,6 +25,7 @@ import InventoryList from './components/InventoryList';
 import VolunteerList from './components/VolunteerList';
 import AttendanceList from './components/AttendanceList';
 import CouponList from './components/CouponList';
+import ManualDashboard from './components/ManualDashboard';
 
 // Form Components
 import MemberForm from './components/MemberForm';
@@ -61,6 +62,9 @@ function App() {
   const [modalType, setModalType] = useState(null);
   const [modalProps, setModalProps] = useState({});
 
+  // Toast state
+  const [toast, setToast] = useState(null);
+
   useEffect(() => {
     initApp();
     const handleKeyDown = (e) => {
@@ -71,6 +75,13 @@ function App() {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  useEffect(() => {
+    // Load preferences
+    const prefs = associago.getPreferences();
+    if (prefs.language) i18n.changeLanguage(prefs.language);
+    if (prefs.theme) setTheme(prefs.theme);
   }, []);
 
   useEffect(() => {
@@ -113,6 +124,15 @@ function App() {
     }, 500);
   };
 
+  const savePreferences = () => {
+      associago.setPreferences({
+          language: i18n.language,
+          theme: theme
+      });
+      setToast({ type: 'success', message: t('Preferences saved successfully.') });
+      setTimeout(() => setToast(null), 3000);
+  };
+
   const openModal = (type, props = {}) => {
       setModalType(type);
       setModalProps(props);
@@ -151,7 +171,7 @@ function App() {
   };
 
   const PAGES = useMemo(() => [
-    { id: "dashboard", label: t('nav.dashboard'), icon: "bi-speedometer2", component: FinancialDashboard },
+    { id: "dashboard", label: t('nav.dashboard'), icon: "bi-speedometer2", component: Dashboard },
     { id: "members", label: t('nav.members'), icon: "bi-people", component: MemberList },
     { id: "activities", label: t('nav.activities'), icon: "bi-calendar3", component: ActivityList },
     { id: "events", label: t('nav.events'), icon: "bi-calendar3", component: EventList },
@@ -160,6 +180,7 @@ function App() {
     { id: "inventory", label: t('nav.inventory'), icon: "bi-box-seam", component: InventoryList },
     { id: "volunteers", label: t('nav.volunteers'), icon: "bi-person-check", component: VolunteerList },
     { id: "coupons", label: t('nav.coupons'), icon: "bi-ticket-perforated", component: CouponList },
+    { id: "manual", label: t('User Manual'), icon: "bi-book", component: ManualDashboard },
     { id: "settings", label: t('nav.settings'), icon: "bi-gear", component: SettingsDashboard },
   ], [t]);
 
@@ -173,11 +194,13 @@ function App() {
     currentAssociation,
     currentAssociationId: currentAssociation?.id, // Fix for SettingsDashboard
     theme,
-    setTheme
-  }), [currentUser, currentAssociation, theme]);
+    setTheme,
+    savePreferences // Expose savePreferences to shell
+  }), [currentUser, currentAssociation, theme, i18n.language]);
 
   const profileItems = [
     { id: "settings", label: t('nav.settings'), icon: "bi-gear", onClick: () => setActiveId("settings") },
+    { id: "info", label: t('App Info'), icon: "bi-info-circle" },
     { type: "sep" },
     { id: "logout", label: t('Logout'), icon: "bi-box-arrow-right", danger: true, onClick: handleLogout }
   ];
@@ -219,6 +242,21 @@ function App() {
       <Modal isOpen={modalOpen} onClose={closeModal} title={t('Edit Item')}>
           {renderModalContent()}
       </Modal>
+
+      {/* Global Toast Notification */}
+      {toast && (
+        <div className="position-fixed bottom-0 end-0 p-3" style={{ zIndex: 1100 }}>
+            <div className={`toast show align-items-center text-white bg-${toast.type === 'error' ? 'danger' : 'success'} border-0`} role="alert" aria-live="assertive" aria-atomic="true">
+                <div className="d-flex">
+                    <div className="toast-body">
+                        {toast.message}
+                    </div>
+                    <button type="button" className="btn-close btn-close-white me-2 m-auto" onClick={() => setToast(null)} aria-label="Close"></button>
+                </div>
+            </div>
+        </div>
+      )}
+
       <style>{`
         .jl-root { height: 100vh; width: 100vw; overflow: hidden; background-color: var(--bs-body-bg); color: var(--bs-body-color); }
         .jl-appframe { height: 100%; display: flex; flex-direction: column; }

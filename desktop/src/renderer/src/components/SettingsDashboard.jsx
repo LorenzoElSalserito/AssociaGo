@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, Button, Form, Row, Col, Alert, Spinner, Nav, Image, Badge } from 'react-bootstrap';
 import { associago } from '../api';
 import { useTranslation } from 'react-i18next';
-import { Save, Database, Download, Globe, Moon, Sun, Building, Upload, Edit, X, FileText, CreditCard, Plus, Trash2 } from 'lucide-react';
+import { Save, Database, Download, Globe, Moon, Sun, Building, Upload, Edit, X, FileText, CreditCard, Plus, Trash2, Bug } from 'lucide-react';
 import PaymentMethodForm from './PaymentMethodForm';
 
 const SettingsDashboard = ({ shell }) => {
@@ -10,6 +10,7 @@ const SettingsDashboard = ({ shell }) => {
 
   const [activeTab, setActiveTab] = useState('association');
   const [isEditing, setIsEditing] = useState(false);
+  const [appVersion, setAppVersion] = useState('0.9');
 
   // Profile State
   const [profile, setProfile] = useState({
@@ -46,6 +47,9 @@ const SettingsDashboard = ({ shell }) => {
     if (shell.currentAssociationId) {
         loadData();
         if (activeTab === 'finance') loadPaymentMethods();
+    }
+    if (window.api && window.api.getAppVersion) {
+        window.api.getAppVersion().then(v => setAppVersion(v));
     }
   }, [shell.currentAssociationId, activeTab]);
 
@@ -189,6 +193,18 @@ const SettingsDashboard = ({ shell }) => {
           loadPaymentMethods();
       } catch (error) {
           alert(t('Error deleting payment method'));
+      }
+  };
+
+  const handleReportBug = () => {
+      const subject = encodeURIComponent("[SEGNALAZIONE BUG] AssociaGo");
+      const body = encodeURIComponent(`Versione App: ${appVersion}\n\nDescrizione del problema:\n`);
+      window.location.href = `mailto:commercial.lorenzodm@gmail.com?subject=${subject}&body=${body}`;
+  };
+
+  const handleSavePreferences = () => {
+      if (shell.savePreferences) {
+          shell.savePreferences();
       }
   };
 
@@ -410,7 +426,7 @@ const SettingsDashboard = ({ shell }) => {
   );
 
   const renderGeneralTab = () => (
-    <Row>
+    <Row className="g-4">
         <Col md={6}>
             <Card className="h-100 border-0 shadow-sm">
                 <Card.Body>
@@ -420,6 +436,9 @@ const SettingsDashboard = ({ shell }) => {
                         <Form.Select value={i18n.language} onChange={(e) => i18n.changeLanguage(e.target.value)}>
                             <option value="it">Italiano</option>
                             <option value="en">English</option>
+                            <option value="de">Deutsch</option>
+                            <option value="es">Español</option>
+                            <option value="fr">Français</option>
                         </Form.Select>
                     </Form.Group>
                     <Form.Group className="mb-3">
@@ -433,6 +452,9 @@ const SettingsDashboard = ({ shell }) => {
                             </Button>
                         </div>
                     </Form.Group>
+                    <Button variant="primary" className="w-100 mt-3" onClick={handleSavePreferences}>
+                        <Save size={16} className="me-2" /> {t('Save Preferences')}
+                    </Button>
                 </Card.Body>
             </Card>
         </Col>
@@ -445,6 +467,31 @@ const SettingsDashboard = ({ shell }) => {
                         <Download size={18} className="me-2" /> {t('Backup Now')}
                     </Button>
                     {backupPath && <Alert variant="success" className="small py-2">{t('Saved to:')} {backupPath}</Alert>}
+                </Card.Body>
+            </Card>
+        </Col>
+        <Col md={12}>
+            <Card className="border-0 shadow-sm">
+                <Card.Body>
+                    <h6 className="mb-3">{t('App Info')}</h6>
+                    <div className="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p className="mb-1"><strong>AssociaGo</strong> v{appVersion}</p>
+                            <p className="mb-1 text-muted small">Copyright © Lorenzo De Marco (Lorenzo DM)</p>
+                            <p className="mb-1 text-muted small">{t('License')}: AGPLv3</p>
+                            <p className="mb-3 text-muted small">
+                                <a href="https://www.lorenzodm.it" target="_blank" rel="noopener noreferrer" className="text-decoration-none">
+                                    www.lorenzodm.it
+                                </a>
+                            </p>
+                            <Alert variant="warning" className="small py-2 mb-0 d-inline-block">
+                                <strong>{t('Disclaimer')}:</strong> {t('AssociaGo may make errors, always check the outputs provided before forwarding them.')}
+                            </Alert>
+                        </div>
+                        <Button variant="warning" className="text-dark" onClick={handleReportBug}>
+                            <Bug size={18} className="me-2" /> {t('Report Bug')}
+                        </Button>
+                    </div>
                 </Card.Body>
             </Card>
         </Col>

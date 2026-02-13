@@ -25,7 +25,7 @@ public class ActivityCost {
     @Column(nullable = false)
     private String category; // 'MATERIALS', 'EQUIPMENT', 'STAFF', 'RENT', 'MARKETING', 'OTHER'
 
-    @Column(nullable = false)
+    @Column(name = "incurred_date", nullable = false)
     private LocalDate date;
 
     @Column(name = "is_recurring")

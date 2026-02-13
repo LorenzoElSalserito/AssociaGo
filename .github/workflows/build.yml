@@ -1,0 +1,103 @@
+name: Build AssociaGo Multi-Platform
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch:  # Permette l'avvio manuale da GitHub
+
+defaults:
+  run:
+    shell: bash  # Forza l'uso di Bash su tutti i sistemi operativi (incluso Windows)
+
+jobs:
+  build:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      # 1. Checkout del codice
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Setup Java (Backend)
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      # 3. Setup Node.js (Frontend/Electron)
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: desktop/package-lock.json
+
+      # 4. Permessi esecuzione Gradle (necessario per Linux/Mac se committato da Windows)
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      # 5. Build Backend (Spring Boot)
+      - name: Build Spring Boot JAR
+        run: ./gradlew build -x test
+        # Nota: -x test salta i test unitari per velocizzare la build di rilascio. 
+        # Rimuovilo se vuoi bloccare la build in caso di test falliti.
+
+      # 6. Preparazione directory risorse per Electron
+      - name: Prepare Electron resources directory
+        run: mkdir -p desktop/resources
+
+      # 7. Copia del JAR nel contesto Electron
+      # Rinominiamo il file in 'backend.jar' per semplificare il riferimento nel codice Electron
+      - name: Copy JAR to Electron resources
+        run: cp build/libs/*.jar desktop/resources/backend.jar
+
+      # 8. Installazione dipendenze Frontend
+      - name: Install Frontend Dependencies
+        working-directory: ./desktop
+        run: npm ci
+
+      # 9. Build & Package Electron (Specifico per OS)
+      
+      # --- LINUX ---
+      - name: Build for Linux
+        if: matrix.os == 'ubuntu-latest'
+        working-directory: ./desktop
+        run: npm run build:linux
+
+      # --- WINDOWS ---
+      - name: Build for Windows
+        if: matrix.os == 'windows-latest'
+        working-directory: ./desktop
+        run: npm run build:win
+
+      # --- MACOS ---
+      - name: Build for macOS
+        if: matrix.os == 'macos-latest'
+        working-directory: ./desktop
+        run: npm run build:mac
+        env:
+          # Disabilita la firma del codice se non hai i certificati Apple Developer configurati nei secrets
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+
+      # 10. Upload degli artefatti generati
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: AssociaGo-${{ matrix.os }}
+          path: |
+            desktop/dist/*.AppImage
+            desktop/dist/*.deb
+            desktop/dist/*.exe
+            desktop/dist/*.dmg
+            desktop/dist/*.zip
+          if-no-files-found: warn
+          retention-days: 5

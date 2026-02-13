@@ -1,30 +1,42 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Button, Row, Col, Spinner, Table, Badge } from 'react-bootstrap';
+import { Card, Button, Row, Col, Spinner, Table, Badge, Image } from 'react-bootstrap';
 import { associago } from '../api';
 import { useTranslation } from 'react-i18next';
-import { TrendingUp, TrendingDown, DollarSign, Download, Calendar, Users, Activity, ArrowRight } from 'lucide-react';
+import { TrendingUp, TrendingDown, DollarSign, Download, Calendar, Users, Activity, ArrowRight, Building } from 'lucide-react';
 
-const FinancialDashboard = ({ shell }) => {
+const Dashboard = ({ shell, associationId }) => {
   const { t } = useTranslation();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [logoUrl, setLogoUrl] = useState(null);
 
   useEffect(() => {
     loadDashboard();
-  }, [shell.currentAssociation?.id]);
+    loadLogo();
+  }, [associationId]);
 
   const loadDashboard = async () => {
-    if (!shell.currentAssociation?.id) return;
+    if (!associationId) return;
 
     setLoading(true);
     try {
-      const data = await associago.dashboard.getStats(shell.currentAssociation.id);
+      const data = await associago.dashboard.getStats(associationId);
       setStats(data);
     } catch (error) {
       console.error("Failed to fetch dashboard data", error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const loadLogo = async () => {
+      if (!associationId) return;
+      try {
+          const url = await associago.getLogoUrl(associationId);
+          setLogoUrl(url);
+      } catch (error) {
+          console.error("Failed to load logo", error);
+      }
   };
 
   if (loading) return (
@@ -39,11 +51,23 @@ const FinancialDashboard = ({ shell }) => {
   return (
     <div className="fade-in">
       {/* Welcome Header */}
-      <div className="d-flex justify-content-between align-items-end mb-5">
-        <div>
-            <h6 className="text-uppercase text-primary fw-bold small mb-2">{shell.currentAssociation?.nome || "Associazione"}</h6>
-            <h2 className="fw-bold text-dark mb-1">{t('Dashboard')}</h2>
-            <p className="text-muted mb-0">{t('Overview of your association activities')}</p>
+      <div className="d-flex justify-content-between align-items-center mb-5">
+        <div className="d-flex align-items-center">
+            <div className="me-3 position-relative">
+                <div className="border rounded bg-light d-flex align-items-center justify-content-center overflow-hidden shadow-sm"
+                     style={{width: '64px', height: '64px'}}>
+                    {logoUrl ? (
+                        <Image src={logoUrl} alt="Logo" style={{width: '100%', height: '100%', objectFit: 'cover'}}
+                               onError={(e) => e.target.style.display = 'none'} />
+                    ) : (
+                        <Building size={32} className="text-muted" />
+                    )}
+                </div>
+            </div>
+            <div>
+                <h6 className="text-uppercase text-primary fw-bold small mb-1">{shell.currentAssociation?.nome || "Associazione"}</h6>
+                <h2 className="fw-bold text-dark mb-0">{t('Dashboard')}</h2>
+            </div>
         </div>
         <div className="text-end">
             <span className="badge bg-light text-dark border px-3 py-2 rounded-pill">
@@ -180,10 +204,10 @@ const FinancialDashboard = ({ shell }) => {
                 <Card.Body className="d-flex flex-column justify-content-center p-4">
                     <h4 className="fw-bold mb-3">{t('Quick Actions')}</h4>
                     <div className="d-grid gap-3">
-                        <Button variant="outline-light" className="text-white text-primary fw-bold text-start py-3 px-4 shadow-sm" onClick={() => shell.openModal('member-form')}>
+                        <Button variant="outline-light" className="text-white text-primary fw-bold text-start py-3 px-4 shadow-sm" onClick={() => shell.openModal('member-form', { associationId })}>
                             <Users size={18} className="me-2" /> {t('Register New Member')}
                         </Button>
-                        <Button variant="outline-light" className="text-white fw-bold text-start py-3 px-4" onClick={() => shell.openModal('event-form')}>
+                        <Button variant="outline-light" className="text-white fw-bold text-start py-3 px-4" onClick={() => shell.openModal('event-form', { associationId })}>
                             <Calendar size={18} className="me-2" /> {t('Create Event')}
                         </Button>
                         <Button variant="outline-light" className="text-white fw-bold text-start py-3 px-4" onClick={() => shell.navigate('fiscal')}>
@@ -198,4 +222,4 @@ const FinancialDashboard = ({ shell }) => {
   );
 };
 
-export default FinancialDashboard;
+export default Dashboard;

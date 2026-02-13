@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/fiscal")
-@CrossOrigin(origins = "*")
 public class FiscalController {
 
     private final FiscalService fiscalService;

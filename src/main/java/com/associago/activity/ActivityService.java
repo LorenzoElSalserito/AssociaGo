@@ -190,7 +190,11 @@ public class ActivityService {
 
         BigDecimal pendingRevenue = participants.stream()
                 .filter(p -> !p.isPaid())
-                .map(p -> activity.getCost().subtract(p.getDiscountAmount())) 
+                .map(p -> {
+                    BigDecimal cost = activity.getCost() != null ? activity.getCost() : BigDecimal.ZERO;
+                    BigDecimal discount = p.getDiscountAmount() != null ? p.getDiscountAmount() : BigDecimal.ZERO;
+                    return cost.subtract(discount);
+                })
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         BigDecimal totalCostsVal = costs.stream()

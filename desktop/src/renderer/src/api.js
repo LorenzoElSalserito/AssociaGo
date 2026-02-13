@@ -212,14 +212,21 @@ const members = {
     calculateFiscalCode: (data) => apiRequest('/v1/members/calculate-fiscal-code', { method: 'POST', body: data }),
 };
 
+const users = {
+    create: (data) => apiRequest('/v1/users', { method: 'POST', body: data }),
+    getAll: () => apiRequest('/v1/users'),
+};
+
 const memberships = {
     getByAssociation: (assocId) => apiRequest(`/v1/memberships/association/${assocId || CURRENT_ASSOCIATION_ID}`),
+    create: (data) => apiRequest('/v1/memberships', { method: 'POST', body: data }),
     delete: (id) => apiRequest(`/v1/memberships/${id}`, { method: 'DELETE' }),
     renew: (id, newExpirationDate) => apiRequest(`/v1/memberships/${id}/renew?newExpirationDate=${newExpirationDate}`, { method: 'POST' }),
 };
 
 const reports = {
     downloadFinancialReport: (year) => apiRequest(`/v1/reports/finance/year/${year || new Date().getFullYear()}`),
+    downloadComparisonReport: (year1, year2) => apiRequest(`/v1/reports/finance/comparison?year1=${year1}&year2=${year2}`),
     downloadActivityReport: (id) => apiRequest(`/v1/reports/activities/${id}`),
     downloadAssemblyMinutes: (id) => apiRequest(`/v1/reports/assemblies/${id}/minutes`),
     downloadTransactionReceipt: (id) => apiRequest(`/v1/reports/finance/transactions/${id}/receipt`),
@@ -242,6 +249,7 @@ const finance = {
     updateTransaction: (id, data) => apiRequest(`/v1/finance/transactions/${id}`, { method: 'PUT', body: data }),
     deleteTransaction: (id) => apiRequest(`/v1/finance/transactions/${id}`, { method: 'DELETE' }),
     getYoyComparison: (year) => apiRequest(`/v1/finance/yoy-comparison?year=${year}`),
+    getCustomComparison: (year1, year2) => apiRequest(`/v1/finance/comparison?year1=${year1}&year2=${year2}`),
 
     // Journal Entries
     getJournalEntries: (filters = {}) => {
@@ -339,6 +347,16 @@ export const associago = {
     },
     setAuthToken: (token) => { /* Token management if needed */ },
 
+    validateAssociation: async (id) => {
+        try {
+            await apiRequest(`/associations/${id}`);
+            return true;
+        } catch (e) {
+            if (e.message && e.message.includes('404')) return false;
+            throw e;
+        }
+    },
+
     getAssociationProfile: (id) => apiRequest(`/associations/${id}`),
     updateAssociationProfile: (id, data) => apiRequest(`/associations/${id}`, { method: 'PUT', body: data }),
     uploadLogo: (id, file) => {
@@ -356,6 +374,7 @@ export const associago = {
     events,
     assemblies,
     members,
+    users,
     memberships,
     reports,
     dashboard,
