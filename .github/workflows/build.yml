@@ -36,7 +36,7 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-          cache-dependency-path: desktop/package-lock.json
+          # Rimuoviamo la cache dependency path per evitare problemi con lockfile cross-platform
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -51,11 +51,21 @@ jobs:
           find build/libs -name "*.jar" ! -name "*-plain.jar" -exec cp {} desktop/resources/backend/backend.jar \;
 
       # Installazione dipendenze Frontend
-      # Usiamo 'npm install' su tutte le piattaforme per gestire meglio le dipendenze opzionali native (Rollup)
-      # che spesso causano problemi con 'npm ci' cross-platform.
-      - name: Install Frontend Dependencies
+      
+      # LINUX: Usa npm ci (veloce e sicuro)
+      - name: Install Frontend Dependencies (Linux)
+        if: matrix.os == 'ubuntu-latest'
         working-directory: ./desktop
-        run: npm install
+        run: npm ci
+
+      # WINDOWS & MACOS: Rimuovi lockfile e usa npm install per risolvere dipendenze native
+      - name: Install Frontend Dependencies (Windows/Mac)
+        if: matrix.os != 'ubuntu-latest'
+        working-directory: ./desktop
+        run: |
+          rm -f package-lock.json
+          rm -rf node_modules
+          npm install
 
       # Il comando npm run build:xxx esegue automaticamente 'prebuild' che scarica il JRE
       
