@@ -111,3 +111,4 @@ desktop/resources/backend/
 desktop/resources/jre/
 desktop/scripts/jre.tar.gz
 desktop/scripts/jre.zip
+desktop/dist-electron/*

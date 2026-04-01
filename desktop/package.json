@@ -16,7 +16,11 @@
     "build:unpack": "npm run prebuild && npm run build && electron-builder --dir",
     "build:win": "npm run prebuild && npm run build && electron-builder --win",
     "build:mac": "npm run prebuild && npm run build && electron-builder --mac",
-    "build:linux": "npm run prebuild && npm run build && electron-builder --linux"
+    "build:linux": "npm run prebuild && npm run build && electron-builder --linux",
+    "dist": "cd .. && ./gradlew bootJar && cd desktop && npm run prebuild && electron-vite build && electron-builder",
+    "dist:win": "cd .. && ./gradlew bootJar && cd desktop && npm run prebuild && electron-vite build && electron-builder --win",
+    "dist:mac": "cd .. && ./gradlew bootJar && cd desktop && npm run prebuild && electron-vite build && electron-builder --mac",
+    "dist:linux": "cd .. && ./gradlew bootJar && cd desktop && npm run prebuild && electron-vite build && electron-builder --linux"
   },
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.0",
@@ -60,5 +64,93 @@
   "overrides": {
     "react": "18.2.0",
     "react-dom": "18.2.0"
+  },
+  "build": {
+    "appId": "com.lorenzodm.associago",
+    "productName": "AssociaGo",
+    "directories": {
+      "output": "dist-electron"
+    },
+    "files": [
+      "out/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "../build/libs",
+        "to": "backend-libs",
+        "filter": ["*.jar", "!*-plain.jar"]
+      }
+    ],
+    "mac": {
+      "category": "public.app-category.productivity",
+      "icon": "src/assets/icon.icns",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": ["x64", "arm64"]
+        }
+      ],
+      "identity": null,
+      "hardenedRuntime": false,
+      "gatekeeperAssess": false
+    },
+    "dmg": {
+      "contents": [
+        {
+          "x": 130,
+          "y": 220
+        },
+        {
+          "x": 410,
+          "y": 220,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ],
+      "window": {
+        "width": 540,
+        "height": 380
+      },
+      "title": "AssociaGo ${version}"
+    },
+    "win": {
+      "icon": "src/assets/icon.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
+      "publisherName": "Lorenzo DM"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "src/assets/icon.ico",
+      "uninstallerIcon": "src/assets/icon.ico",
+      "installerHeaderIcon": "src/assets/icon.ico",
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "AssociaGo",
+      "artifactName": "AssociaGo-Setup-${version}.${ext}",
+      "perMachine": true,
+      "allowElevation": true,
+      "installerLanguages": ["en_US", "it_IT"],
+      "language": 1033,
+      "menuCategory": "AssociaGo",
+      "uninstallDisplayName": "AssociaGo ${version}"
+    },
+    "linux": {
+      "icon": "src/assets/icon.png",
+      "category": "Office",
+      "target": [
+        "AppImage",
+        "snap",
+        "deb"
+      ],
+      "desktop": {
+        "Icon": "/usr/share/icons/hicolor/1080x1080/apps/desktop.png"
+      }
+    }
   }
 }
