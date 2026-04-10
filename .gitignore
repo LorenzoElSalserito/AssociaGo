@@ -101,7 +101,11 @@ local.properties
 # ==========================================
 # Temporary or documentation files not needed in repo
 AssociaGo_PRD_Migration_v3.0.1.md
+AssociaGo_PRD_v4.0.md
+package_librepm.json
+build-desktop_librepm.yml
 .claude/
+.codex
 
 # Electron Builder artifacts & Local Resources
 desktop/dist/
@@ -112,3 +116,4 @@ desktop/resources/jre/
 desktop/scripts/jre.tar.gz
 desktop/scripts/jre.zip
 desktop/dist-electron/*
+/electron-librepm/
