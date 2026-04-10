@@ -1,0 +1,151 @@
+{
+  "name": "librepm-desktop",
+  "version": "0.1.0",
+  "description": "LibrePM - European Project Governance Platform",
+  "author": {
+    "name": "Lorenzo DM",
+    "email": "commercial.lorenzodm@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/LorenzoElSalserito/LibrePM"
+  },
+  "type": "module",
+  "main": "electron/main.cjs",
+  "scripts": {
+    "dev": "concurrently -k \"vite --host 127.0.0.1\" \"wait-on http://127.0.0.1:5173 && electron .\"",
+    "dev:renderer": "vite",
+    "dev:electron": "wait-on http://localhost:5173 && electron .",
+    "build": "vite build",
+    "dist": "cd .. && ./gradlew bootJar && cd desktop && npm run build:jre && vite build && electron-builder",
+    "build:jre": "rm -rf jre && jlink --add-modules java.base,java.desktop,java.instrument,java.logging,java.management,java.naming,java.net.http,java.prefs,java.rmi,java.scripting,java.security.jgss,java.sql,java.xml,jdk.unsupported,jdk.crypto.ec,jdk.localedata --compress=2 --no-header-files --no-man-pages --strip-debug --output jre",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@uiw/react-md-editor": "^4.0.4",
+    "bootstrap": "^5.3.3",
+    "bootstrap-icons": "^1.11.3",
+    "chart.js": "^4.4.1",
+    "date-fns": "^4.1.0",
+    "frappe-gantt": "^0.6.1",
+    "i18next": "^23.12.2",
+    "i18next-browser-languagedetector": "^8.0.0",
+    "react": "^18.3.1",
+    "react-big-calendar": "^1.15.0",
+    "react-chartjs-2": "^5.2.0",
+    "react-datepicker": "^7.3.0",
+    "react-dom": "^18.3.1",
+    "react-dropzone": "^14.3.5",
+    "react-i18next": "^15.0.0",
+    "react-toastify": "^10.0.5",
+    "react-tooltip": "^5.26.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "concurrently": "^8.2.2",
+    "electron": "^32.3.3",
+    "electron-builder": "^25.0.5",
+    "eslint": "^8.57.0",
+    "eslint-plugin-react": "^7.34.3",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "eslint-plugin-react-refresh": "^0.4.7",
+    "sass-embedded": "^1.98.0",
+    "vite": "^5.4.2",
+    "wait-on": "^7.2.0"
+  },
+  "build": {
+    "appId": "com.lorenzodm.librepm",
+    "productName": "LibrePM",
+    "directories": {
+      "output": "dist-electron"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "../build/libs",
+        "to": "backend-libs",
+        "filter": ["*.jar", "!*-plain.jar"]
+      },
+      {
+        "from": "jre",
+        "to": "jre"
+      }
+    ],
+    "mac": {
+      "category": "public.app-category.productivity",
+      "icon": "src/assets/icon.icns",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": ["x64", "arm64"]
+        }
+      ],
+      "identity": null,
+      "hardenedRuntime": false,
+      "gatekeeperAssess": false
+    },
+    "dmg": {
+      "contents": [
+        {
+          "x": 130,
+          "y": 220
+        },
+        {
+          "x": 410,
+          "y": 220,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ],
+      "window": {
+        "width": 540,
+        "height": 380
+      },
+      "title": "LibrePM ${version}"
+    },
+    "win": {
+      "icon": "src/assets/icon.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
+      "publisherName": "Lorenzo DM"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "src/assets/icon.ico",
+      "uninstallerIcon": "src/assets/icon.ico",
+      "installerHeaderIcon": "src/assets/icon.ico",
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "LibrePM",
+      "artifactName": "LibrePM-Setup-${version}.${ext}",
+      "perMachine": true,
+      "allowElevation": true,
+      "installerLanguages": ["en_US", "it_IT"],
+      "language": 1033,
+      "menuCategory": "LibrePM",
+      "uninstallDisplayName": "LibrePM ${version}"
+    },
+    "linux": {
+      "icon": "src/assets/icon.png",
+      "category": "Office",
+      "target": [
+        "AppImage",
+        "snap",
+        "deb"
+      ],
+      "desktop": {
+        "Icon": "/usr/share/icons/hicolor/1080x1080/apps/librepm-desktop.png"
+      }
+    }
+  }
+}

@@ -1,5 +1,5 @@
 # AssociaGo
-
+![icon.png](desktop/src/assets/icon.png)
 AssociaGo is a comprehensive management software designed for associations, non-profit organizations, and clubs. It provides a robust platform for managing members, finances, events, activities, inventory, and volunteers. The application is built using a modern technology stack, featuring a Spring Boot backend and a React-based frontend wrapped in Electron for a seamless desktop experience.
 
 ## License

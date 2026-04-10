@@ -11,7 +11,7 @@ const path = require("path");
 const fs = require("fs");
 const http = require("http");
 const os = require("os");
-const { spawn } = require("child_process");
+const { spawn, spawnSync } = require("child_process");
 const { electronApp, optimizer, is } = require('@electron-toolkit/utils');
 
 const isDev = process.env.NODE_ENV === "development" || !app.isPackaged;
@@ -230,23 +230,56 @@ function waitForBackendReady(port, retries = 30, delay = 1000) {
     });
 }
 
+function isExecutable(binPath) {
+    try {
+        const result = spawnSync(binPath, ["-version"], { stdio: "ignore" });
+        return !result.error && (result.status === 0 || result.status === 1);
+    } catch (_) {
+        return false;
+    }
+}
+
 function getJavaExecutable() {
     // In dev mode, assume 'java' is in PATH
     if (isDev) return "java";
 
-    // In production, look for bundled JRE
-    // Structure: resources/jre/bin/java
-    const jrePath = path.join(process.resourcesPath, "jre");
-    const javaBin = process.platform === "win32" ? "bin/java.exe" : "bin/java";
-    const bundledJava = path.join(jrePath, javaBin);
+    // 1. Preferred: bundled JRE shipped inside the package
+    //    Structure: <resources>/jre/bin/java[.exe]
+    const jreDir = path.join(process.resourcesPath, "jre");
+    const javaRelative = process.platform === "win32" ? "bin/java.exe" : "bin/java";
+    const bundledJava = path.join(jreDir, javaRelative);
 
     if (fs.existsSync(bundledJava)) {
+        // Make sure the file is executable on POSIX (extraResources should preserve
+        // permissions, but some packagers strip them).
+        if (process.platform !== "win32") {
+            try { fs.chmodSync(bundledJava, 0o755); } catch (_) {}
+        }
         console.log("[Main] Using bundled JRE:", bundledJava);
         return bundledJava;
     }
 
-    console.warn("[Main] Bundled JRE not found at", bundledJava, ", falling back to system java");
-    return "java";
+    console.warn("[Main] Bundled JRE not found at", bundledJava);
+
+    // 2. Fallback: system java on PATH
+    const systemJava = process.platform === "win32" ? "java.exe" : "java";
+    if (isExecutable(systemJava)) {
+        console.warn("[Main] Falling back to system java on PATH");
+        return systemJava;
+    }
+
+    // 3. Last resort: JAVA_HOME
+    if (process.env.JAVA_HOME) {
+        const fromJavaHome = path.join(process.env.JAVA_HOME, javaRelative);
+        if (fs.existsSync(fromJavaHome) && isExecutable(fromJavaHome)) {
+            console.warn("[Main] Falling back to JAVA_HOME:", fromJavaHome);
+            return fromJavaHome;
+        }
+    }
+
+    // 4. Nothing available — return null so the caller can show a clear error.
+    console.error("[Main] No usable Java runtime found (bundled, PATH, or JAVA_HOME).");
+    return null;
 }
 
 function getBackendJar() {
@@ -294,8 +327,25 @@ async function startBackend() {
     const javaExec = getJavaExecutable();
     const jarPath = getBackendJar();
 
+    if (!javaExec) {
+        const message =
+            "AssociaGo non riesce a trovare una runtime Java.\n\n" +
+            "Il pacchetto avrebbe dovuto includere una JRE integrata. " +
+            "Come fallback prova a installare Java 21 (https://adoptium.net) " +
+            "e a riavviare l'applicazione.";
+        console.error("[Main] " + message);
+        dialog.showErrorBox("AssociaGo - Java non trovato", message);
+        app.quit();
+        return;
+    }
+
     if (!jarPath) {
+        const message =
+            "AssociaGo non riesce a trovare il backend (file .jar) all'interno del pacchetto.\n\n" +
+            "Il pacchetto risulta incompleto. Reinstalla l'applicazione.";
         console.error("[Main] Cannot start backend: JAR not found.");
+        dialog.showErrorBox("AssociaGo - Backend mancante", message);
+        app.quit();
         return;
     }
 
