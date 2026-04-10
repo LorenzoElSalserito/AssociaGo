@@ -4,6 +4,7 @@
 // where "./gradlew" and "&&" cd-hopping don't behave like in bash.
 const path = require('path');
 const { spawnSync } = require('child_process');
+const fs = require('fs');
 
 const isWin = process.platform === 'win32';
 const repoRoot = path.resolve(__dirname, '..', '..');
@@ -24,11 +25,35 @@ function run(label, cmd, args, cwd) {
     }
 }
 
+function copyIcons() {
+    console.log(`\n[package-prepare] Copying icons to build directory`);
+    const buildDir = path.join(desktopDir, 'build');
+    const resourcesDir = path.join(desktopDir, 'resources');
+
+    if (!fs.existsSync(buildDir)) {
+        fs.mkdirSync(buildDir, { recursive: true });
+    }
+
+    const icons = ['icon.ico', 'icon.png', 'icon.icns'];
+    for (const icon of icons) {
+        const src = path.join(resourcesDir, icon);
+        const dest = path.join(buildDir, icon);
+        if (fs.existsSync(src)) {
+            fs.copyFileSync(src, dest);
+            console.log(`  Copied ${icon}`);
+        } else {
+            console.log(`  Warning: Icon ${src} not found`);
+        }
+    }
+}
+
 const gradleCmd = isWin ? 'gradlew.bat' : './gradlew';
 const npmCmd = isWin ? 'npm.cmd' : 'npm';
 
 run('Building backend JAR (gradle bootJar)', gradleCmd, ['bootJar'], repoRoot);
 run('Building bundled JRE (build:jre)', npmCmd, ['run', 'build:jre'], desktopDir);
 run('Building renderer/main bundle (build)', npmCmd, ['run', 'build'], desktopDir);
+
+copyIcons();
 
 console.log('\n[package-prepare] All steps completed successfully.');

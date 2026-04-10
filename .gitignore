@@ -108,8 +108,7 @@ build-desktop_librepm.yml
 .claude/
 .codex
 /docs
-PLAN.md
-PLAN_TRAD.md
+PLAN*
 
 # Electron Builder artifacts & Local Resources
 desktop/dist/
