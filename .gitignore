@@ -106,6 +106,7 @@ package_librepm.json
 build-desktop_librepm.yml
 .claude/
 .codex
+docs
 
 # Electron Builder artifacts & Local Resources
 desktop/dist/
