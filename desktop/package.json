@@ -96,7 +96,7 @@
       },
       {
         "from": "resources",
-        "to": ".",
+        "to": "runtime-assets",
         "filter": [
           "icon.icns",
           "icon.ico",

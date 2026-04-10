@@ -148,15 +148,17 @@ function getRuntimeAssetPath(...segments) {
 }
 
 function getWindowIconPath() {
+    const packagedRuntimeAsset = (fileName) => path.join(process.resourcesPath, "runtime-assets", fileName);
+
     if (process.platform === "darwin") {
-        return getRuntimeAssetPath("icon.icns");
+        return app.isPackaged ? path.join(process.resourcesPath, "icon.icns") : getRuntimeAssetPath("resources", "icon.icns");
     }
 
     if (process.platform === "win32") {
-        return getRuntimeAssetPath("icon.ico");
+        return app.isPackaged ? packagedRuntimeAsset("icon.ico") : getRuntimeAssetPath("resources", "icon.ico");
     }
 
-    return getRuntimeAssetPath("icon.png");
+    return app.isPackaged ? packagedRuntimeAsset("icon.png") : getRuntimeAssetPath("resources", "icon.png");
 }
 
 function resolveRendererEntry(pageName) {
