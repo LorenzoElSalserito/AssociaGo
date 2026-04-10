@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <property name="LOGS" value="./logs" />
+    <springProperty scope="context"
+                    name="ASSOCIAGO_DATA_PATH"
+                    source="associago.data.path"
+                    defaultValue="${user.home}/.associago" />
+    <property name="LOGS" value="${ASSOCIAGO_DATA_PATH}/logs" />
 
     <appender name="Console"
               class="ch.qos.logback.core.ConsoleAppender">

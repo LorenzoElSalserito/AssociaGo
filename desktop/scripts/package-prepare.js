@@ -55,5 +55,6 @@ run('Building bundled JRE (build:jre)', npmCmd, ['run', 'build:jre'], desktopDir
 run('Building renderer/main bundle (build)', npmCmd, ['run', 'build'], desktopDir);
 
 copyIcons();
+run('Verifying packaging assets', npmCmd, ['run', 'verify:packaging'], desktopDir);
 
 console.log('\n[package-prepare] All steps completed successfully.');

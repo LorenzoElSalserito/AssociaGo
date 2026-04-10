@@ -42,3 +42,6 @@ jobs:
       - name: Build frontend
         working-directory: desktop
         run: npm run build
+      - name: Verify packaging assets
+        working-directory: desktop
+        run: npm run verify:packaging

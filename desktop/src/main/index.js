@@ -14,6 +14,10 @@ const os = require("os");
 const { spawn, spawnSync } = require("child_process");
 const { electronApp, optimizer, is } = require('@electron-toolkit/utils');
 
+const APP_SYSTEM_NAME = "associago-desktop";
+const APP_DISPLAY_NAME = "AssociaGo";
+const APP_USER_MODEL_ID = "com.lorenzodm.associago.desktop";
+
 const isDev = process.env.NODE_ENV === "development" || !app.isPackaged;
 
 // Se ti ricompaiono problemi GPU/ANGLE su Linux, avvia con:
@@ -123,6 +127,45 @@ function nowStamp() {
 
 function getAssociaGoHome() {
     return path.join(os.homedir(), ".associago");
+}
+
+function ensureDir(dirPath) {
+    if (!fs.existsSync(dirPath)) {
+        fs.mkdirSync(dirPath, { recursive: true });
+    }
+}
+
+function getUserDataPath() {
+    return path.join(app.getPath("appData"), APP_SYSTEM_NAME);
+}
+
+function getRuntimeAssetPath(...segments) {
+    if (isDev) {
+        return path.join(__dirname, "..", "..", ...segments);
+    }
+
+    return path.join(process.resourcesPath, ...segments);
+}
+
+function getWindowIconPath() {
+    if (process.platform === "darwin") {
+        return getRuntimeAssetPath("icon.icns");
+    }
+
+    if (process.platform === "win32") {
+        return getRuntimeAssetPath("icon.ico");
+    }
+
+    return getRuntimeAssetPath("icon.png");
+}
+
+function resolveRendererEntry(pageName) {
+    if (isDev && process.env['ELECTRON_RENDERER_URL']) {
+        const baseUrl = process.env['ELECTRON_RENDERER_URL'];
+        return new URL(`${pageName}.html`, baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`).toString();
+    }
+
+    return path.join(__dirname, `../renderer/${pageName}.html`);
 }
 
 function getBackendPortFile() {
@@ -354,9 +397,11 @@ async function startBackend() {
 
     // Ensure data directory exists
     const dataPath = getAssociaGoHome();
-    if (!fs.existsSync(dataPath)) {
-        fs.mkdirSync(dataPath, { recursive: true });
-    }
+    ensureDir(dataPath);
+    ensureDir(path.join(dataPath, "config"));
+    ensureDir(path.join(dataPath, "logs"));
+    ensureDir(path.join(dataPath, "logs", "archived"));
+    ensureDir(path.join(dataPath, "assets"));
 
     // Delete old port file to ensure we read the new one
     const portFile = getBackendPortFile();
@@ -430,18 +475,16 @@ function createSplashWindow() {
         transparent: false,
         alwaysOnTop: true,
         resizable: false,
-        // icon: path.join(__dirname, "..", "src/assets", "icon.svg"), // Use SVG icon
+        icon: getWindowIconPath(),
         webPreferences: {
             nodeIntegration: false,
             contextIsolation: true
         }
     });
 
-    if (isDev && process.env['ELECTRON_RENDERER_URL']) {
-        splashWindow.loadFile(path.join(__dirname, '../../src/renderer/splash.html'))
-    } else {
-        splashWindow.loadFile(path.join(__dirname, '../renderer/splash.html'))
-    }
+    const splashEntry = resolveRendererEntry("splash");
+    if (splashEntry.startsWith("http")) splashWindow.loadURL(splashEntry);
+    else splashWindow.loadFile(splashEntry);
 
     splashWindow.center();
 
@@ -456,8 +499,8 @@ function createWindow() {
         height: 900,
         minWidth: 800,
         minHeight: 600,
-        title: "AssociaGo",
-        // icon: path.join(__dirname, "..", "src/assets", "Logo.svg"), // Use SVG icon
+        title: APP_DISPLAY_NAME,
+        icon: getWindowIconPath(),
         show: false, // Hidden initially, shown when ready
         autoHideMenuBar: true,
         webPreferences: {
@@ -486,14 +529,15 @@ function createWindow() {
         console.error("[Main] did-fail-load", { errorCode, errorDescription, validatedURL });
     });
 
-    if (isDev && process.env['ELECTRON_RENDERER_URL']) {
-        mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL']);
+    const mainEntry = resolveRendererEntry("index");
+    if (mainEntry.startsWith("http")) {
+        mainWindow.loadURL(mainEntry);
         if (mainWindow.webContents.isDevToolsOpened()) {
             mainWindow.webContents.closeDevTools();
         }
         mainWindow.webContents.openDevTools({ mode: 'detach', activate: false });
     } else {
-        mainWindow.loadFile(path.join(__dirname, "../renderer/index.html"));
+        mainWindow.loadFile(mainEntry);
     }
 
     mainWindow.once('ready-to-show', () => {
@@ -542,7 +586,9 @@ function createWindow() {
 // ----------------------------
 
 app.whenReady().then(async () => {
-    electronApp.setAppUserModelId('com.associago');
+    app.setName(APP_SYSTEM_NAME);
+    app.setPath("userData", getUserDataPath());
+    electronApp.setAppUserModelId(APP_USER_MODEL_ID);
 
     app.on('browser-window-created', (_, window) => {
         optimizer.watchWindowShortcuts(window);

@@ -2,6 +2,7 @@
 # JAVA / GRADLE / SPRING BOOT
 # ==========================================
 .gradle/
+.gradle-local/
 build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
@@ -99,16 +100,22 @@ local.properties
 # ==========================================
 # PROJECT SPECIFIC
 # ==========================================
-# Temporary or documentation files not needed in repo
-AssociaGo_PRD_Migration_v3.0.1.md
+# Local project docs, plans, scratch notes and agent workspace files:
+# do not commit product drafts, migration notes, planning docs or local AI-tool state
 AssociaGo_PRD.md
 AssociaGo_PRD*
+FETCH_FIX.md
+PLAN*
+PLAN_TRAD*
+/docs/
+/.claude
+/.claude/
+/.codex
+/.codex/
+
+# Local packaging scratch files
 package_librepm.json
 build-desktop_librepm.yml
-.claude/
-.codex
-/docs
-PLAN*
 
 # Electron Builder artifacts & Local Resources
 desktop/dist/
