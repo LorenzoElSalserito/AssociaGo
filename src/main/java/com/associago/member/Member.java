@@ -32,7 +32,13 @@ public class Member {
 
     @Column(name = "member_type")
     private String memberType = "Socio Ordinario"; // Socio Ordinario, Socio Fondatore, Presidente, Tesoriere, etc.
-    
+
+    @Column(name = "completeness_score")
+    private Integer completenessScore = 0;
+
+    @Column(name = "member_category")
+    private String memberCategory = "ordinary";
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
     
@@ -59,6 +65,10 @@ public class Member {
     public void setMembershipStatus(String membershipStatus) { this.membershipStatus = membershipStatus; }
     public String getMemberType() { return memberType; }
     public void setMemberType(String memberType) { this.memberType = memberType; }
+    public Integer getCompletenessScore() { return completenessScore; }
+    public void setCompletenessScore(Integer completenessScore) { this.completenessScore = completenessScore; }
+    public String getMemberCategory() { return memberCategory; }
+    public void setMemberCategory(String memberCategory) { this.memberCategory = memberCategory; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }

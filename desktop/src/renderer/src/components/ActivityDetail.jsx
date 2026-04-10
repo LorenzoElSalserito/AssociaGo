@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Button, Table, Badge, Nav, Spinner, Dropdown } from 'react-bootstrap';
-import { ArrowLeft, Plus, Trash2, Edit, MoreVertical, DollarSign, Users, Clock, User, Download } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Edit, MoreVertical, DollarSign, Users, Clock, User, Download, Award, Upload } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { associago } from '../api';
+import CsvImporter from './CsvImporter';
+import { translateActivityCategory, translateCompensationType, translateCostCategory, translateCertificateType } from '../utils/enumTranslations';
 
 const ActivityDetail = ({ activityId, shell, onBack }) => {
     const { t } = useTranslation();
@@ -15,6 +17,7 @@ const ActivityDetail = ({ activityId, shell, onBack }) => {
     const [costs, setCosts] = useState([]);
     const [instructors, setInstructors] = useState([]);
     const [schedules, setSchedules] = useState([]);
+    const [certificateTemplates, setCertificateTemplates] = useState([]);
 
     useEffect(() => {
         loadData();
@@ -23,22 +26,33 @@ const ActivityDetail = ({ activityId, shell, onBack }) => {
     const loadData = async () => {
         setLoading(true);
         try {
-            const [d, p, c, i, s] = await Promise.all([
+            const [d, p, c, i, s, templates] = await Promise.all([
                 associago.activities.getDetails(activityId),
                 associago.activities.getParticipants(activityId),
                 associago.activities.getCosts(activityId),
                 associago.activities.getInstructors(activityId),
-                associago.activities.getSchedules(activityId)
+                associago.activities.getSchedules(activityId),
+                associago.certificates.getTemplates(shell?.currentAssociationId)
             ]);
             setDetails(d);
             setParticipants(p);
             setCosts(c);
             setInstructors(i);
             setSchedules(s);
+            setCertificateTemplates(templates || []);
         } catch (error) {
             console.error("Error loading activity details:", error);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleBatchCertificates = async (templateId) => {
+        try {
+            await associago.certificates.batchActivity(activityId, templateId, shell.currentAssociationId);
+            alert(t('Certificates issued successfully.'));
+        } catch (error) {
+            alert(error.message);
         }
     };
 
@@ -84,7 +98,7 @@ const ActivityDetail = ({ activityId, shell, onBack }) => {
                 <div>
                     <h2 className="fw-bold text-dark mb-0">{activity.name}</h2>
                     <div className="text-muted small">
-                        <Badge bg="info" className="me-2">{activity.category}</Badge>
+                        <Badge bg="info" className="me-2">{translateActivityCategory(activity.category, t)}</Badge>
                         {new Date(activity.startDate).toLocaleDateString()} - {activity.endDate ? new Date(activity.endDate).toLocaleDateString() : t('Ongoing')}
                     </div>
                 </div>
@@ -142,6 +156,8 @@ const ActivityDetail = ({ activityId, shell, onBack }) => {
                         <Nav.Item><Nav.Link eventKey="schedules" className="d-flex align-items-center gap-2"><Clock size={18}/> {t('Schedule')}</Nav.Link></Nav.Item>
                         <Nav.Item><Nav.Link eventKey="instructors" className="d-flex align-items-center gap-2"><User size={18}/> {t('Instructors')}</Nav.Link></Nav.Item>
                         <Nav.Item><Nav.Link eventKey="costs" className="d-flex align-items-center gap-2"><DollarSign size={18}/> {t('Costs')}</Nav.Link></Nav.Item>
+                        <Nav.Item><Nav.Link eventKey="certificates" className="d-flex align-items-center gap-2"><Award size={18}/> {t('Certificates')}</Nav.Link></Nav.Item>
+                        <Nav.Item><Nav.Link eventKey="import" className="d-flex align-items-center gap-2"><Upload size={18}/> {t('CSV Import')}</Nav.Link></Nav.Item>
                     </Nav>
                 </Card.Header>
                 <Card.Body className="p-0">
@@ -166,7 +182,7 @@ const ActivityDetail = ({ activityId, shell, onBack }) => {
                                                 </Badge>
                                                 {p.amountPaid > 0 && <span className="ms-2 small text-muted">€ {p.amountPaid}</span>}
                                             </td>
-                                            <td><Badge bg={p.isActive ? 'success' : 'secondary'}>{p.isActive ? 'Active' : 'Inactive'}</Badge></td>
+                                            <td><Badge bg={p.isActive ? 'success' : 'secondary'}>{p.isActive ? t('Active') : t('Inactive')}</Badge></td>
                                             <td className="text-end pe-4">
                                                 <Button variant="link" className="text-danger p-0" onClick={() => handleDeleteSubResource('participant', p.id)}><Trash2 size={16}/></Button>
                                             </td>
@@ -219,7 +235,7 @@ const ActivityDetail = ({ activityId, shell, onBack }) => {
                                         <tr key={i.id}>
                                             <td className="ps-4">{i.firstName} {i.lastName}</td>
                                             <td>{i.specialization}</td>
-                                            <td>€ {i.compensation} ({i.compensationType})</td>
+                                            <td>€ {i.compensation} ({translateCompensationType(i.compensationType, t)})</td>
                                             <td className="text-end pe-4">
                                                 <Button variant="link" className="text-muted p-0 me-2" onClick={() => shell.openModal('activity-instructor-form', { activityId, instructor: i, onSuccess: loadData })}><Edit size={16}/></Button>
                                                 <Button variant="link" className="text-danger p-0" onClick={() => handleDeleteSubResource('instructor', i.id)}><Trash2 size={16}/></Button>
@@ -245,7 +261,7 @@ const ActivityDetail = ({ activityId, shell, onBack }) => {
                                     {costs.map(c => (
                                         <tr key={c.id}>
                                             <td className="ps-4">{c.description} <small className="text-muted d-block">{new Date(c.date).toLocaleDateString()}</small></td>
-                                            <td><Badge bg="light" text="dark" className="border">{c.category}</Badge></td>
+                                            <td><Badge bg="light" text="dark" className="border">{translateCostCategory(c.category, t)}</Badge></td>
                                             <td className="text-danger">-€ {c.amount}</td>
                                             <td className="text-end pe-4">
                                                 <Button variant="link" className="text-muted p-0 me-2" onClick={() => shell.openModal('activity-cost-form', { activityId, cost: c, onSuccess: loadData })}><Edit size={16}/></Button>
@@ -256,6 +272,43 @@ const ActivityDetail = ({ activityId, shell, onBack }) => {
                                     {costs.length === 0 && <tr><td colSpan="4" className="text-center py-4 text-muted">{t('No costs')}</td></tr>}
                                 </tbody>
                             </Table>
+                        </div>
+                    )}
+
+                    {activeTab === 'certificates' && (
+                        <div className="p-3">
+                            <Card className="border-0 bg-light">
+                                <Card.Body>
+                                    <h6 className="mb-3">{t('Batch certificate issuance')}</h6>
+                                    <Table responsive hover size="sm" className="mb-0">
+                                        <thead><tr><th>{t('Template')}</th><th>{t('Type')}</th><th className="text-end">{t('Actions')}</th></tr></thead>
+                                        <tbody>
+                                            {certificateTemplates.map((template) => (
+                                                <tr key={template.id}>
+                                                    <td>{template.name}</td>
+                                                    <td>{translateCertificateType(template.type, t)}</td>
+                                                    <td className="text-end">
+                                                        <Button size="sm" onClick={() => handleBatchCertificates(template.id)}>
+                                                            <Award size={14} className="me-2" />{t('Issue Batch')}
+                                                        </Button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                            {certificateTemplates.length === 0 && <tr><td colSpan="3" className="text-center py-4 text-muted">{t('No certificate templates available')}</td></tr>}
+                                        </tbody>
+                                    </Table>
+                                </Card.Body>
+                            </Card>
+                        </div>
+                    )}
+
+                    {activeTab === 'import' && (
+                        <div className="p-3">
+                            <CsvImporter
+                                title={t('Activity Participants CSV Import')}
+                                onPreview={(file) => associago.csvImport.previewActivityParticipants(file, shell.currentAssociationId, activityId)}
+                                onConfirm={(importId) => associago.csvImport.confirmImport(importId)}
+                            />
                         </div>
                     )}
                 </Card.Body>

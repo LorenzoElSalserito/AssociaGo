@@ -21,8 +21,7 @@ import java.util.List;
  * Configurazione Spring Security per AssociaGo
  *
  * @author Lorenzo DM
- * @since 1.0.0
- * @updated 0.3.0 - Aggiunti endpoint bootstrap accessibili senza auth
+ * @since 0.1.0
  */
 @Configuration
 @EnableWebSecurity
@@ -40,16 +39,28 @@ public class SecurityConfig {
             AuthProperties authProperties
     ) throws Exception {
 
-        http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
-
-        // Se auth disabilitata (desktop/dev) -> permetti tutto per non bloccare lo sviluppo,
-        // ma manteniamo CSRF off perché non ha senso senza sessione.
+        // Se auth disabilitata (desktop/dev) -> permetti tutto per non bloccare lo sviluppo.
+        // CORS: in modalità desktop il renderer Electron carica da file:// e il browser
+        // invia Origin: "null" (stringa letterale). Il pattern "file://*" NON lo matcha,
+        // quindi usiamo "*" che accetta qualsiasi origin incluso "null".
         if (!authProperties.isEnabled()) {
+            http.cors(cors -> {
+                CorsConfiguration desktopCors = new CorsConfiguration();
+                desktopCors.addAllowedOriginPattern("*");
+                desktopCors.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+                desktopCors.setAllowedHeaders(List.of("*"));
+                desktopCors.setAllowCredentials(true);
+                UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+                source.registerCorsConfiguration("/**", desktopCors);
+                cors.configurationSource(source);
+            });
             http.csrf(AbstractHttpConfigurer::disable);
             http.authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
             http.httpBasic(AbstractHttpConfigurer::disable);
             return http.build();
         }
+
+        http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
 
         // Auth abilitata -> session-based con CSRF cookie (XSRF-TOKEN)
         http.csrf(csrf -> csrf

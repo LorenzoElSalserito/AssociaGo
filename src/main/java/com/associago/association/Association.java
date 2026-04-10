@@ -69,6 +69,12 @@ public class Association {
     @Column(name = "regulation_path")
     private String regulationPath;
 
+    @Column(name = "secondary_logo_path")
+    private String secondaryLogoPath;
+
+    @Column(name = "partner_logo_path")
+    private String partnerLogoPath;
+
     // --- Configuration ---
     @Column(name = "foundation_date")
     private LocalDate foundationDate;
@@ -106,6 +112,16 @@ public class Association {
 
     @Column(name = "db_ssl")
     private boolean dbSsl = false;
+
+    // --- Federation ---
+    @Column(name = "federation_registration_number")
+    private String federationRegistrationNumber;
+
+    @Column(name = "federation_provider")
+    private String federationProvider;
+
+    @Column(name = "federation_registered_at")
+    private LocalDateTime federationRegisteredAt;
 
     // --- Metadata ---
     @Column(name = "created_at", updatable = false)
@@ -184,6 +200,12 @@ public class Association {
     public String getRegulationPath() { return regulationPath; }
     public void setRegulationPath(String regulationPath) { this.regulationPath = regulationPath; }
 
+    public String getSecondaryLogoPath() { return secondaryLogoPath; }
+    public void setSecondaryLogoPath(String secondaryLogoPath) { this.secondaryLogoPath = secondaryLogoPath; }
+
+    public String getPartnerLogoPath() { return partnerLogoPath; }
+    public void setPartnerLogoPath(String partnerLogoPath) { this.partnerLogoPath = partnerLogoPath; }
+
     public LocalDate getFoundationDate() { return foundationDate; }
     public void setFoundationDate(LocalDate foundationDate) { this.foundationDate = foundationDate; }
 
@@ -219,6 +241,15 @@ public class Association {
 
     public boolean isDbSsl() { return dbSsl; }
     public void setDbSsl(boolean dbSsl) { this.dbSsl = dbSsl; }
+
+    public String getFederationRegistrationNumber() { return federationRegistrationNumber; }
+    public void setFederationRegistrationNumber(String federationRegistrationNumber) { this.federationRegistrationNumber = federationRegistrationNumber; }
+
+    public String getFederationProvider() { return federationProvider; }
+    public void setFederationProvider(String federationProvider) { this.federationProvider = federationProvider; }
+
+    public LocalDateTime getFederationRegisteredAt() { return federationRegisteredAt; }
+    public void setFederationRegisteredAt(LocalDateTime federationRegisteredAt) { this.federationRegisteredAt = federationRegisteredAt; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }

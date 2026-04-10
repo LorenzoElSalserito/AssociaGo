@@ -1,11 +1,16 @@
 package com.associago.event;
 
+import com.associago.event.dto.EventCreateDTO;
+import com.associago.event.dto.EventDTO;
+import com.associago.event.mapper.EventMapper;
 import com.associago.stats.dto.EventStatsDTO;
 import com.associago.stats.dto.EventSummaryDTO;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.StreamSupport;
 
 @RestController
 @RequestMapping("/api/v1/events")
@@ -20,26 +25,34 @@ public class EventController {
     // --- CRUD ---
 
     @GetMapping
-    public ResponseEntity<Iterable<Event>> getAllEvents() {
-        return ResponseEntity.ok(eventService.getAllEvents());
+    public ResponseEntity<List<EventDTO>> getAllEvents() {
+        List<EventDTO> events = StreamSupport.stream(eventService.getAllEvents().spliterator(), false)
+                .map(EventMapper::toDTO)
+                .toList();
+        return ResponseEntity.ok(events);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Event> getEventById(@PathVariable Long id) {
+    public ResponseEntity<EventDTO> getEventById(@PathVariable Long id) {
         return eventService.getEventById(id)
+                .map(EventMapper::toDTO)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<Event> createEvent(@RequestBody Event event) {
-        return ResponseEntity.ok(eventService.createEvent(event));
+    public ResponseEntity<EventDTO> createEvent(@Valid @RequestBody EventCreateDTO dto) {
+        Event entity = EventMapper.toEntity(dto);
+        Event saved = eventService.createEvent(entity);
+        return ResponseEntity.ok(EventMapper.toDTO(saved));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Event> updateEvent(@PathVariable Long id, @RequestBody Event event) {
+    public ResponseEntity<EventDTO> updateEvent(@PathVariable Long id, @Valid @RequestBody EventCreateDTO dto) {
         try {
-            return ResponseEntity.ok(eventService.updateEvent(id, event));
+            Event entity = EventMapper.toEntity(dto);
+            Event updated = eventService.updateEvent(id, entity);
+            return ResponseEntity.ok(EventMapper.toDTO(updated));
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }

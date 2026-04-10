@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Bell } from 'lucide-react';
 import { OverlayTrigger, Popover, Badge, ListGroup, Button } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
 import { associago } from '../api';
 
 export default function NotificationBell({ userId }) {
+    const { t } = useTranslation();
     const [notifications, setNotifications] = useState([]);
     const [unreadCount, setUnreadCount] = useState(0);
 
@@ -49,19 +51,19 @@ export default function NotificationBell({ userId }) {
         const now = new Date();
         const diff = Math.floor((now - date) / 1000); // seconds
 
-        if (diff < 60) return `${diff}s fa`;
-        if (diff < 3600) return `${Math.floor(diff / 60)}m fa`;
-        if (diff < 86400) return `${Math.floor(diff / 3600)}h fa`;
+        if (diff < 60) return t('notifications.timeAgo.seconds', { count: diff });
+        if (diff < 3600) return t('notifications.timeAgo.minutes', { count: Math.floor(diff / 60) });
+        if (diff < 86400) return t('notifications.timeAgo.hours', { count: Math.floor(diff / 3600) });
         return date.toLocaleDateString();
     };
 
     const popover = (
         <Popover id="notification-popover" style={{ width: '320px', maxWidth: '100%' }}>
             <Popover.Header as="div" className="d-flex justify-content-between align-items-center bg-white border-bottom p-3">
-                <strong className="mb-0">Notifiche</strong>
+                <strong className="mb-0">{t('notifications.title')}</strong>
                 {unreadCount > 0 && (
                     <Button variant="link" size="sm" className="p-0 text-decoration-none" onClick={markAllRead}>
-                        Segna lette
+                        {t('notifications.markAllRead')}
                     </Button>
                 )}
             </Popover.Header>
@@ -85,7 +87,7 @@ export default function NotificationBell({ userId }) {
                     </ListGroup>
                 ) : (
                     <div className="p-4 text-center text-muted small">
-                        Nessuna notifica
+                        {t('notifications.empty')}
                     </div>
                 )}
             </Popover.Body>
@@ -98,7 +100,7 @@ export default function NotificationBell({ userId }) {
                 <Bell size={20} className="text-secondary" />
                 {unreadCount > 0 && (
                     <span className="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle">
-                        <span className="visually-hidden">New alerts</span>
+                        <span className="visually-hidden">{t('notifications.newAlerts')}</span>
                     </span>
                 )}
             </button>

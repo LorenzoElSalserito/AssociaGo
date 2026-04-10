@@ -18,7 +18,7 @@ export default function ProfileMenu({ initials = "U", title, subtitle, items = [
     const [showInfoModal, setShowInfoModal] = useState(false);
     const menuRef = useRef(null);
     const { t } = useTranslation();
-    const [appVersion, setAppVersion] = useState('0.9'); // Default fallback
+    const [appVersion, setAppVersion] = useState(''); // Loaded from Electron
 
     // Chiudi menu quando si clicca fuori
     useEffect(() => {

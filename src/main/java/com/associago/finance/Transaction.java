@@ -49,6 +49,15 @@ public class Transaction {
     @Column(name = "activity_id")
     private Long activityId;
 
+    @Column(name = "project_id")
+    private Long projectId;
+
+    @Column(name = "fund_id")
+    private Long fundId;
+
+    @Column(name = "cost_center")
+    private String costCenter;
+
     @Column(name = "membership_id")
     private Long membershipId;
 
@@ -121,6 +130,12 @@ public class Transaction {
     public void setEventId(Long eventId) { this.eventId = eventId; }
     public Long getActivityId() { return activityId; }
     public void setActivityId(Long activityId) { this.activityId = activityId; }
+    public Long getProjectId() { return projectId; }
+    public void setProjectId(Long projectId) { this.projectId = projectId; }
+    public Long getFundId() { return fundId; }
+    public void setFundId(Long fundId) { this.fundId = fundId; }
+    public String getCostCenter() { return costCenter; }
+    public void setCostCenter(String costCenter) { this.costCenter = costCenter; }
     public Long getMembershipId() { return membershipId; }
     public void setMembershipId(Long membershipId) { this.membershipId = membershipId; }
     public Long getInventoryItemId() { return inventoryItemId; }

@@ -117,7 +117,7 @@ const AttendanceForm = () => {
                 <div>
                     <h3 className="text-xl font-bold mb-4">{t('attendance.title')}</h3>
                     {/* Qui andrebbe la lista dei partecipanti con checkbox per presenza */}
-                    <p className="text-gray-500 italic">Participant list implementation pending...</p>
+                    <p className="text-gray-500 italic">{t('attendance.placeholder.recordsPending')}</p>
                 </div>
             )}
         </div>

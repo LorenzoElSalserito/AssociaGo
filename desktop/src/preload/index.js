@@ -3,7 +3,8 @@ import { electronAPI } from '@electron-toolkit/preload'
 
 // Custom APIs for renderer
 const api = {
-  getBackendPort: () => ipcRenderer.invoke('get-backend-port')
+  getBackendPort: () => ipcRenderer.invoke('get-backend-port'),
+  getAppVersion: () => ipcRenderer.invoke('getAppVersion')
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

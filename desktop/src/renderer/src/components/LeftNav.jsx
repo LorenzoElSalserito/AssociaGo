@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useTranslation } from 'react-i18next';
 import {
     LayoutDashboard,
@@ -12,13 +12,29 @@ import {
     ClipboardList,
     Package,
     UserCheck,
-    FileText
+    FileText,
+    PiggyBank,
+    Award,
+    Upload,
+    Mail,
+    DoorOpen,
+    Banknote,
+    BarChart3,
+    CheckSquare,
+    BookOpen as BookOpenIcon
 } from "lucide-react";
 import AppIcon from "../assets/6.svg";
 
 export default function LeftNav({ items, activeId, onSelect }) {
     const { t } = useTranslation();
     const [collapsed, setCollapsed] = useState(false);
+    const [appVersion, setAppVersion] = useState('');
+
+    useEffect(() => {
+        if (window.api?.getAppVersion) {
+            window.api.getAppVersion().then(v => setAppVersion(v));
+        }
+    }, []);
 
     const visibleItems = useMemo(() => items, [items]);
 
@@ -34,6 +50,17 @@ export default function LeftNav({ items, activeId, onSelect }) {
             case "bi-box-seam": return <Package size={20} />;
             case "bi-person-check": return <UserCheck size={20} />;
             case "bi-file-text": return <FileText size={20} />;
+            case "bi-piggy-bank": return <PiggyBank size={20} />;
+            case "bi-award": return <Award size={20} />;
+            case "bi-upload": return <Upload size={20} />;
+            case "bi-mail": return <Mail size={20} />;
+            case "bi-door-open": return <DoorOpen size={20} />;
+            case "bi-banknote": return <Banknote size={20} />;
+            case "bi-bar-chart": return <BarChart3 size={20} />;
+            case "bi-check2-square": return <CheckSquare size={20} />;
+            case "bi-ticket-perforated": return <CreditCard size={20} />;
+            case "bi-envelope": return <Mail size={20} />;
+            case "bi-book": return <BookOpenIcon size={20} />;
             default: return <LayoutDashboard size={20} />;
         }
     };
@@ -80,7 +107,7 @@ export default function LeftNav({ items, activeId, onSelect }) {
 
                 {!collapsed && (
                     <div className="jl-sidebar-branding">
-                        <small className="text-muted opacity-75">AssociaGo v3.0</small>
+                        <small className="text-muted opacity-75">AssociaGo {appVersion ? `v${appVersion}` : ''}</small>
                     </div>
                 )}
             </div>

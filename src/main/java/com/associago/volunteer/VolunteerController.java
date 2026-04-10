@@ -1,9 +1,15 @@
 package com.associago.volunteer;
 
+import com.associago.volunteer.dto.VolunteerCreateDTO;
+import com.associago.volunteer.dto.VolunteerDTO;
+import com.associago.volunteer.mapper.VolunteerMapper;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @RestController
 @RequestMapping("/api/v1/volunteers")
@@ -16,29 +22,38 @@ public class VolunteerController {
     }
 
     @GetMapping
-    public ResponseEntity<Iterable<Volunteer>> getAllVolunteers() {
-        return ResponseEntity.ok(volunteerService.getAllVolunteers());
+    public ResponseEntity<List<VolunteerDTO>> getAllVolunteers() {
+        List<VolunteerDTO> volunteers = StreamSupport.stream(volunteerService.getAllVolunteers().spliterator(), false)
+                .map(VolunteerMapper::toDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(volunteers);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Volunteer> getVolunteerById(@PathVariable Long id) {
+    public ResponseEntity<VolunteerDTO> getVolunteerById(@PathVariable Long id) {
         return volunteerService.getVolunteerById(id)
+                .map(VolunteerMapper::toDTO)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<Volunteer> createVolunteer(@RequestBody Volunteer volunteer) {
-        return ResponseEntity.ok(volunteerService.createVolunteer(volunteer));
+    public ResponseEntity<VolunteerDTO> createVolunteer(@Valid @RequestBody VolunteerCreateDTO dto) {
+        Volunteer volunteer = VolunteerMapper.toEntity(dto);
+        Volunteer saved = volunteerService.createVolunteer(volunteer);
+        return ResponseEntity.ok(VolunteerMapper.toDTO(saved));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Volunteer> updateVolunteer(@PathVariable Long id, @RequestBody Volunteer volunteer) {
-        try {
-            return ResponseEntity.ok(volunteerService.updateVolunteer(id, volunteer));
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<VolunteerDTO> updateVolunteer(@PathVariable Long id,
+                                                         @Valid @RequestBody VolunteerCreateDTO dto) {
+        return volunteerService.getVolunteerById(id)
+                .map(existing -> {
+                    VolunteerMapper.updateEntity(existing, dto);
+                    Volunteer saved = volunteerService.updateVolunteer(id, existing);
+                    return ResponseEntity.ok(VolunteerMapper.toDTO(saved));
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
@@ -66,7 +81,6 @@ public class VolunteerController {
         }
     }
 
-    // Expenses
     @GetMapping("/{id}/expenses")
     public ResponseEntity<List<VolunteerExpense>> getExpensesByVolunteer(@PathVariable Long id) {
         return ResponseEntity.ok(volunteerService.getExpensesByVolunteer(id));

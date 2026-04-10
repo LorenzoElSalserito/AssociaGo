@@ -8,12 +8,17 @@
     "members": "Membres",
     "activities": "Activités",
     "events": "Événements",
+    "attendance": "Présences",
+    "budget": "Budget",
+    "balance": "Bilan annuel",
+    "certificates": "Attestations",
     "fiscal": "Finance",
     "assemblies": "Assemblées",
     "inventory": "Inventaire",
     "volunteers": "Bénévoles",
     "coupons": "Coupons",
-    "settings": "Paramètres"
+    "settings": "Paramètres",
+    "communications": "Communications"
   },
   "General Settings": "Paramètres Généraux",
   "Language": "Langue",
@@ -525,5 +530,369 @@
   "9. Coupon e Sconti": "9. Coupons et Réductions",
   "10. Impostazioni": "10. Paramètres",
   "Save Preferences": "Enregistrer les Préférences",
-  "Preferences saved successfully.": "Préférences enregistrées avec succès."
+  "Preferences saved successfully.": "Préférences enregistrées avec succès.",
+  "A transaction will be automatically created": {
+    "": "Une transaction sera automatiquement créée."
+  },
+  "Absent": "Absent",
+  "Account": "Compte",
+  "Activity": "Activité",
+  "Activity (Optional)": "Activité (Facultatif)",
+  "Activity Participants CSV Import": "Importation CSV des participants d'activité",
+  "Actual": "Réel",
+  "Actual Expenses": "Dépenses réelles",
+  "Actual Income": "Revenus réels",
+  "Add": "Ajouter",
+  "Add Budget Line": "Ajouter une ligne budgétaire",
+  "Add Expense": "Ajouter une dépense",
+  "Add Line": "Ajouter une ligne",
+  "Annual Balance": "Bilan Annuel",
+  "Annual financial statements": "États financiers annuels",
+  "Are you sure you want to delete this activity?": "Êtes-vous sûr de vouloir supprimer cette activité ?",
+  "Are you sure you want to delete this assembly?": "Êtes-vous sûr de vouloir supprimer cette assemblée ?",
+  "Are you sure you want to delete this event?": "Êtes-vous sûr de vouloir supprimer cet événement ?",
+  "Are you sure you want to delete this item?": "Êtes-vous sûr de vouloir supprimer cet élément ?",
+  "Are you sure you want to delete this member?": "Êtes-vous sûr de vouloir supprimer ce membre ?",
+  "Assigned To (User ID)": "Assigné à (ID utilisateur)",
+  "Attendance": "Présences",
+  "Back to Balances": "Retour aux bilans",
+  "Back to Budgets": "Retour aux budgets",
+  "Base Membership Fee": "Cotisation de base",
+  "Batch Issue for Activity": "Émission groupée par activité",
+  "Batch Issue for Event": "Émission groupée par événement",
+  "Batch certificate issuance": "Émission groupée de certificats",
+  "Body Template": "Corps du modèle",
+  "Budget planning and tracking": "Planification et suivi du budget",
+  "Budgeted": "Budgétisé",
+  "Budgeted Amount": "Montant budgétisé",
+  "Budgeted Expenses": "Dépenses budgétisées",
+  "Budgeted Income": "Revenus budgétisés",
+  "Budgets": "Budgets",
+  "CSV File": "Fichier CSV",
+  "CSV Import": "Importation CSV",
+  "Certificate": "Certificat",
+  "Certificates": "Certificats",
+  "Certificates issued successfully": {
+    "": "Certificats émis avec succès."
+  },
+  "Certifications": "Certifications",
+  "City": "Ville",
+  "Compensation Type": "Type de rémunération",
+  "Compute": "Calculer",
+  "Compute Annual Balance": "Calculer le bilan annuel",
+  "Compute Balance": "Calculer le bilan",
+  "Condition on Loan": "Condition au prêt",
+  "Conference": "Conférence",
+  "Confirm Import": "Confirmer l'importation",
+  "Confirmed": "Confirmé",
+  "Congress": "Congrès",
+  "Contacts": "Contacts",
+  "Create a local backup of your data": {
+    "": "Créez une sauvegarde locale de vos données."
+  },
+  "Credit": "Crédit",
+  "Current Value": "Valeur actuelle",
+  "Custom Comparison": "Comparaison personnalisée",
+  "Dashboard": "Tableau de bord",
+  "Database Type": "Type de base de données",
+  "Day": "Jour",
+  "Debit": "Débit",
+  "Delete": "Supprimer",
+  "Depreciation Years": "Années d'amortissement",
+  "Document Type": "Type de document",
+  "Download Receipt": "Télécharger le reçu",
+  "Edit Line": "Modifier la ligne",
+  "Edit Template": "Modifier le modèle",
+  "Error": "Erreur",
+  "Error adding document": "Erreur lors de l'ajout du document",
+  "Error deleting activity": "Erreur lors de la suppression de l'activité",
+  "Error deleting member": "Erreur lors de la suppression du membre",
+  "Error downloading receipt": "Erreur lors du téléchargement du reçu",
+  "Error saving assembly": "Erreur lors de la sauvegarde de l'assemblée",
+  "Error saving event": "Erreur lors de la sauvegarde de l'événement",
+  "Error saving expense": "Erreur lors de la sauvegarde de la dépense",
+  "Error saving item": "Erreur lors de la sauvegarde de l'élément",
+  "Error saving motion": "Erreur lors de la sauvegarde de la motion",
+  "Error saving volunteer": "Erreur lors de la sauvegarde du bénévole",
+  "Error updating status": "Erreur lors de la mise à jour du statut",
+  "Errors": "Erreurs",
+  "Event": "Événement",
+  "Event (Optional)": "Événement (Facultatif)",
+  "Event Participants CSV Import": "Importation CSV des participants d'événement",
+  "Example format": "Format exemple",
+  "Expense": "Dépense",
+  "Expiration": "Expiration",
+  "Export Comparison PDF": "Exporter le PDF comparatif",
+  "First Call Quorum": "Quorum première convocation",
+  "Fixed Rate": "Tarif fixe",
+  "Foundation Date": "Date de fondation",
+  "Generate Preview": "Générer l'aperçu",
+  "Generate a preview, validate the file and then confirm the batch import": {
+    "": "Générez un aperçu, validez le fichier puis confirmez l'importation."
+  },
+  "Generating preview": {
+    "": {
+      "": {
+        "": "Génération de l'aperçu..."
+      }
+    }
+  },
+  "Guest (External)": "Invité (Externe)",
+  "Guest Email": "Email de l'invité",
+  "Guest Name": "Nom de l'invité",
+  "Hide CSV Import": "Masquer l'importation CSV",
+  "Import CSV": "Importer CSV",
+  "Import completed": {
+    "": "Importation terminée."
+  },
+  "Importing": {
+    "": {
+      "": {
+        "": "Importation en cours..."
+      }
+    }
+  },
+  "Inventory Code": "Code inventaire",
+  "Issue": "Émettre",
+  "Issue Batch": "Émission groupée",
+  "Issue Certificate": "Émettre un certificat",
+  "Issued": "Émis",
+  "Issued At": "Émis le",
+  "Journal Entries": "Écritures comptables",
+  "Manage courses, activities and discounts": "Gérer cours, activités et remises",
+  "Member CSV Import": "Importation CSV des membres",
+  "Missing signers": "Signataires manquants",
+  "Net Result": "Résultat net",
+  "New Budget": "Nouveau budget",
+  "New Member": "Nouveau membre",
+  "New Template": "Nouveau modèle",
+  "No balances computed yet": {
+    "": "Aucun bilan calculé."
+  },
+  "No budget lines yet": {
+    "": "Aucune ligne budgétaire."
+  },
+  "No budgets found": {
+    "": "Aucun budget trouvé."
+  },
+  "No certificate templates available": "Aucun modèle de certificat disponible",
+  "No certificates issued yet": {
+    "": "Aucun certificat émis."
+  },
+  "No coupons found": {
+    "": "Aucun coupon trouvé."
+  },
+  "No expenses": "Aucune dépense",
+  "No journal entries found": "Aucune écriture comptable trouvée",
+  "No templates yet": {
+    "": "Aucun modèle."
+  },
+  "Or issue in batch for all participants:": "Ou émettre en lot pour tous les participants :",
+  "Participant Type": "Type de participant",
+  "Participation": "Participation",
+  "Planned": "Planifié",
+  "Preview generated successfully": {
+    "": "Aperçu généré avec succès."
+  },
+  "Progress": "Progrès",
+  "Prov": {
+    "": "Prov."
+  },
+  "Province": "Province",
+  "Proxy Receiver": "Mandataire",
+  "Public Event": "Événement public",
+  "Purchase Price": "Prix d'achat",
+  "Recipient": "Destinataire",
+  "Registry": "Registre",
+  "Regulation Path/Link": "Chemin/Lien règlement",
+  "Remember to configure institutional signatures for president, secretary and treasurer before generating balances, certificates and official documents": {
+    "": "Pensez à configurer les signatures institutionnelles pour le président, secrétaire et trésorier."
+  },
+  "Renew Membership": "Renouveler l'adhésion",
+  "Rows": "Lignes",
+  "Save": "Enregistrer",
+  "Save Expense": "Enregistrer la dépense",
+  "Scrutineer": "Scrutateur",
+  "Second Call Quorum": "Quorum deuxième convocation",
+  "Section": "Section",
+  "Select template": {
+    "": {
+      "": {
+        "": "Sélectionner un modèle..."
+      }
+    }
+  },
+  "Send Email": "Envoyer un email",
+  "Skipped": "Ignoré",
+  "Socio creato ma errore nella registrazione del pagamento": {
+    "": "Membre créé mais erreur lors de l'enregistrement du paiement."
+  },
+  "Statute Path/Link": "Chemin/Lien statut",
+  "Sync Actuals": "Synchroniser les réels",
+  "Template": "Modèle",
+  "Template Name": "Nom du modèle",
+  "Templates": "Modèles",
+  "Templates and issued certificates": "Modèles et certificats émis",
+  "This will compute the balance from all registered transactions for the selected year": {
+    "": "Ceci calculera le bilan à partir de toutes les transactions de l'année sélectionnée."
+  },
+  "Time": "Heure",
+  "Total": "Total",
+  "Training": "Formation",
+  "Transactions": "Transactions",
+  "Type is required": "Le type est obligatoire",
+  "Unable to load document": {
+    "": "Impossible de charger le document."
+  },
+  "Unlimited": "Illimité",
+  "Update Event": "Mettre à jour l'événement",
+  "Upload": "Télécharger",
+  "Use {{firstName}}, {{lastName}}, {{activityName}}, {{date}} as placeholders": "Utilisez {{firstName}}, {{lastName}}, {{activityName}}, {{date}} comme paramètres",
+  "Valid": "Valide",
+  "Variance": "Écart",
+  "Voting Type": "Type de vote",
+  "Year 1": "Année 1",
+  "Year 2": "Année 2",
+  "ZIP Code": "Code postal",
+  "attendance": {
+    "fields": {
+      "endTime": "Heure de fin",
+      "startTime": "Heure de début"
+    },
+    "manage": "Gérer les présences",
+    "new": "Nouvel enregistrement",
+    "placeholder": {
+      "list": "Aucune présence enregistrée",
+      "recordsPending": "Enregistrements en attente"
+    },
+    "title": "Présences"
+  },
+  "common": {
+    "create": "Créer",
+    "date": "Date",
+    "save": "Enregistrer",
+    "update": "Mettre à jour"
+  },
+  "e": {
+    "g": {
+      " CONI, FIGC, etc": {
+        "": "ex. CONI, FIGC, etc."
+      },
+      " INV-001": "ex. INV-001",
+      " RM": "ex. RM",
+      " Travel reimbursement": "ex. Remboursement de voyage"
+    }
+  },
+  "enum": {
+    "deadlineCategory": {
+      "fiscal": "Fiscal",
+      "governance": "Gouvernance",
+      "insurance": "Assurances",
+      "legal": "Juridique",
+      "other": "Autre"
+    },
+    "documentType": {
+      "attachment": "Pièce jointe",
+      "regulation": "Règlement",
+      "statute": "Statut"
+    },
+    "locationType": {
+      "legal": "Siège social",
+      "operational": "Siège opérationnel",
+      "project": "Siège projet"
+    }
+  },
+  "notifications": {
+    "empty": "Aucune notification",
+    "markAllRead": "Tout marquer comme lu",
+    "newAlerts": "Nouvelles alertes",
+    "title": "Notifications"
+  },
+  "registry": {
+    "complete": "Registre complet",
+    "deadlines": "Échéances",
+    "dueDate": "Date d'échéance",
+    "locations": "Sites"
+  },
+  "Signatures": "Signatures",
+  "No signature image": "Aucune image de signature",
+  "Upload signature image": "Télécharger l'image de signature",
+  "PNG or JPG, transparent background recommended": "PNG ou JPG, fond transparent recommandé",
+  "Save the name first, then upload the signature image.": "Enregistrez d'abord le nom, puis téléchargez l'image.",
+  "Signature saved successfully.": "Signature enregistrée avec succès.",
+  "Signature image uploaded.": "Image de signature téléchargée.",
+  "Signature image removed.": "Image de signature supprimée.",
+  "Communications": "Communications",
+  "Email communications and templates": "Communications email et modèles",
+  "New Message": "Nouveau Message",
+  "Edit Message": "Modifier le Message",
+  "Messages": "Messages",
+  "Subject": "Objet",
+  "Sender Name": "Nom de l'expéditeur",
+  "Sender Email": "Email de l'expéditeur",
+  "Segment Filter": "Filtre de segment",
+  "Message Body (HTML)": "Corps du message (HTML)",
+  "Message Content": "Contenu du message",
+  "Apply Template": "Appliquer le modèle",
+  "Resolve Recipients": "Résoudre les destinataires",
+  "Send": "Envoyer",
+  "Total Recipients": "Destinataires totaux",
+  "Delivered": "Livrés",
+  "Sent At": "Envoyé le",
+  "No communications yet.": "Aucune communication.",
+  "No recipients resolved yet.": "Aucun destinataire résolu.",
+  "recipients resolved": "destinataires résolus",
+  "Communication sent successfully.": "Communication envoyée avec succès.",
+  "Send this communication to all recipients?": "Envoyer cette communication à tous les destinataires ?",
+  "e.g. active (leave empty for all members)": "ex. active (vide pour tous les membres)",
+  "Filter recipients by member status": "Filtrer les destinataires par statut de membre",
+  "Use {{name}} and {{associationName}} as placeholders": "Utilisez {{name}} et {{associationName}} comme paramètres",
+  "DRAFT": "Brouillon",
+  "SENDING": "En envoi",
+  "SENT": "Envoyé",
+  "FAILED": "Échoué",
+  "Coming Soon": "Bientôt disponible",
+  "Body": "Corps",
+  "Layout": "Mise en page",
+  "Signatories": "Signataires",
+  "Preview": "Aperçu",
+  "Custom": "Personnalisé",
+  "Active": "Actif",
+  "Inactive": "Inactif",
+  "Orientation": "Orientation",
+  "Landscape": "Paysage",
+  "Portrait": "Portrait",
+  "Paper Size": "Format de papier",
+  "Signatory Roles": "Rôles des signataires",
+  "Select which institutional roles should sign this certificate.": "Sélectionnez les rôles institutionnels qui doivent signer ce certificat.",
+  "President": "Président",
+  "Secretary": "Secrétaire",
+  "Treasurer": "Trésorier",
+  "Insert field": "Insérer un champ",
+  "Write the certificate body text. Click the buttons above to insert merge fields...": "Rédigez le texte du certificat. Cliquez sur les boutons ci-dessus pour insérer des champs de fusion...",
+  "Merge fields will be replaced with actual member and event data when the certificate is generated.": "Les champs de fusion seront remplacés par les données réelles du membre et de l'événement lors de la génération.",
+  "Certificate Title": "Titre du certificat",
+  "Certificate body will appear here...": "Le corps du certificat apparaîtra ici...",
+  "Template name...": "Nom du modèle...",
+  "Sports Medical Certificate": "Certificat Médical Sportif",
+  "Required for participation in sports activities (ASD).": "Requis pour la participation aux activités sportives (ASD).",
+  "Certificate Type": "Type de Certificat",
+  "Non-Agonistic": "Non Compétitif",
+  "Agonistic": "Compétitif",
+  "Issue Date": "Date d'émission",
+  "Expiry Date": "Date d'expiration",
+  "Certifying Doctor": "Médecin Certificateur",
+  "Medical Facility": "Établissement Médical",
+  "Dr. ...": "Dr. ...",
+  "Hospital / Clinic": "Hôpital / Clinique",
+  "Valid": "Valide",
+  "Expired": "Expiré",
+  "Expiring Soon": "Expire bientôt",
+  "Missing": "Manquant",
+  "expired medical certificates": "certificats médicaux expirés",
+  "expiring within 30 days": "expirent dans les 30 jours",
+  "Medical certificate expired": "Certificat médical expiré",
+  "Medical certificate expiring soon": "Certificat médical expire bientôt",
+  "Cert. Expired": "Cert. Expiré",
+  "Cert. Expiring": "Cert. Expire"
 }

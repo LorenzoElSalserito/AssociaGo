@@ -8,12 +8,17 @@
     "members": "Members",
     "activities": "Activities",
     "events": "Events",
+    "attendance": "Attendance",
+    "budget": "Budget",
+    "balance": "Annual Balance",
+    "certificates": "Certificates",
     "fiscal": "Finance",
     "assemblies": "Assemblies",
     "inventory": "Inventory",
     "volunteers": "Volunteers",
     "coupons": "Coupons",
-    "settings": "Settings"
+    "settings": "Settings",
+    "communications": "Communications"
   },
   "General Settings": "General Settings",
   "Language": "Language",
@@ -496,5 +501,388 @@
   "9. Coupon e Sconti": "9. Coupons and Discounts",
   "10. Impostazioni": "10. Settings",
   "Save Preferences": "Save Preferences",
-  "Preferences saved successfully.": "Preferences saved successfully."
+  "Preferences saved successfully.": "Preferences saved successfully.",
+  "A transaction will be automatically created": {
+    "": "A transaction will be automatically created."
+  },
+  "Absent": "Absent",
+  "Account": "Account",
+  "Acquisition Method": "Acquisition Method",
+  "Activity": "Activity",
+  "Activity (Optional)": "Activity (Optional)",
+  "Activity Participants CSV Import": "Activity Participants CSV Import",
+  "Actual": "Actual",
+  "Actual Expenses": "Actual Expenses",
+  "Actual Income": "Actual Income",
+  "Add": "Add",
+  "Add Budget Line": "Add Budget Line",
+  "Add Expense": "Add Expense",
+  "Add Line": "Add Line",
+  "All Types": "All Types",
+  "Annual Balance": "Annual Balance",
+  "Annual financial statements": "Annual financial statements",
+  "Apply Filters": "Apply Filters",
+  "Are you sure you want to delete this activity?": "Are you sure you want to delete this activity?",
+  "Are you sure you want to delete this assembly?": "Are you sure you want to delete this assembly?",
+  "Are you sure you want to delete this event?": "Are you sure you want to delete this event?",
+  "Are you sure you want to delete this item?": "Are you sure you want to delete this item?",
+  "Are you sure you want to delete this member?": "Are you sure you want to delete this member?",
+  "Are you sure you want to delete this transaction?": "Are you sure you want to delete this transaction?",
+  "Assigned To (User ID)": "Assigned To (User ID)",
+  "Attendance": "Attendance",
+  "Back to Balances": "Back to Balances",
+  "Back to Budgets": "Back to Budgets",
+  "Base Membership Fee": "Base Membership Fee",
+  "Batch Issue for Activity": "Batch Issue for Activity",
+  "Batch Issue for Event": "Batch Issue for Event",
+  "Batch certificate issuance": "Batch certificate issuance",
+  "Body Template": "Body Template",
+  "Budget planning and tracking": "Budget planning and tracking",
+  "Budgeted": "Budgeted",
+  "Budgeted Amount": "Budgeted Amount",
+  "Budgeted Expenses": "Budgeted Expenses",
+  "Budgeted Income": "Budgeted Income",
+  "Budgets": "Budgets",
+  "CSV File": "CSV File",
+  "CSV Import": "CSV Import",
+  "Certificate": "Certificate",
+  "Certificates": "Certificates",
+  "Certificates issued successfully": {
+    "": "Certificates issued successfully."
+  },
+  "Certifications": "Certifications",
+  "City": "City",
+  "Clear Filters": "Clear Filters",
+  "Compensation Type": "Compensation Type",
+  "Compute": "Compute",
+  "Compute Annual Balance": "Compute Annual Balance",
+  "Compute Balance": "Compute Balance",
+  "Condition on Loan": "Condition on Loan",
+  "Conference": "Conference",
+  "Confirm Import": "Confirm Import",
+  "Confirmed": "Confirmed",
+  "Congress": "Congress",
+  "Contacts": "Contacts",
+  "Create a local backup of your data": {
+    "": "Create a local backup of your data."
+  },
+  "Credit": "Credit",
+  "Current Value": "Current Value",
+  "Custom Comparison": "Custom Comparison",
+  "Dashboard": "Dashboard",
+  "Database Type": "Database Type",
+  "Day": "Day",
+  "Debit": "Debit",
+  "Delete": "Delete",
+  "Depreciation Years": "Depreciation Years",
+  "Document Type": "Document Type",
+  "Donation": "Donation",
+  "Download Receipt": "Download Receipt",
+  "Edit Line": "Edit Line",
+  "Edit Profile": "Edit Profile",
+  "Edit Template": "Edit Template",
+  "Edit Transaction": "Edit Transaction",
+  "Error": "Error",
+  "Error adding document": "Error adding document",
+  "Error deleting activity": "Error deleting activity",
+  "Error deleting member": "Error deleting member",
+  "Error deleting transaction": "Error deleting transaction",
+  "Error downloading receipt": "Error downloading receipt",
+  "Error saving assembly": "Error saving assembly",
+  "Error saving event": "Error saving event",
+  "Error saving expense": "Error saving expense",
+  "Error saving item": "Error saving item",
+  "Error saving motion": "Error saving motion",
+  "Error saving transaction": "Error saving transaction",
+  "Error saving volunteer": "Error saving volunteer",
+  "Error updating status": "Error updating status",
+  "Errors": "Errors",
+  "Event": "Event",
+  "Event (Optional)": "Event (Optional)",
+  "Event Participants CSV Import": "Event Participants CSV Import",
+  "Example format": "Example format",
+  "Expense": "Expense",
+  "Expiration": "Expiration",
+  "Export Comparison PDF": "Export Comparison PDF",
+  "First Call Quorum": "First Call Quorum",
+  "Fixed Rate": "Fixed Rate",
+  "Foundation Date": "Foundation Date",
+  "Generate Preview": "Generate Preview",
+  "Generate a preview, validate the file and then confirm the batch import": {
+    "": "Generate a preview, validate the file and then confirm the batch import."
+  },
+  "Generating preview": {
+    "": {
+      "": {
+        "": "Generating preview..."
+      }
+    }
+  },
+  "Guest (External)": "Guest (External)",
+  "Guest Email": "Guest Email",
+  "Guest Name": "Guest Name",
+  "Hide CSV Import": "Hide CSV Import",
+  "Import CSV": "Import CSV",
+  "Import completed": {
+    "": "Import completed."
+  },
+  "Importing": {
+    "": {
+      "": {
+        "": "Importing..."
+      }
+    }
+  },
+  "Inventory Code": "Inventory Code",
+  "Issue": "Issue",
+  "Issue Batch": "Issue Batch",
+  "Issue Certificate": "Issue Certificate",
+  "Issued": "Issued",
+  "Issued At": "Issued At",
+  "Journal Entries": "Journal Entries",
+  "Loan": "Loan",
+  "Manage courses, activities and discounts": "Manage courses, activities and discounts",
+  "Member CSV Import": "Member CSV Import",
+  "Membership": "Membership",
+  "Missing signers": "Missing signers",
+  "Net Result": "Net Result",
+  "New Budget": "New Budget",
+  "New Member": "New Member",
+  "New Template": "New Template",
+  "New Transaction": "New Transaction",
+  "No balances computed yet": {
+    "": "No balances computed yet."
+  },
+  "No budget lines yet": {
+    "": "No budget lines yet."
+  },
+  "No budgets found": {
+    "": "No budgets found."
+  },
+  "No certificate templates available": "No certificate templates available",
+  "No certificates issued yet": {
+    "": "No certificates issued yet."
+  },
+  "No coupons found": {
+    "": "No coupons found."
+  },
+  "No expenses": "No expenses",
+  "No journal entries found": "No journal entries found",
+  "No templates yet": {
+    "": "No templates yet."
+  },
+  "Or issue in batch for all participants:": "Or issue in batch for all participants:",
+  "Participant Type": "Participant Type",
+  "Participation": "Participation",
+  "Planned": "Planned",
+  "Preview generated successfully": {
+    "": "Preview generated successfully."
+  },
+  "Progress": "Progress",
+  "Prov": {
+    "": "Prov."
+  },
+  "Province": "Province",
+  "Proxy Receiver": "Proxy Receiver",
+  "Public Event": "Public Event",
+  "Purchase": "Purchase",
+  "Purchase Date": "Purchase Date",
+  "Purchase Price": "Purchase Price",
+  "Recipient": "Recipient",
+  "Record Rent": "Record Rent",
+  "Registry": "Registry",
+  "Regulation Path/Link": "Regulation Path/Link",
+  "Remember to configure institutional signatures for president, secretary and treasurer before generating balances, certificates and official documents": {
+    "": "Remember to configure institutional signatures for president, secretary and treasurer before generating balances, certificates and official documents."
+  },
+  "Renew Membership": "Renew Membership",
+  "Rent": "Rent",
+  "Rent Payment": "Rent Payment",
+  "Rows": "Rows",
+  "Save": "Save",
+  "Save Changes": "Save Changes",
+  "Save Expense": "Save Expense",
+  "Scrutineer": "Scrutineer",
+  "Second Call Quorum": "Second Call Quorum",
+  "Section": "Section",
+  "Select template": {
+    "": {
+      "": {
+        "": "Select template..."
+      }
+    }
+  },
+  "Send Email": "Send Email",
+  "Skipped": "Skipped",
+  "Socio creato ma errore nella registrazione del pagamento": {
+    "": "Socio creato ma errore nella registrazione del pagamento."
+  },
+  "Statute Path/Link": "Statute Path/Link",
+  "Sync Actuals": "Sync Actuals",
+  "Template": "Template",
+  "Template Name": "Template Name",
+  "Templates": "Templates",
+  "Templates and issued certificates": "Templates and issued certificates",
+  "This will compute the balance from all registered transactions for the selected year": {
+    "": "This will compute the balance from all registered transactions for the selected year."
+  },
+  "Time": "Time",
+  "Total": "Total",
+  "Training": "Training",
+  "Transactions": "Transactions",
+  "Type is required": "Type is required",
+  "Unable to load document": {
+    "": "Unable to load document."
+  },
+  "Unlimited": "Unlimited",
+  "Update Event": "Update Event",
+  "Upload": "Upload",
+  "Use {{firstName}}, {{lastName}}, {{activityName}}, {{date}} as placeholders": "Use {{firstName}}, {{lastName}}, {{activityName}}, {{date}} as placeholders",
+  "Valid": "Valid",
+  "Variance": "Variance",
+  "Voting Type": "Voting Type",
+  "Year 1": "Year 1",
+  "Year 2": "Year 2",
+  "ZIP Code": "ZIP Code",
+  "attendance": {
+    "fields": {
+      "endTime": "attendance.fields.endTime",
+      "startTime": "attendance.fields.startTime"
+    },
+    "manage": "attendance.manage",
+    "new": "attendance.new",
+    "placeholder": {
+      "list": "attendance.placeholder.list",
+      "recordsPending": "attendance.placeholder.recordsPending"
+    },
+    "title": "attendance.title"
+  },
+  "common": {
+    "create": "common.create",
+    "date": "common.date",
+    "save": "common.save",
+    "update": "common.update"
+  },
+  "e": {
+    "g": {
+      " CONI, FIGC, etc": {
+        "": "e.g. CONI, FIGC, etc."
+      },
+      " INV-001": "e.g. INV-001",
+      " RM": "e.g. RM",
+      " Travel reimbursement": "e.g. Travel reimbursement"
+    }
+  },
+  "enum": {
+    "deadlineCategory": {
+      "fiscal": "enum.deadlineCategory.fiscal",
+      "governance": "enum.deadlineCategory.governance",
+      "insurance": "enum.deadlineCategory.insurance",
+      "legal": "enum.deadlineCategory.legal",
+      "other": "enum.deadlineCategory.other"
+    },
+    "documentType": {
+      "attachment": "enum.documentType.attachment",
+      "regulation": "enum.documentType.regulation",
+      "statute": "enum.documentType.statute"
+    },
+    "locationType": {
+      "legal": "enum.locationType.legal",
+      "operational": "enum.locationType.operational",
+      "project": "enum.locationType.project"
+    }
+  },
+  "notifications": {
+    "empty": "notifications.empty",
+    "markAllRead": "notifications.markAllRead",
+    "newAlerts": "notifications.newAlerts",
+    "title": "notifications.title"
+  },
+  "registry": {
+    "complete": "registry.complete",
+    "deadlines": "registry.deadlines",
+    "dueDate": "registry.dueDate",
+    "locations": "registry.locations"
+  },
+  "Signatures": "Signatures",
+  "No signature image": "No signature image",
+  "Upload signature image": "Upload signature image",
+  "PNG or JPG, transparent background recommended": "PNG or JPG, transparent background recommended",
+  "Save the name first, then upload the signature image.": "Save the name first, then upload the signature image.",
+  "Signature saved successfully.": "Signature saved successfully.",
+  "Signature image uploaded.": "Signature image uploaded.",
+  "Signature image removed.": "Signature image removed.",
+  "Communications": "Communications",
+  "Email communications and templates": "Email communications and templates",
+  "New Message": "New Message",
+  "Edit Message": "Edit Message",
+  "Messages": "Messages",
+  "Subject": "Subject",
+  "Sender Name": "Sender Name",
+  "Sender Email": "Sender Email",
+  "Segment Filter": "Segment Filter",
+  "Message Body (HTML)": "Message Body (HTML)",
+  "Message Content": "Message Content",
+  "Apply Template": "Apply Template",
+  "Resolve Recipients": "Resolve Recipients",
+  "Send": "Send",
+  "Total Recipients": "Total Recipients",
+  "Delivered": "Delivered",
+  "Sent At": "Sent At",
+  "No communications yet.": "No communications yet.",
+  "No recipients resolved yet.": "No recipients resolved yet.",
+  "recipients resolved": "recipients resolved",
+  "Communication sent successfully.": "Communication sent successfully.",
+  "Send this communication to all recipients?": "Send this communication to all recipients?",
+  "e.g. active (leave empty for all members)": "e.g. active (leave empty for all members)",
+  "Filter recipients by member status": "Filter recipients by member status",
+  "Use {{name}} and {{associationName}} as placeholders": "Use {{name}} and {{associationName}} as placeholders",
+  "DRAFT": "Draft",
+  "SENDING": "Sending",
+  "SENT": "Sent",
+  "FAILED": "Failed",
+  "Coming Soon": "Coming Soon",
+  "Body": "Body",
+  "Layout": "Layout",
+  "Signatories": "Signatories",
+  "Preview": "Preview",
+  "Custom": "Custom",
+  "Active": "Active",
+  "Inactive": "Inactive",
+  "Orientation": "Orientation",
+  "Landscape": "Landscape",
+  "Portrait": "Portrait",
+  "Paper Size": "Paper Size",
+  "Signatory Roles": "Signatory Roles",
+  "Select which institutional roles should sign this certificate.": "Select which institutional roles should sign this certificate.",
+  "President": "President",
+  "Secretary": "Secretary",
+  "Treasurer": "Treasurer",
+  "Insert field": "Insert field",
+  "Write the certificate body text. Click the buttons above to insert merge fields...": "Write the certificate body text. Click the buttons above to insert merge fields...",
+  "Merge fields will be replaced with actual member and event data when the certificate is generated.": "Merge fields will be replaced with actual member and event data when the certificate is generated.",
+  "Certificate Title": "Certificate Title",
+  "Certificate body will appear here...": "Certificate body will appear here...",
+  "Template name...": "Template name...",
+  "Sports Medical Certificate": "Sports Medical Certificate",
+  "Required for participation in sports activities (ASD).": "Required for participation in sports activities (ASD).",
+  "Certificate Type": "Certificate Type",
+  "Non-Agonistic": "Non-Agonistic",
+  "Agonistic": "Agonistic",
+  "Issue Date": "Issue Date",
+  "Expiry Date": "Expiry Date",
+  "Certifying Doctor": "Certifying Doctor",
+  "Medical Facility": "Medical Facility",
+  "Dr. ...": "Dr. ...",
+  "Hospital / Clinic": "Hospital / Clinic",
+  "Valid": "Valid",
+  "Expired": "Expired",
+  "Expiring Soon": "Expiring Soon",
+  "Missing": "Missing",
+  "expired medical certificates": "expired medical certificates",
+  "expiring within 30 days": "expiring within 30 days",
+  "Medical certificate expired": "Medical certificate expired",
+  "Medical certificate expiring soon": "Medical certificate expiring soon",
+  "Cert. Expired": "Cert. Expired",
+  "Cert. Expiring": "Cert. Expiring"
 }

@@ -1,18 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, Table, Form, InputGroup, Badge, Spinner, Dropdown } from 'react-bootstrap';
-import { Search, Plus, Filter, MoreVertical, Edit, Trash2, Mail, RefreshCw } from 'lucide-react';
+import { Card, Button, Table, Form, InputGroup, Badge, Spinner, Dropdown, Alert } from 'react-bootstrap';
+import { Search, Plus, Filter, MoreVertical, Edit, Trash2, Mail, RefreshCw, AlertTriangle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { associago } from '../api';
+import CsvImporter from './CsvImporter';
 
 const MemberList = ({ associationId, shell }) => {
     const { t } = useTranslation();
     const [members, setMembers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
+    const [showImport, setShowImport] = useState(false);
+    const [medicalAlerts, setMedicalAlerts] = useState({ expiring: [], expired: [] });
+
+    const isASD = shell?.currentAssociation?.tipo === 'ASD';
 
     useEffect(() => {
         if (associationId) {
             fetchMembers();
+            if (isASD) fetchMedicalAlerts();
         }
     }, [associationId]);
 
@@ -56,6 +62,29 @@ const MemberList = ({ associationId, shell }) => {
         }
     };
 
+    const fetchMedicalAlerts = async () => {
+        try {
+            const [expiring, expired] = await Promise.all([
+                associago.medicalCertificates.getExpiring(associationId, 30),
+                associago.medicalCertificates.getExpired(associationId)
+            ]);
+            setMedicalAlerts({ expiring: expiring || [], expired: expired || [] });
+        } catch (e) { console.error('Error fetching medical alerts:', e); }
+    };
+
+    const getMedicalBadge = (memberId) => {
+        if (!isASD) return null;
+        const userId = members.find(m => m.id === memberId)?.user?.id;
+        if (!userId) return null;
+        if (medicalAlerts.expired.some(c => c.memberId === userId)) {
+            return <Badge bg="danger" className="ms-2 fw-normal" title={t('Medical certificate expired')}>{t('Cert. Expired')}</Badge>;
+        }
+        if (medicalAlerts.expiring.some(c => c.memberId === userId)) {
+            return <Badge bg="warning" text="dark" className="ms-2 fw-normal" title={t('Medical certificate expiring soon')}>{t('Cert. Expiring')}</Badge>;
+        }
+        return null;
+    };
+
     const filteredMembers = members.filter(member =>
         member.user?.firstName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         member.user?.lastName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -69,11 +98,36 @@ const MemberList = ({ associationId, shell }) => {
                     <h2 className="fw-bold text-dark mb-1">{t('Members')}</h2>
                     <p className="text-muted mb-0">{t('Manage association members')}</p>
                 </div>
-                <Button variant="primary" className="d-flex align-items-center" onClick={() => shell.openModal('member-form', { associationId, onSuccess: fetchMembers })}>
+                <Button variant="primary" className="d-flex align-items-center" onClick={() => shell.openModal('member-form', { associationId, associationType: shell?.currentAssociation?.tipo, onSuccess: fetchMembers })}>
                     <Plus size={18} className="me-2" />
                     {t('Add Member')}
                 </Button>
             </div>
+
+            {isASD && (medicalAlerts.expired.length > 0 || medicalAlerts.expiring.length > 0) && (
+                <Alert variant="warning" className="d-flex align-items-center gap-2 shadow-sm mb-3">
+                    <AlertTriangle size={18} />
+                    <div>
+                        {medicalAlerts.expired.length > 0 && (
+                            <span className="fw-bold text-danger">{medicalAlerts.expired.length} {t('expired medical certificates')}</span>
+                        )}
+                        {medicalAlerts.expired.length > 0 && medicalAlerts.expiring.length > 0 && ' — '}
+                        {medicalAlerts.expiring.length > 0 && (
+                            <span className="fw-bold text-warning">{medicalAlerts.expiring.length} {t('expiring within 30 days')}</span>
+                        )}
+                    </div>
+                </Alert>
+            )}
+
+            {showImport && (
+                <div className="mb-4">
+                    <CsvImporter
+                        title={t('Member CSV Import')}
+                        onPreview={(file) => associago.csvImport.previewMembers(file, associationId)}
+                        onImport={(file) => associago.csvImport.importMembers(file, associationId)}
+                    />
+                </div>
+            )}
 
             <Card className="border-0 shadow-sm">
                 <Card.Header className="bg-white border-bottom-0 pt-4 pb-0">
@@ -91,6 +145,9 @@ const MemberList = ({ associationId, shell }) => {
                                 />
                             </InputGroup>
                         </div>
+                        <Button variant="outline-primary" onClick={() => setShowImport((current) => !current)}>
+                            {showImport ? t('Hide CSV Import') : t('Import CSV')}
+                        </Button>
                     </div>
                 </Card.Header>
                 <Card.Body className="p-0">
@@ -120,7 +177,7 @@ const MemberList = ({ associationId, shell }) => {
                                                         {member.user?.firstName?.[0]}{member.user?.lastName?.[0]}
                                                     </div>
                                                     <div>
-                                                        <div className="fw-bold text-dark">{member.user?.firstName} {member.user?.lastName}</div>
+                                                        <div className="fw-bold text-dark">{member.user?.firstName} {member.user?.lastName}{getMedicalBadge(member.id)}</div>
                                                         <div className="small text-muted">{member.user?.taxCode}</div>
                                                     </div>
                                                 </div>

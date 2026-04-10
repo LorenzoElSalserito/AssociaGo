@@ -1,9 +1,13 @@
 package com.associago.report;
 
+import com.associago.activity.Activity;
+import com.associago.activity.ActivityService;
 import com.associago.assembly.Assembly;
 import com.associago.assembly.AssemblyService;
 import com.associago.association.Association;
 import com.associago.association.AssociationService;
+import com.associago.event.Event;
+import com.associago.event.EventService;
 import com.associago.finance.FinancialService;
 import com.associago.finance.Transaction;
 import com.associago.member.Member;
@@ -15,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -27,13 +32,20 @@ public class ReportController {
     private final FinancialService financialService;
     private final AssemblyService assemblyService;
     private final AssociationService associationService;
+    private final ActivityService activityService;
+    private final EventService eventService;
 
-    public ReportController(ReportService reportService, MemberService memberService, FinancialService financialService, AssemblyService assemblyService, AssociationService associationService) {
+    public ReportController(ReportService reportService, MemberService memberService,
+                            FinancialService financialService, AssemblyService assemblyService,
+                            AssociationService associationService, ActivityService activityService,
+                            EventService eventService) {
         this.reportService = reportService;
         this.memberService = memberService;
         this.financialService = financialService;
         this.assemblyService = assemblyService;
         this.associationService = associationService;
+        this.activityService = activityService;
+        this.eventService = eventService;
     }
 
     private Association getAssociation(Long associationId) {
@@ -97,6 +109,48 @@ public class ReportController {
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=confronto_" + year1 + "_" + year2 + ".pdf")
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(pdf);
+    }
+
+    @GetMapping("/members/list")
+    public ResponseEntity<byte[]> getMemberList(@RequestHeader(value = "X-Association-Id", required = false) Long associationId) throws IOException {
+        List<Member> members = new ArrayList<>();
+        memberService.getAllMembers().forEach(members::add);
+        Association association = getAssociation(associationId != null ? associationId : 1L);
+
+        byte[] pdf = reportService.generateMemberList(members, association);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=elenco_soci.pdf")
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(pdf);
+    }
+
+    @GetMapping("/events/{id}/report")
+    public ResponseEntity<byte[]> getEventReport(@PathVariable Long id, @RequestHeader(value = "X-Association-Id", required = false) Long associationId) throws IOException {
+        Event event = eventService.getEventById(id).orElseThrow(() -> new RuntimeException("Event not found"));
+        int participantCount = eventService.getParticipants(id).size();
+        Association association = getAssociation(associationId != null ? associationId : event.getAssociationId());
+
+        byte[] pdf = reportService.generateEventReport(event, participantCount, association);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=report_evento_" + id + ".pdf")
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(pdf);
+    }
+
+    @GetMapping("/activities/{id}/report")
+    public ResponseEntity<byte[]> getActivityReport(@PathVariable Long id, @RequestHeader(value = "X-Association-Id", required = false) Long associationId) throws IOException {
+        Activity activity = activityService.findById(id).orElseThrow(() -> new RuntimeException("Activity not found"));
+        int participantCount = activityService.findParticipantsByActivityId(id).size();
+        Association association = getAssociation(associationId != null ? associationId : activity.getAssociationId());
+
+        byte[] pdf = reportService.generateActivityReport(activity, participantCount, association);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=report_attivita_" + id + ".pdf")
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(pdf);
     }

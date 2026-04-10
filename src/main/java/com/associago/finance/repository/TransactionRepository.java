@@ -15,6 +15,8 @@ import java.util.List;
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, Long>, JpaSpecificationExecutor<Transaction> {
     List<Transaction> findByDateBetween(LocalDate startDate, LocalDate endDate);
+
+    List<Transaction> findByAssociationIdAndDateBetween(Long associationId, LocalDate startDate, LocalDate endDate);
     
     @Query("SELECT SUM(t.amount) FROM Transaction t WHERE t.type = :type AND t.date BETWEEN :startDate AND :endDate")
     BigDecimal sumByTypeAndDateRange(@Param("type") TransactionType type, @Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);

@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { associago } from '../api';
-import { Calculator } from 'lucide-react';
+import { Calculator, FileHeart, Upload } from 'lucide-react';
 
-const MemberForm = ({ associationId, onSuccess, onCancel }) => {
+const MemberForm = ({ associationId, associationType, onSuccess, onCancel }) => {
+  const isASD = associationType === 'ASD';
   const { register, handleSubmit, setValue, getValues, watch, formState: { errors, isSubmitting } } = useForm();
   const [calculatingCF, setCalculatingCF] = useState(false);
 
@@ -46,7 +47,25 @@ const MemberForm = ({ associationId, onSuccess, onCancel }) => {
         membershipCardNumber: data.cardNumber
       });
 
-      // Step 3: Register Payment (if selected)
+      // Step 3: Save Medical Certificate (if ASD and data provided)
+      if (isASD && data.medicalCertIssueDate) {
+        try {
+          await associago.medicalCertificates.save({
+            memberId: user.id,
+            associationId,
+            certificateType: data.medicalCertType || 'NON_AGONISTIC',
+            issueDate: data.medicalCertIssueDate,
+            expiryDate: data.medicalCertExpiryDate,
+            issuedBy: data.medicalCertIssuedBy,
+            medicalFacility: data.medicalCertFacility,
+            notes: data.medicalCertNotes
+          });
+        } catch (medError) {
+          console.warn('Member created but medical certificate save failed', medError);
+        }
+      }
+
+      // Step 4: Register Payment (if selected)
       if (data.registerPayment && data.paymentAmount > 0) {
         try {
           await associago.finance.createTransaction({
@@ -198,6 +217,59 @@ const MemberForm = ({ associationId, onSuccess, onCancel }) => {
             </select>
         </div>
       </div>
+
+      {isASD && (
+        <>
+          <hr className="my-4" />
+          <div className="card border-primary border-opacity-25 mb-3">
+            <div className="card-header bg-primary bg-opacity-10 d-flex align-items-center gap-2">
+              <FileHeart size={18} className="text-primary" />
+              <span className="fw-bold">{t('Sports Medical Certificate')}</span>
+            </div>
+            <div className="card-body">
+              <p className="text-muted small mb-3">{t('Required for participation in sports activities (ASD).')}</p>
+              <div className="row g-3">
+                <div className="col-md-6">
+                  <label className="form-label">{t('Certificate Type')}</label>
+                  <select {...register('medicalCertType')} className="form-select">
+                    <option value="NON_AGONISTIC">{t('Non-Agonistic')}</option>
+                    <option value="AGONISTIC">{t('Agonistic')}</option>
+                  </select>
+                </div>
+                <div className="col-md-6">
+                  <label className="form-label">{t('Status')}</label>
+                  <select {...register('medicalCertStatus')} className="form-select" disabled>
+                    <option value="MISSING">{t('Missing')}</option>
+                    <option value="VALID">{t('Valid')}</option>
+                    <option value="EXPIRING_SOON">{t('Expiring Soon')}</option>
+                    <option value="EXPIRED">{t('Expired')}</option>
+                  </select>
+                </div>
+                <div className="col-md-6">
+                  <label className="form-label">{t('Issue Date')}</label>
+                  <input type="date" {...register('medicalCertIssueDate')} className="form-control" />
+                </div>
+                <div className="col-md-6">
+                  <label className="form-label">{t('Expiry Date')}</label>
+                  <input type="date" {...register('medicalCertExpiryDate')} className="form-control" />
+                </div>
+                <div className="col-md-6">
+                  <label className="form-label">{t('Certifying Doctor')}</label>
+                  <input {...register('medicalCertIssuedBy')} className="form-control" placeholder={t('Dr. ...')} />
+                </div>
+                <div className="col-md-6">
+                  <label className="form-label">{t('Medical Facility')}</label>
+                  <input {...register('medicalCertFacility')} className="form-control" placeholder={t('Hospital / Clinic')} />
+                </div>
+                <div className="col-12">
+                  <label className="form-label">{t('Notes')}</label>
+                  <textarea {...register('medicalCertNotes')} className="form-control" rows={2} />
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
 
       <hr className="my-4" />
 

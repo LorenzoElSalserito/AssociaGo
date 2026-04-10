@@ -149,6 +149,14 @@ function tryParseBackendPort(content) {
     return null;
 }
 
+function sendSplashStatus(message) {
+    if (splashWindow && !splashWindow.isDestroyed()) {
+        splashWindow.webContents.executeJavaScript(
+            `document.getElementById('status').textContent = ${JSON.stringify(message)};`
+        ).catch(() => {});
+    }
+}
+
 function waitForBackendPort(retries = 20, delay = 1000) {
     return new Promise((resolve) => {
         const portFile = getBackendPortFile();
@@ -156,6 +164,7 @@ function waitForBackendPort(retries = 20, delay = 1000) {
 
         const check = () => {
             attempts++;
+            sendSplashStatus(`Starting backend... (${attempts}/${retries})`);
             try {
                 if (fs.existsSync(portFile)) {
                     const content = fs.readFileSync(portFile, "utf-8");
@@ -175,6 +184,45 @@ function waitForBackendPort(retries = 20, delay = 1000) {
                 resolve(null);
             } else {
                 setTimeout(check, delay);
+            }
+        };
+
+        check();
+    });
+}
+
+function waitForBackendReady(port, retries = 30, delay = 1000) {
+    return new Promise((resolve) => {
+        let attempts = 0;
+
+        const check = () => {
+            attempts++;
+            sendSplashStatus(`Waiting for backend health check... (${attempts}/${retries})`);
+
+            const req = http.get(`http://127.0.0.1:${port}/actuator/health`, { timeout: 2000 }, (res) => {
+                let body = '';
+                res.on('data', chunk => body += chunk);
+                res.on('end', () => {
+                    if (res.statusCode === 200) {
+                        console.log(`[Main] Backend health OK on port ${port} (attempt ${attempts})`);
+                        sendSplashStatus('Backend ready. Loading UI...');
+                        resolve(true);
+                    } else {
+                        retry();
+                    }
+                });
+            });
+
+            req.on('error', () => retry());
+            req.on('timeout', () => { req.destroy(); retry(); });
+
+            function retry() {
+                if (attempts >= retries) {
+                    console.error("[Main] Timeout waiting for backend health.");
+                    resolve(false);
+                } else {
+                    setTimeout(check, delay);
+                }
             }
         };
 
@@ -204,25 +252,43 @@ function getJavaExecutable() {
 function getBackendJar() {
     if (isDev) return null;
 
-    // In production, look for bundled JAR in resources/backend/backend.jar
-    const jarPath = path.join(process.resourcesPath, "backend", "backend.jar");
-
-    if (fs.existsSync(jarPath)) {
-        console.log("[Main] Found backend JAR:", jarPath);
-        return jarPath;
+    // In production, look for the bundled backend in the known resource locations.
+    const fixedJarPath = path.join(process.resourcesPath, "backend", "backend.jar");
+    if (fs.existsSync(fixedJarPath)) {
+        console.log("[Main] Found backend JAR:", fixedJarPath);
+        return fixedJarPath;
     }
 
-    console.error("[Main] Backend JAR not found at:", jarPath);
+    const candidateDirs = [
+        path.join(process.resourcesPath, "backend"),
+        path.join(process.resourcesPath, "backend-libs")
+    ];
+
+    for (const dir of candidateDirs) {
+        if (!fs.existsSync(dir)) continue;
+
+        const jarFile = fs.readdirSync(dir)
+            .find((file) => file.endsWith(".jar") && !file.endsWith("-plain.jar"));
+
+        if (jarFile) {
+            const resolved = path.join(dir, jarFile);
+            console.log("[Main] Found backend JAR:", resolved);
+            return resolved;
+        }
+    }
+
+    console.error("[Main] Backend JAR not found in packaged resources.");
     return null;
 }
 
-function startBackend() {
+async function startBackend() {
     if (isDev) {
         console.log("[Main] Dev mode: Skipping backend spawn (assume running externally)");
-        // Try to read port immediately, assuming it's already running
-        return waitForBackendPort(5, 500).then(p => {
-            backendPort = p || BACKEND_DEFAULT_PORT;
-        });
+        const p = await waitForBackendPort(5, 500);
+        backendPort = p || BACKEND_DEFAULT_PORT;
+        const ready = await waitForBackendReady(backendPort, 10, 500);
+        if (!ready) console.warn("[Main] Dev backend health check failed, proceeding anyway.");
+        return;
     }
 
     const javaExec = getJavaExecutable();
@@ -230,10 +296,11 @@ function startBackend() {
 
     if (!jarPath) {
         console.error("[Main] Cannot start backend: JAR not found.");
-        return Promise.resolve();
+        return;
     }
 
     console.log(`[Main] Spawning backend: ${javaExec} -jar ${jarPath}`);
+    sendSplashStatus('Starting Java backend...');
 
     // Ensure data directory exists
     const dataPath = getAssociaGoHome();
@@ -254,7 +321,7 @@ function startBackend() {
     ], {
         cwd: path.dirname(jarPath),
         detached: false,
-        stdio: 'pipe' // Capture stdout/stderr
+        stdio: 'pipe'
     });
 
     backendProcess.stdout.on('data', (data) => {
@@ -270,10 +337,27 @@ function startBackend() {
         backendProcess = null;
     });
 
-    return waitForBackendPort().then(p => {
-        if (p) backendPort = p;
-        else console.warn("[Main] Failed to retrieve backend port after spawn.");
-    });
+    // Step 1: Wait for port file
+    sendSplashStatus('Waiting for backend port...');
+    const p = await waitForBackendPort();
+    if (p) {
+        backendPort = p;
+    } else {
+        console.warn("[Main] Failed to retrieve backend port after spawn.");
+        return;
+    }
+
+    // Step 2: Health check — wait for Spring Boot to be fully ready
+    sendSplashStatus('Running database migrations...');
+    const ready = await waitForBackendReady(backendPort);
+    if (!ready) {
+        console.error("[Main] Backend never became healthy.");
+        dialog.showErrorBox(
+            "Startup Error",
+            "AssociaGo backend failed to start. Check logs for details."
+        );
+        app.quit();
+    }
 }
 
 function stopBackend() {
@@ -635,7 +719,7 @@ ipcMain.handle("data:exportJsonDialog", async () => {
         // TODO: Implement backend export endpoint
         // const data = await callBackend("GET", "/export");
         const exportData = {
-            version: "1.0.0",
+            version: app.getVersion(),
             exportedAt: new Date().toISOString(),
             data: {},
         };

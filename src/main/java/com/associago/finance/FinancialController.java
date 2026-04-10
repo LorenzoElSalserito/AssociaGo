@@ -1,5 +1,8 @@
 package com.associago.finance;
 
+import com.associago.finance.dto.TransactionCreateDTO;
+import com.associago.finance.dto.TransactionDTO;
+import com.associago.finance.mapper.TransactionMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -25,14 +28,18 @@ public class FinancialController {
     }
 
     @PostMapping("/transactions")
-    public Transaction createTransaction(@RequestBody Transaction transaction) {
-        return financialService.saveTransaction(transaction);
+    public TransactionDTO createTransaction(@RequestBody TransactionCreateDTO dto) {
+        Transaction entity = TransactionMapper.toEntity(dto);
+        Transaction saved = financialService.saveTransaction(entity);
+        return TransactionMapper.toDTO(saved);
     }
 
     @PutMapping("/transactions/{id}")
-    public ResponseEntity<Transaction> updateTransaction(@PathVariable Long id, @RequestBody Transaction transaction) {
+    public ResponseEntity<TransactionDTO> updateTransaction(@PathVariable Long id, @RequestBody TransactionCreateDTO dto) {
         try {
-            return ResponseEntity.ok(financialService.updateTransaction(id, transaction));
+            Transaction entity = TransactionMapper.toEntity(dto);
+            Transaction updated = financialService.updateTransaction(id, entity);
+            return ResponseEntity.ok(TransactionMapper.toDTO(updated));
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
@@ -45,7 +52,7 @@ public class FinancialController {
     }
 
     @GetMapping("/transactions")
-    public List<Transaction> getAllTransactions(
+    public List<TransactionDTO> getAllTransactions(
             @RequestParam(required = false) TransactionType type,
             @RequestParam(required = false) Long categoryId,
             @RequestParam(required = false) Long eventId,
@@ -86,7 +93,9 @@ public class FinancialController {
             return cb.and(predicates.toArray(new Predicate[0]));
         };
 
-        return financialService.getTransactions(spec);
+        return financialService.getTransactions(spec).stream()
+                .map(TransactionMapper::toDTO)
+                .toList();
     }
 
     @GetMapping("/journal-entries")

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useTranslation } from 'react-i18next';
 import { associago } from "../api.js";
-import { Globe, Lock, Building, Mail, ArrowRight, Plus, Trash2, FileText, Hash } from 'lucide-react';
+import { Globe, Lock, Building, Mail, ArrowRight, Plus, Trash2, FileText, Hash, Eye, EyeOff } from 'lucide-react';
 import icon6 from '../assets/6.svg';
 
 export default function LoginPage({ onLogin }) {
@@ -23,6 +23,8 @@ export default function LoginPage({ onLogin }) {
 
     const [passwordInput, setPasswordInput] = useState("");
     const [rememberMe, setRememberMe] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showSetupPassword, setShowSetupPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
@@ -226,8 +228,11 @@ export default function LoginPage({ onLogin }) {
                                 <label className="form-label small fw-bold text-muted">{t("Password")}</label>
                                 <div className="input-group">
                                     <span className="input-group-text bg-light border-end-0"><Lock size={18} className="text-muted"/></span>
-                                    <input type="password" className="form-control bg-light border-start-0" autoFocus
+                                    <input type={showPassword ? "text" : "password"} className="form-control bg-light border-start-0" autoFocus
                                         value={passwordInput} onChange={e => setPasswordInput(e.target.value)} placeholder="••••••••" />
+                                    <button type="button" className="input-group-text bg-light border-start-0" onClick={() => setShowPassword((current) => !current)}>
+                                        {showPassword ? <EyeOff size={18} className="text-muted" /> : <Eye size={18} className="text-muted" />}
+                                    </button>
                                 </div>
                             </div>
                             <div className="form-check mb-4">
@@ -293,8 +298,11 @@ export default function LoginPage({ onLogin }) {
                                 <label className="form-label small fw-bold text-muted">{t("Master Password")}</label>
                                 <div className="input-group">
                                     <span className="input-group-text bg-light border-end-0"><Lock size={18} className="text-muted"/></span>
-                                    <input type="password" className="form-control bg-light border-start-0" required minLength={6}
+                                    <input type={showSetupPassword ? "text" : "password"} className="form-control bg-light border-start-0" required minLength={6}
                                         value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} />
+                                    <button type="button" className="input-group-text bg-light border-start-0" onClick={() => setShowSetupPassword((current) => !current)}>
+                                        {showSetupPassword ? <EyeOff size={18} className="text-muted" /> : <Eye size={18} className="text-muted" />}
+                                    </button>
                                 </div>
                             </div>
 

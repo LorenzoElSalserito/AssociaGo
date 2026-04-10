@@ -1,9 +1,11 @@
 package com.associago.report;
 
+import com.associago.activity.Activity;
 import com.associago.assembly.Assembly;
 import com.associago.assembly.AssemblyMotion;
 import com.associago.assembly.AssemblyParticipant;
 import com.associago.association.Association;
+import com.associago.event.Event;
 import com.associago.finance.Transaction;
 import com.associago.member.Member;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -256,6 +258,185 @@ public class ReportService {
             document.save(baos);
             return baos.toByteArray();
         }
+    }
+
+    public byte[] generateMemberList(List<Member> members, Association association) throws IOException {
+        try (PDDocument document = new PDDocument()) {
+            PDPage page = new PDPage();
+            document.addPage(page);
+            addHeader(document, page, association);
+
+            try (PDPageContentStream cs = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, true, true)) {
+                cs.beginText();
+                cs.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 16);
+                cs.newLineAtOffset(50, 680);
+                cs.showText("Elenco Soci");
+                cs.endText();
+
+                // Table header
+                int y = 650;
+                cs.beginText();
+                cs.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 9);
+                cs.newLineAtOffset(50, y);
+                cs.showText("N.");
+                cs.newLineAtOffset(25, 0);
+                cs.showText("Cognome");
+                cs.newLineAtOffset(110, 0);
+                cs.showText("Nome");
+                cs.newLineAtOffset(100, 0);
+                cs.showText("Codice Fiscale");
+                cs.newLineAtOffset(120, 0);
+                cs.showText("Email");
+                cs.newLineAtOffset(120, 0);
+                cs.showText("Stato");
+                cs.endText();
+                y -= 5;
+                cs.moveTo(50, y);
+                cs.lineTo(550, y);
+                cs.stroke();
+                y -= 12;
+
+                cs.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 8);
+                int num = 1;
+                for (Member m : members) {
+                    if (y < 60) {
+                        // New page
+                        cs.close();
+                        page = new PDPage();
+                        document.addPage(page);
+                        y = 750;
+                        PDPageContentStream csAppend = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, true, true);
+                        csAppend.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 8);
+                    }
+                    cs.beginText();
+                    cs.newLineAtOffset(50, y);
+                    cs.showText(String.valueOf(num++));
+                    cs.newLineAtOffset(25, 0);
+                    cs.showText(truncate(m.getLastName(), 18));
+                    cs.newLineAtOffset(110, 0);
+                    cs.showText(truncate(m.getFirstName(), 16));
+                    cs.newLineAtOffset(100, 0);
+                    cs.showText(m.getFiscalCode() != null ? m.getFiscalCode() : "");
+                    cs.newLineAtOffset(120, 0);
+                    cs.showText(truncate(m.getEmail(), 22));
+                    cs.newLineAtOffset(120, 0);
+                    cs.showText(m.getMembershipStatus() != null ? m.getMembershipStatus() : "");
+                    cs.endText();
+                    y -= 12;
+                }
+            }
+
+            addFooter(document, page, association);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            document.save(baos);
+            return baos.toByteArray();
+        }
+    }
+
+    public byte[] generateEventReport(Event event, int participantCount, Association association) throws IOException {
+        try (PDDocument document = new PDDocument()) {
+            PDPage page = new PDPage();
+            document.addPage(page);
+            addHeader(document, page, association);
+
+            try (PDPageContentStream cs = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, true, true)) {
+                cs.beginText();
+                cs.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 16);
+                cs.newLineAtOffset(50, 680);
+                cs.showText("Report Evento");
+                cs.endText();
+
+                cs.beginText();
+                cs.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 12);
+                cs.newLineAtOffset(50, 640);
+                cs.showText("Nome: " + (event.getName() != null ? event.getName() : ""));
+                cs.newLineAtOffset(0, -18);
+                cs.showText("Tipo: " + (event.getType() != null ? event.getType() : "N/D"));
+                cs.newLineAtOffset(0, -18);
+                cs.showText("Luogo: " + (event.getLocation() != null ? event.getLocation() : "N/D"));
+                cs.newLineAtOffset(0, -18);
+                cs.showText("Inizio: " + (event.getStartDatetime() != null ? event.getStartDatetime().format(DATE_TIME_FORMATTER) : "N/D"));
+                cs.newLineAtOffset(0, -18);
+                cs.showText("Fine: " + (event.getEndDatetime() != null ? event.getEndDatetime().format(DATE_TIME_FORMATTER) : "N/D"));
+                cs.newLineAtOffset(0, -18);
+                cs.showText("Stato: " + (event.getStatus() != null ? event.getStatus() : "N/D"));
+                cs.newLineAtOffset(0, -18);
+                cs.showText("Posti max: " + (event.getMaxParticipants() != null ? event.getMaxParticipants() : "Illimitati"));
+                cs.newLineAtOffset(0, -18);
+                cs.showText("Partecipanti iscritti: " + participantCount);
+                cs.newLineAtOffset(0, -18);
+                cs.showText("Costo soci: " + (event.getCostMember() != null ? event.getCostMember() + " EUR" : "Gratuito"));
+                cs.newLineAtOffset(0, -18);
+                cs.showText("Costo non soci: " + (event.getCostNonMember() != null ? event.getCostNonMember() + " EUR" : "Gratuito"));
+                cs.newLineAtOffset(0, -30);
+                cs.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 12);
+                cs.showText("Descrizione:");
+                cs.endText();
+
+                if (event.getDescription() != null && !event.getDescription().isEmpty()) {
+                    cs.beginText();
+                    cs.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 10);
+                    cs.newLineAtOffset(50, 420);
+                    cs.showText(truncate(event.getDescription(), 90));
+                    cs.endText();
+                }
+            }
+
+            addFooter(document, page, association);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            document.save(baos);
+            return baos.toByteArray();
+        }
+    }
+
+    public byte[] generateActivityReport(Activity activity, int participantCount, Association association) throws IOException {
+        try (PDDocument document = new PDDocument()) {
+            PDPage page = new PDPage();
+            document.addPage(page);
+            addHeader(document, page, association);
+
+            try (PDPageContentStream cs = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, true, true)) {
+                cs.beginText();
+                cs.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 16);
+                cs.newLineAtOffset(50, 680);
+                cs.showText("Report Attività");
+                cs.endText();
+
+                cs.beginText();
+                cs.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 12);
+                cs.newLineAtOffset(50, 640);
+                cs.showText("Nome: " + (activity.getName() != null ? activity.getName() : ""));
+                cs.newLineAtOffset(0, -18);
+                cs.showText("Categoria: " + (activity.getCategory() != null ? activity.getCategory() : "N/D"));
+                cs.newLineAtOffset(0, -18);
+                cs.showText("Luogo: " + (activity.getLocation() != null ? activity.getLocation() : "N/D"));
+                cs.newLineAtOffset(0, -18);
+                cs.showText("Inizio: " + (activity.getStartDate() != null ? activity.getStartDate().format(DATE_FORMATTER) : "N/D"));
+                cs.newLineAtOffset(0, -18);
+                cs.showText("Fine: " + (activity.getEndDate() != null ? activity.getEndDate().format(DATE_FORMATTER) : "N/D"));
+                cs.newLineAtOffset(0, -18);
+                cs.showText("Orario: " + (activity.getScheduleDetails() != null ? activity.getScheduleDetails() : "N/D"));
+                cs.newLineAtOffset(0, -18);
+                cs.showText("Costo: " + (activity.getCost() != null ? activity.getCost() + " EUR" : "Gratuito"));
+                cs.newLineAtOffset(0, -18);
+                cs.showText("Posti max: " + (activity.getMaxParticipants() != null ? activity.getMaxParticipants() : "Illimitati"));
+                cs.newLineAtOffset(0, -18);
+                cs.showText("Partecipanti iscritti: " + participantCount);
+                cs.newLineAtOffset(0, -18);
+                cs.showText("Stato: " + (activity.isActive() ? "Attiva" : "Non attiva"));
+                cs.endText();
+            }
+
+            addFooter(document, page, association);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            document.save(baos);
+            return baos.toByteArray();
+        }
+    }
+
+    private String truncate(String s, int max) {
+        if (s == null) return "";
+        return s.length() <= max ? s : s.substring(0, max - 1) + "…";
     }
 
     public byte[] generateAssemblyMinutes(Assembly assembly, List<AssemblyParticipant> participants, List<AssemblyMotion> motions, Association association) throws IOException {

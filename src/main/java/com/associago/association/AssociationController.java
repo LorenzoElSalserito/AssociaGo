@@ -1,5 +1,10 @@
 package com.associago.association;
 
+import com.associago.association.dto.AssociationCreateDTO;
+import com.associago.association.dto.AssociationDTO;
+import com.associago.association.dto.AssociationUpdateDTO;
+import com.associago.association.mapper.AssociationMapper;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -12,7 +17,7 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/associations")
+@RequestMapping({"/api/associations", "/api/v1/associations"})
 public class AssociationController {
 
     private final AssociationService associationService;
@@ -23,34 +28,42 @@ public class AssociationController {
     }
 
     @GetMapping
-    public List<Association> getAllAssociations() {
-        return associationService.findAll();
+    public List<AssociationDTO> getAllAssociations() {
+        return associationService.findAll().stream()
+                .map(AssociationMapper::toDTO)
+                .toList();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Association> getAssociationById(@PathVariable Long id) {
+    public ResponseEntity<AssociationDTO> getAssociationById(@PathVariable Long id) {
         return associationService.findById(id)
+                .map(AssociationMapper::toDTO)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public Association createAssociation(@RequestBody Association association) {
-        return associationService.create(association);
+    public AssociationDTO createAssociation(@Valid @RequestBody AssociationCreateDTO dto) {
+        Association entity = AssociationMapper.toEntity(dto);
+        return AssociationMapper.toDTO(associationService.create(entity));
     }
-    
+
     @PostMapping("/setup")
-    public Association setupAssociation(@RequestBody Association association) {
-        return associationService.create(association);
+    public AssociationDTO setupAssociation(@Valid @RequestBody AssociationCreateDTO dto) {
+        Association entity = AssociationMapper.toEntity(dto);
+        return AssociationMapper.toDTO(associationService.create(entity));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Association> updateAssociation(@PathVariable Long id, @RequestBody Association association) {
-        try {
-            return ResponseEntity.ok(associationService.update(id, association));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<AssociationDTO> updateAssociation(@PathVariable Long id,
+                                                            @Valid @RequestBody AssociationUpdateDTO dto) {
+        return associationService.findById(id)
+                .map(existing -> {
+                    AssociationMapper.updateEntity(existing, dto);
+                    Association updated = associationService.update(id, existing);
+                    return ResponseEntity.ok(AssociationMapper.toDTO(updated));
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")

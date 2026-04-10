@@ -1,10 +1,16 @@
 package com.associago.inventory;
 
+import com.associago.inventory.dto.InventoryItemCreateDTO;
+import com.associago.inventory.dto.InventoryItemDTO;
+import com.associago.inventory.mapper.InventoryItemMapper;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @RestController
 @RequestMapping("/api/v1/inventory")
@@ -17,29 +23,38 @@ public class InventoryController {
     }
 
     @GetMapping
-    public ResponseEntity<Iterable<InventoryItem>> getAllItems() {
-        return ResponseEntity.ok(inventoryService.getAllItems());
+    public ResponseEntity<List<InventoryItemDTO>> getAllItems() {
+        List<InventoryItemDTO> items = StreamSupport.stream(inventoryService.getAllItems().spliterator(), false)
+                .map(InventoryItemMapper::toDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(items);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<InventoryItem> getItemById(@PathVariable Long id) {
+    public ResponseEntity<InventoryItemDTO> getItemById(@PathVariable Long id) {
         return inventoryService.getItemById(id)
+                .map(InventoryItemMapper::toDTO)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<InventoryItem> createItem(@RequestBody InventoryItem item) {
-        return ResponseEntity.ok(inventoryService.createItem(item));
+    public ResponseEntity<InventoryItemDTO> createItem(@Valid @RequestBody InventoryItemCreateDTO dto) {
+        InventoryItem item = InventoryItemMapper.toEntity(dto);
+        InventoryItem saved = inventoryService.createItem(item);
+        return ResponseEntity.ok(InventoryItemMapper.toDTO(saved));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<InventoryItem> updateItem(@PathVariable Long id, @RequestBody InventoryItem item) {
-        try {
-            return ResponseEntity.ok(inventoryService.updateItem(id, item));
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<InventoryItemDTO> updateItem(@PathVariable Long id,
+                                                        @Valid @RequestBody InventoryItemCreateDTO dto) {
+        return inventoryService.getItemById(id)
+                .map(existing -> {
+                    InventoryItemMapper.updateEntity(existing, dto);
+                    InventoryItem saved = inventoryService.updateItem(id, existing);
+                    return ResponseEntity.ok(InventoryItemMapper.toDTO(saved));
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")

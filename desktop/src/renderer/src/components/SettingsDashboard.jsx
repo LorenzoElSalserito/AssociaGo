@@ -2,15 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { Card, Button, Form, Row, Col, Alert, Spinner, Nav, Image, Badge } from 'react-bootstrap';
 import { associago } from '../api';
 import { useTranslation } from 'react-i18next';
-import { Save, Database, Download, Globe, Moon, Sun, Building, Upload, Edit, X, FileText, CreditCard, Plus, Trash2, Bug } from 'lucide-react';
+import { Save, Database, Download, Globe, Moon, Sun, Building, Upload, Edit, X, FileText, CreditCard, Plus, Trash2, Bug, PenTool } from 'lucide-react';
 import PaymentMethodForm from './PaymentMethodForm';
+import AssociationRegistryPanel from './AssociationRegistryPanel';
+import SignaturePanel from './SignaturePanel';
 
 const SettingsDashboard = ({ shell }) => {
   const { t, i18n } = useTranslation();
 
   const [activeTab, setActiveTab] = useState('association');
   const [isEditing, setIsEditing] = useState(false);
-  const [appVersion, setAppVersion] = useState('0.9');
+  const [appVersion, setAppVersion] = useState(''); // Loaded from Electron
+  const [backendVersion, setBackendVersion] = useState('');
 
   // Profile State
   const [profile, setProfile] = useState({
@@ -51,6 +54,9 @@ const SettingsDashboard = ({ shell }) => {
     if (window.api && window.api.getAppVersion) {
         window.api.getAppVersion().then(v => setAppVersion(v));
     }
+    associago.getBackendInfo().then(info => {
+        if (info?.version) setBackendVersion(info.version);
+    }).catch(() => {});
   }, [shell.currentAssociationId, activeTab]);
 
   const loadData = async () => {
@@ -257,6 +263,9 @@ const SettingsDashboard = ({ shell }) => {
                         <Form.Text className="text-muted d-block mt-1">
                             {t('Recommended: 500x500px PNG or JPG')}
                         </Form.Text>
+                        <Alert variant="warning" className="small mt-3 mb-0">
+                            {t('Remember to configure institutional signatures for president, secretary and treasurer before generating balances, certificates and official documents.')}
+                        </Alert>
                     </div>
                 </div>
             </Col>
@@ -476,7 +485,10 @@ const SettingsDashboard = ({ shell }) => {
                     <h6 className="mb-3">{t('App Info')}</h6>
                     <div className="d-flex justify-content-between align-items-start">
                         <div>
-                            <p className="mb-1"><strong>AssociaGo</strong> v{appVersion}</p>
+                            <p className="mb-1"><strong>AssociaGo</strong> v{appVersion || backendVersion}</p>
+                            {backendVersion && backendVersion !== appVersion && (
+                                <p className="mb-1 text-muted small">Backend: v{backendVersion}</p>
+                            )}
                             <p className="mb-1 text-muted small">Copyright © Lorenzo De Marco (Lorenzo DM)</p>
                             <p className="mb-1 text-muted small">{t('License')}: AGPLv3</p>
                             <p className="mb-3 text-muted small">
@@ -585,19 +597,24 @@ const SettingsDashboard = ({ shell }) => {
       }
   };
 
-  /*const renderDatabaseTab = () => (
+  const renderDatabaseTab = () => (
     <div>
         <Alert variant="warning" className="small mb-4">
             {t('Changing database settings may require restarting the application.')}
         </Alert>
-        <Form.Check
-            type="switch"
-            id="useRemoteDb"
-            label={t('Use Remote Database')}
-            checked={dbConfig.useRemoteDb}
-            onChange={e => setDbConfig({...dbConfig, useRemoteDb: e.target.checked})}
-            className="mb-4"
-        />
+        <div className="d-flex align-items-center gap-3 mb-4">
+            <Form.Check
+                type="switch"
+                id="useRemoteDb"
+                label={t('Use Remote Database')}
+                checked={false}
+                disabled={true}
+                className="mb-0"
+            />
+            <Badge bg="warning" text="dark" className="px-3 py-2" style={{ fontSize: '0.8rem' }}>
+                {t('Coming Soon')}
+            </Badge>
+        </div>
         {dbConfig.useRemoteDb && (
             <Card className="border-0 shadow-sm mb-4">
                 <Card.Body>
@@ -660,7 +677,7 @@ const SettingsDashboard = ({ shell }) => {
             {t('Save Database Settings')}
         </Button>
     </div>
-  );*/
+  );
 
   return (
     <div className="fade-in" style={{ maxWidth: '1200px', margin: '0 auto' }}>
@@ -699,6 +716,16 @@ const SettingsDashboard = ({ shell }) => {
                     </Nav.Link>
                 </Nav.Item>
                 <Nav.Item>
+                    <Nav.Link eventKey="registry" className="d-flex align-items-center gap-2">
+                        <FileText size={18} /> {t('Registry')}
+                    </Nav.Link>
+                </Nav.Item>
+                <Nav.Item>
+                    <Nav.Link eventKey="signatures" className="d-flex align-items-center gap-2">
+                        <PenTool size={18} /> {t('Signatures')}
+                    </Nav.Link>
+                </Nav.Item>
+                <Nav.Item>
                     <Nav.Link eventKey="database" className="d-flex align-items-center gap-2">
                         <Database size={18} /> {t('Database')}
                     </Nav.Link>
@@ -709,7 +736,9 @@ const SettingsDashboard = ({ shell }) => {
             {activeTab === 'association' && renderAssociationTab()}
             {activeTab === 'finance' && renderFinanceTab()}
             {activeTab === 'general' && renderGeneralTab()}
-            {/*activeTab === 'database' && renderDatabaseTab()*/}
+            {activeTab === 'registry' && <AssociationRegistryPanel associationId={shell.currentAssociationId} />}
+            {activeTab === 'signatures' && <SignaturePanel associationId={shell.currentAssociationId} />}
+            {activeTab === 'database' && renderDatabaseTab()}
         </Card.Body>
       </Card>
     </div>

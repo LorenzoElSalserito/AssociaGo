@@ -10,4 +10,6 @@ import java.util.List;
 public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
     List<Invoice> findByAssociationId(Long associationId);
     List<Invoice> findByAssociationIdAndIsPaid(Long associationId, boolean isPaid);
+
+    List<Invoice> findByAssociationIdOrderByNumberAsc(Long associationId);
 }

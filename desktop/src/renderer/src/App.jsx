@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { associago } from './api';
 
@@ -8,10 +8,10 @@ import TopHeader from "./components/TopHeader";
 import ProfileMenu from "./components/ProfileMenu";
 import CommandPalette from "./components/CommandPalette";
 import NotificationBell from "./components/NotificationBell";
-import SetupWizard from './components/SetupWizard';
 import LoginPage from './components/LoginPage';
 import SplashScreen from './components/SplashScreen';
 import Modal from './components/Modal';
+import ErrorBoundary from './components/ErrorBoundary';
 
 // Page Components
 import MemberList from './components/MemberList';
@@ -26,6 +26,13 @@ import VolunteerList from './components/VolunteerList';
 import AttendanceList from './components/AttendanceList';
 import CouponList from './components/CouponList';
 import ManualDashboard from './components/ManualDashboard';
+import BudgetDashboard from './components/BudgetDashboard';
+import AnnualBalanceDashboard from './components/AnnualBalanceDashboard';
+import CertificateList from './components/CertificateList';
+import CommunicationDashboard from './components/CommunicationDashboard';
+//import ResourceBookingDashboard from './components/ResourceBookingDashboard';
+//import CashRegisterDashboard from './components/CashRegisterDashboard';
+//import CsvImportDashboard from './components/CsvImportDashboard';
 
 // Form Components
 import MemberForm from './components/MemberForm';
@@ -179,7 +186,15 @@ function App() {
     { id: "assemblies", label: t('nav.assemblies'), icon: "bi-file-text", component: AssemblyList },
     { id: "inventory", label: t('nav.inventory'), icon: "bi-box-seam", component: InventoryList },
     { id: "volunteers", label: t('nav.volunteers'), icon: "bi-person-check", component: VolunteerList },
+    { id: "attendance", label: t('nav.attendance'), icon: "bi-check2-square", component: AttendanceList },
     { id: "coupons", label: t('nav.coupons'), icon: "bi-ticket-perforated", component: CouponList },
+    { id: "budget", label: t('nav.budget'), icon: "bi-piggy-bank", component: BudgetDashboard },
+    { id: "balance", label: t('nav.balance'), icon: "bi-bar-chart", component: AnnualBalanceDashboard },
+    { id: "certificates", label: t('nav.certificates'), icon: "bi-award", component: CertificateList },
+    { id: "communications", label: t('nav.communications'), icon: "bi-envelope", component: CommunicationDashboard },
+    //{ id: "resources", label: t('nav.resources'), icon: "bi-door-open", component: ResourceBookingDashboard },
+    //{ id: "cash-register", label: t('nav.cashRegister'), icon: "bi-banknote", component: CashRegisterDashboard },
+    //{ id: "csv-import", label: t('nav.csvImport'), icon: "bi-upload", component: CsvImportDashboard },
     { id: "manual", label: t('User Manual'), icon: "bi-book", component: ManualDashboard },
     { id: "settings", label: t('nav.settings'), icon: "bi-gear", component: SettingsDashboard },
   ], [t]);
@@ -233,7 +248,9 @@ function App() {
                 />
                 <section className="jl-content">
                     <div className="jl-page p-4">
-                        <PageComponent shell={shell} associationId={currentAssociation?.id} />
+                        <ErrorBoundary>
+                            <PageComponent shell={shell} associationId={currentAssociation?.id} />
+                        </ErrorBoundary>
                     </div>
                 </section>
             </main>

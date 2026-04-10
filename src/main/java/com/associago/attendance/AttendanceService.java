@@ -38,6 +38,7 @@ public class AttendanceService {
     @Transactional
     public AttendanceSession updateSession(Long id, AttendanceSession sessionDetails) {
         return sessionRepository.findById(id).map(session -> {
+            session.setActivityId(sessionDetails.getActivityId());
             session.setDate(sessionDetails.getDate());
             session.setStartTime(sessionDetails.getStartTime());
             session.setEndTime(sessionDetails.getEndTime());
@@ -57,6 +58,10 @@ public class AttendanceService {
         return recordRepository.findBySessionId(sessionId);
     }
 
+    public Optional<AttendanceRecord> getRecordById(Long id) {
+        return recordRepository.findById(id);
+    }
+
     @Transactional
     public AttendanceRecord createRecord(AttendanceRecord record) {
         if (record.getStatus() == null) {
@@ -68,6 +73,8 @@ public class AttendanceService {
     @Transactional
     public AttendanceRecord updateRecord(Long id, AttendanceRecord recordDetails) {
         return recordRepository.findById(id).map(record -> {
+            record.setSessionId(recordDetails.getSessionId());
+            record.setMemberId(recordDetails.getMemberId());
             record.setStatus(recordDetails.getStatus());
             record.setCheckInTime(recordDetails.getCheckInTime());
             record.setNotes(recordDetails.getNotes());

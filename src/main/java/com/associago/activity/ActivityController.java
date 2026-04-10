@@ -1,7 +1,11 @@
 package com.associago.activity;
 
+import com.associago.activity.dto.ActivityCreateDTO;
+import com.associago.activity.dto.ActivityDTO;
+import com.associago.activity.mapper.ActivityMapper;
 import com.associago.stats.dto.ActivityFinancialSummaryDTO;
 import com.associago.stats.dto.ActivityWithDetailsDTO;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,46 +26,42 @@ public class ActivityController {
     // --- Basic Activity CRUD ---
 
     @GetMapping
-    public List<Activity> getActivities(@RequestParam(required = false) Long associationId) {
+    public List<ActivityDTO> getActivities(@RequestParam(required = false) Long associationId) {
         if (associationId != null) {
-            return activityService.findByAssociationId(associationId);
+            return activityService.findByAssociationId(associationId).stream()
+                    .map(ActivityMapper::toDTO)
+                    .toList();
         }
         return List.of();
     }
 
     @GetMapping("/association/{associationId}")
-    public List<Activity> getActivitiesByAssociation(@PathVariable Long associationId) {
-        return activityService.findByAssociationId(associationId);
+    public List<ActivityDTO> getActivitiesByAssociation(@PathVariable Long associationId) {
+        return activityService.findByAssociationId(associationId).stream()
+                .map(ActivityMapper::toDTO)
+                .toList();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Activity> getActivityById(@PathVariable Long id) {
+    public ResponseEntity<ActivityDTO> getActivityById(@PathVariable Long id) {
         return activityService.findById(id)
+                .map(ActivityMapper::toDTO)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public Activity createActivity(@RequestBody Activity activity) {
-        return activityService.save(activity);
+    public ActivityDTO createActivity(@Valid @RequestBody ActivityCreateDTO dto) {
+        Activity entity = ActivityMapper.toEntity(dto);
+        return ActivityMapper.toDTO(activityService.save(entity));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Activity> updateActivity(@PathVariable Long id, @RequestBody Activity details) {
+    public ResponseEntity<ActivityDTO> updateActivity(@PathVariable Long id, @Valid @RequestBody ActivityCreateDTO dto) {
         return activityService.findById(id)
                 .map(existing -> {
-                    existing.setName(details.getName());
-                    existing.setDescription(details.getDescription());
-                    existing.setCategory(details.getCategory());
-                    existing.setStartDate(details.getStartDate());
-                    existing.setEndDate(details.getEndDate());
-                    existing.setStartTime(details.getStartTime());
-                    existing.setEndTime(details.getEndTime());
-                    existing.setLocation(details.getLocation());
-                    existing.setMaxParticipants(details.getMaxParticipants());
-                    existing.setCost(details.getCost());
-                    existing.setActive(details.isActive());
-                    return ResponseEntity.ok(activityService.save(existing));
+                    ActivityMapper.updateEntity(existing, dto);
+                    return ResponseEntity.ok(ActivityMapper.toDTO(activityService.save(existing)));
                 })
                 .orElse(ResponseEntity.notFound().build());
     }

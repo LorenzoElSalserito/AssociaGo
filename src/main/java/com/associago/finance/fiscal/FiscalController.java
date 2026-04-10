@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/fiscal")
 public class FiscalController {
@@ -42,5 +44,10 @@ public class FiscalController {
             @RequestParam Integer year,
             @RequestParam Long userId) {
         return ResponseEntity.ok(fiscalService.performInvoiceCheck(associationId, year, userId));
+    }
+
+    @GetMapping("/invoice-checks")
+    public List<InvoiceCheck> getInvoiceCheckHistory(@RequestParam Long associationId) {
+        return fiscalService.getInvoiceCheckHistory(associationId);
     }
 }

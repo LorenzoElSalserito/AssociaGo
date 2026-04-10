@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Button, Table, Badge, Spinner, Nav } from 'react-bootstrap';
-import { ArrowLeft, Plus, Trash2, Edit, Users, DollarSign, Calendar, MapPin } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Edit, Users, DollarSign, Calendar, MapPin, Award, Upload } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { associago } from '../api';
+import CsvImporter from './CsvImporter';
+import { translateEventType, translateParticipantStatus, translatePaymentStatus, translateCertificateType } from '../utils/enumTranslations';
 
 const EventDetail = ({ eventId, shell, onBack }) => {
     const { t } = useTranslation();
@@ -10,6 +12,7 @@ const EventDetail = ({ eventId, shell, onBack }) => {
     const [participants, setParticipants] = useState([]);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('participants');
+    const [certificateTemplates, setCertificateTemplates] = useState([]);
 
     useEffect(() => {
         loadData();
@@ -18,16 +21,27 @@ const EventDetail = ({ eventId, shell, onBack }) => {
     const loadData = async () => {
         setLoading(true);
         try {
-            const [sum, parts] = await Promise.all([
+            const [sum, parts, templates] = await Promise.all([
                 associago.events.getSummary(eventId),
-                associago.events.getParticipants(eventId)
+                associago.events.getParticipants(eventId),
+                associago.certificates.getTemplates(shell?.currentAssociationId)
             ]);
             setSummary(sum);
             setParticipants(parts);
+            setCertificateTemplates(templates || []);
         } catch (error) {
             console.error("Error loading event details:", error);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleBatchCertificates = async (templateId) => {
+        try {
+            await associago.certificates.batchEvent(eventId, templateId, shell.currentAssociationId);
+            alert(t('Certificates issued successfully.'));
+        } catch (error) {
+            alert(error.message);
         }
     };
 
@@ -55,7 +69,7 @@ const EventDetail = ({ eventId, shell, onBack }) => {
                 <div>
                     <h2 className="fw-bold text-dark mb-0">{event.name}</h2>
                     <div className="text-muted small d-flex align-items-center gap-3 mt-1">
-                        <Badge bg="info">{event.type}</Badge>
+                        <Badge bg="info">{translateEventType(event.type, t)}</Badge>
                         <span className="d-flex align-items-center"><Calendar size={14} className="me-1"/> {new Date(event.startDatetime).toLocaleString()}</span>
                         {event.location && <span className="d-flex align-items-center"><MapPin size={14} className="me-1"/> {event.location}</span>}
                     </div>
@@ -107,6 +121,8 @@ const EventDetail = ({ eventId, shell, onBack }) => {
                 <Card.Header className="bg-white border-bottom-0 pt-0 px-0">
                     <Nav variant="tabs" className="px-3 pt-3" activeKey={activeTab} onSelect={k => setActiveTab(k)}>
                         <Nav.Item><Nav.Link eventKey="participants" className="d-flex align-items-center gap-2"><Users size={18}/> {t('Participants')}</Nav.Link></Nav.Item>
+                        <Nav.Item><Nav.Link eventKey="certificates" className="d-flex align-items-center gap-2"><Award size={18}/> {t('Certificates')}</Nav.Link></Nav.Item>
+                        <Nav.Item><Nav.Link eventKey="import" className="d-flex align-items-center gap-2"><Upload size={18}/> {t('CSV Import')}</Nav.Link></Nav.Item>
                     </Nav>
                 </Card.Header>
                 <Card.Body className="p-0">
@@ -133,10 +149,10 @@ const EventDetail = ({ eventId, shell, onBack }) => {
                                                 {p.user ? `${p.user.firstName} ${p.user.lastName}` : (p.guestName || t('Unknown'))}
                                                 {p.user && <div className="small text-muted">{p.user.email}</div>}
                                             </td>
-                                            <td><Badge bg={p.status === 'REGISTERED' ? 'success' : 'secondary'}>{p.status}</Badge></td>
+                                            <td><Badge bg={p.status === 'REGISTERED' ? 'success' : 'secondary'}>{translateParticipantStatus(p.status, t)}</Badge></td>
                                             <td>
                                                 <Badge bg={p.paymentStatus === 'PAID' ? 'success' : 'warning'} text="dark" className="border">
-                                                    {p.paymentStatus}
+                                                    {translatePaymentStatus(p.paymentStatus, t)}
                                                 </Badge>
                                                 {p.amountPaid > 0 && <span className="ms-2 small">€ {p.amountPaid}</span>}
                                             </td>
@@ -148,6 +164,38 @@ const EventDetail = ({ eventId, shell, onBack }) => {
                                     {participants.length === 0 && <tr><td colSpan="4" className="text-center py-4 text-muted">{t('No participants')}</td></tr>}
                                 </tbody>
                             </Table>
+                        </div>
+                    )}
+
+                    {activeTab === 'certificates' && (
+                        <div className="p-3">
+                            <Table responsive hover size="sm" className="mb-0">
+                                <thead><tr><th>{t('Template')}</th><th>{t('Type')}</th><th className="text-end">{t('Actions')}</th></tr></thead>
+                                <tbody>
+                                    {certificateTemplates.map((template) => (
+                                        <tr key={template.id}>
+                                            <td>{template.name}</td>
+                                            <td>{translateCertificateType(template.type, t)}</td>
+                                            <td className="text-end">
+                                                <Button size="sm" onClick={() => handleBatchCertificates(template.id)}>
+                                                    <Award size={14} className="me-2" />{t('Issue Batch')}
+                                                </Button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                    {certificateTemplates.length === 0 && <tr><td colSpan="3" className="text-center py-4 text-muted">{t('No certificate templates available')}</td></tr>}
+                                </tbody>
+                            </Table>
+                        </div>
+                    )}
+
+                    {activeTab === 'import' && (
+                        <div className="p-3">
+                            <CsvImporter
+                                title={t('Event Participants CSV Import')}
+                                onPreview={(file) => associago.csvImport.previewEventParticipants(file, shell.currentAssociationId, eventId)}
+                                onConfirm={(importId) => associago.csvImport.confirmImport(importId)}
+                            />
                         </div>
                     )}
                 </Card.Body>

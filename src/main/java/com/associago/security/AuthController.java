@@ -2,6 +2,7 @@ package com.associago.security;
 
 import com.associago.association.Association;
 import com.associago.association.AssociationService;
+import com.associago.association.mapper.AssociationMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping({"/api/auth", "/api/v1/auth"})
 public class AuthController {
 
     private final AssociationService associationService;
@@ -66,7 +67,7 @@ public class AuthController {
 
         return ResponseEntity.ok(Map.of(
             "message", "Login successful",
-            "association", association,
+            "association", AssociationMapper.toDTO(association),
             "sessionId", session.getId()
         ));
     }

@@ -2,6 +2,8 @@ package com.associago.app;
 
 import com.associago.association.Association;
 import com.associago.association.AssociationService;
+import com.associago.association.dto.AssociationDTO;
+import com.associago.association.mapper.AssociationMapper;
 import com.associago.config.AppConfig;
 import com.associago.config.AppConfigManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/setup")
+@RequestMapping({"/api/setup", "/api/v1/setup"})
 public class SetupController {
 
     private final AppConfigManager configManager;
@@ -64,7 +66,7 @@ public class SetupController {
     }
 
     @PostMapping("/init")
-    public ResponseEntity<Association> initSetup(@RequestBody SetupRequest request) {
+    public ResponseEntity<AssociationDTO> initSetup(@RequestBody SetupRequest request) {
         Association association = new Association();
         association.setName(request.name);
         association.setSlug(request.slug);
@@ -91,7 +93,7 @@ public class SetupController {
             }
         }
         
-        return ResponseEntity.ok(savedAssoc);
+        return ResponseEntity.ok(AssociationMapper.toDTO(savedAssoc));
     }
 
     public static class SetupRequest {

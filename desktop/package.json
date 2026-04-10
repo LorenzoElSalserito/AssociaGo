@@ -1,26 +1,29 @@
 {
   "name": "desktop",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "An Electron application with React",
   "main": "./out/main/index.js",
-  "author": "Lorenzo DM",
+  "author": {
+    "name": "Lorenzo DM",
+    "email": "commercial.lorenzodm@gmail.com"
+  },
   "homepage": "https://github.com/lorenzodm/AssociaGo",
   "scripts": {
     "format": "prettier --write .",
-    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "lint": "eslint . --report-unused-disable-directives",
     "start": "electron-vite preview",
     "dev": "electron-vite dev",
     "build": "electron-vite build",
     "postinstall": "electron-builder install-app-deps",
-    "prebuild": "node scripts/download-jre.js",
-    "build:unpack": "npm run prebuild && npm run build && electron-builder --dir",
-    "build:win": "npm run prebuild && npm run build && electron-builder --win",
-    "build:mac": "npm run prebuild && npm run build && electron-builder --mac",
-    "build:linux": "npm run prebuild && npm run build && electron-builder --linux",
-    "dist": "cd .. && ./gradlew bootJar && cd desktop && npm run prebuild && electron-vite build && electron-builder",
-    "dist:win": "cd .. && ./gradlew bootJar && cd desktop && npm run prebuild && electron-vite build && electron-builder --win",
-    "dist:mac": "cd .. && ./gradlew bootJar && cd desktop && npm run prebuild && electron-vite build && electron-builder --mac",
-    "dist:linux": "cd .. && ./gradlew bootJar && cd desktop && npm run prebuild && electron-vite build && electron-builder --linux"
+    "build:jre": "node scripts/build-jre.js",
+    "build:unpack": "cd .. && ./gradlew bootJar && cd desktop && npm run build:jre && npm run build && electron-builder --dir",
+    "build:win": "cd .. && ./gradlew bootJar && cd desktop && npm run build:jre && npm run build && electron-builder --win",
+    "build:mac": "cd .. && ./gradlew bootJar && cd desktop && npm run build:jre && npm run build && electron-builder --mac",
+    "build:linux": "cd .. && ./gradlew bootJar && cd desktop && npm run build:jre && npm run build && electron-builder --linux",
+    "dist": "npm run dist:linux",
+    "dist:win": "npm run build:win",
+    "dist:mac": "npm run build:mac",
+    "dist:linux": "npm run build:linux"
   },
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.0",
@@ -29,6 +32,7 @@
     "axios": "^1.6.7",
     "bootstrap": "^5.3.3",
     "clsx": "^2.1.0",
+    "cross-env": "^7.0.3",
     "date-fns": "^3.3.1",
     "electron-updater": "^6.1.7",
     "i18next": "^23.8.2",
@@ -77,8 +81,12 @@
     "extraResources": [
       {
         "from": "../build/libs",
-        "to": "backend-libs",
+        "to": "backend",
         "filter": ["*.jar", "!*-plain.jar"]
+      },
+      {
+        "from": "resources/jre",
+        "to": "jre"
       }
     ],
     "mac": {
@@ -143,6 +151,7 @@
     "linux": {
       "icon": "src/assets/icon.png",
       "category": "Office",
+      "artifactName": "associago-desktop_${version}_amd64.${ext}",
       "target": [
         "AppImage",
         "snap",

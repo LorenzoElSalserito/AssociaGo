@@ -10,4 +10,5 @@ import java.util.List;
 public interface InvoiceCheckRepository extends JpaRepository<InvoiceCheck, Long> {
     List<InvoiceCheck> findByAssociationId(Long associationId);
     List<InvoiceCheck> findByAssociationIdAndYear(Long associationId, Integer year);
+    List<InvoiceCheck> findByAssociationIdOrderByCheckDateDesc(Long associationId);
 }

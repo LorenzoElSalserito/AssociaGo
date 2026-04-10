@@ -47,6 +47,23 @@ spring:
     locations: classpath:db/migration
     baseline-on-migrate: true
 
+  mail:
+    host: ${SMTP_HOST:localhost}
+    port: ${SMTP_PORT:25}
+    username: ${SMTP_USER:}
+    password: ${SMTP_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: ${SMTP_AUTH:false}
+          starttls:
+            enable: ${SMTP_TLS:false}
+
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+
 server:
   port: 0
   shutdown: graceful
@@ -78,6 +95,13 @@ associago:
     max-file-size: -1
     # CSV: va bene sia per @Value che per ConfigurationProperties List
     allowed-extensions: "png,jpg,jpeg,webp,gif,pdf,txt,md,json,csv"
+
+  federation:
+    coni:
+      enabled: false
+      api-url: https://api.coni.it
+    eoc:
+      enabled: false
 
   cors:
     # CSV: binder -> List<String>

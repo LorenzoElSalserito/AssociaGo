@@ -210,6 +210,20 @@ const members = {
 
     // Utils
     calculateFiscalCode: (data) => apiRequest('/v1/members/calculate-fiscal-code', { method: 'POST', body: data }),
+
+    // Duplicates
+    checkDuplicates: (email, fiscalCode) => {
+        const params = new URLSearchParams();
+        if (email) params.append('email', email);
+        if (fiscalCode) params.append('fiscalCode', fiscalCode);
+        return apiRequest(`/v1/members/check-duplicates?${params}`);
+    },
+
+    // Consents
+    getConsents: (memberId, assocId) => apiRequest(`/v1/members/${memberId}/consents?associationId=${assocId}`),
+    grantConsent: (memberId, assocId, consentType, lawfulBasis) =>
+        apiRequest(`/v1/members/${memberId}/consents?associationId=${assocId}&consentType=${consentType}${lawfulBasis ? '&lawfulBasis=' + lawfulBasis : ''}`, { method: 'POST' }),
+    revokeConsent: (consentId) => apiRequest(`/v1/members/consents/${consentId}/revoke`, { method: 'POST' }),
 };
 
 const users = {
@@ -290,6 +304,160 @@ const notifications = {
     markAllAsRead: (userId) => apiRequest(`/v1/notifications/user/${userId}/read-all`, { method: 'PUT' }),
 };
 
+const budgets = {
+    getAll: (assocId) => apiRequest(`/v1/budgets?associationId=${assocId}`),
+    getById: (id) => apiRequest(`/v1/budgets/${id}`),
+    create: (data) => apiRequest('/v1/budgets', { method: 'POST', body: data }),
+    update: (id, data) => apiRequest(`/v1/budgets/${id}`, { method: 'PUT', body: data }),
+    delete: (id) => apiRequest(`/v1/budgets/${id}`, { method: 'DELETE' }),
+    approve: (id, approvedBy) => apiRequest(`/v1/budgets/${id}/approve?approvedBy=${approvedBy}`, { method: 'POST' }),
+    syncActuals: (id) => apiRequest(`/v1/budgets/${id}/sync-actuals`, { method: 'POST' }),
+    getLines: (budgetId) => apiRequest(`/v1/budgets/${budgetId}/lines`),
+    addLine: (budgetId, data) => apiRequest(`/v1/budgets/${budgetId}/lines`, { method: 'POST', body: data }),
+    updateLine: (lineId, data) => apiRequest(`/v1/budgets/lines/${lineId}`, { method: 'PUT', body: data }),
+    deleteLine: (lineId) => apiRequest(`/v1/budgets/lines/${lineId}`, { method: 'DELETE' }),
+};
+
+const balances = {
+    getAll: (assocId) => apiRequest(`/v1/balances?associationId=${assocId}`),
+    getById: (id) => apiRequest(`/v1/balances/${id}`),
+    getLines: (id) => apiRequest(`/v1/balances/${id}/lines`),
+    compute: (assocId, year) => apiRequest(`/v1/balances/compute?associationId=${assocId}&year=${year}`, { method: 'POST' }),
+    approve: (id, approvedBy, signatories) => apiRequest(`/v1/balances/${id}/approve?approvedBy=${approvedBy}`, { method: 'POST', body: signatories }),
+    delete: (id) => apiRequest(`/v1/balances/${id}`, { method: 'DELETE' }),
+    downloadPdf: (id) => apiRequest(`/v1/balances/${id}/pdf`),
+    checkSigners: (id) => apiRequest(`/v1/balances/${id}/check-signers`),
+};
+
+const certificates = {
+    getTemplates: (assocId) => apiRequest(`/v1/certificates/templates?associationId=${assocId}`),
+    getTemplate: (id) => apiRequest(`/v1/certificates/templates/${id}`),
+    createTemplate: (data) => apiRequest('/v1/certificates/templates', { method: 'POST', body: data }),
+    updateTemplate: (id, data) => apiRequest(`/v1/certificates/templates/${id}`, { method: 'PUT', body: data }),
+    deleteTemplate: (id) => apiRequest(`/v1/certificates/templates/${id}`, { method: 'DELETE' }),
+    getIssued: (assocId) => apiRequest(`/v1/certificates?associationId=${assocId}`),
+    issue: (params) => apiRequest(`/v1/certificates/issue?${new URLSearchParams(params)}`, { method: 'POST' }),
+    batchActivity: (activityId, templateId, assocId) => apiRequest(`/v1/certificates/batch/activity/${activityId}?templateId=${templateId}&associationId=${assocId}`, { method: 'POST' }),
+    batchEvent: (eventId, templateId, assocId) => apiRequest(`/v1/certificates/batch/event/${eventId}?templateId=${templateId}&associationId=${assocId}`, { method: 'POST' }),
+    downloadPdf: (id) => apiRequest(`/v1/certificates/${id}/pdf`, { raw: true }),
+};
+
+const resources = {
+    getAll: (assocId) => apiRequest(`/v1/resources?associationId=${assocId}`),
+    getById: (id) => apiRequest(`/v1/resources/${id}`),
+    create: (data) => apiRequest('/v1/resources', { method: 'POST', body: data }),
+    update: (id, data) => apiRequest(`/v1/resources/${id}`, { method: 'PUT', body: data }),
+    delete: (id) => apiRequest(`/v1/resources/${id}`, { method: 'DELETE' }),
+    getBookings: (assocId) => apiRequest(`/v1/resources/bookings?associationId=${assocId}`),
+    getCalendar: (assocId, start, end) => apiRequest(`/v1/resources/bookings/calendar?associationId=${assocId}&start=${start}&end=${end}`),
+    createBooking: (data) => apiRequest('/v1/resources/bookings', { method: 'POST', body: data }),
+    updateBooking: (id, data) => apiRequest(`/v1/resources/bookings/${id}`, { method: 'PUT', body: data }),
+    cancelBooking: (id) => apiRequest(`/v1/resources/bookings/${id}/cancel`, { method: 'POST' }),
+    approveBooking: (id, approvedBy) => apiRequest(`/v1/resources/bookings/${id}/approve?approvedBy=${approvedBy}`, { method: 'POST' }),
+};
+
+const cashRegisters = {
+    getAll: (assocId) => apiRequest(`/v1/cash-registers?associationId=${assocId}`),
+    getById: (id) => apiRequest(`/v1/cash-registers/${id}`),
+    getOpen: (assocId) => apiRequest(`/v1/cash-registers/open?associationId=${assocId}`),
+    open: (assocId, openedBy) => apiRequest(`/v1/cash-registers/open?associationId=${assocId}&openedBy=${openedBy}`, { method: 'POST' }),
+    close: (id, closedBy) => apiRequest(`/v1/cash-registers/${id}/close?closedBy=${closedBy}`, { method: 'POST' }),
+    getEntries: (registerId) => apiRequest(`/v1/cash-registers/${registerId}/entries`),
+    addEntry: (registerId, data) => apiRequest(`/v1/cash-registers/${registerId}/entries`, { method: 'POST', body: data }),
+    deleteEntry: (entryId) => apiRequest(`/v1/cash-registers/entries/${entryId}`, { method: 'DELETE' }),
+};
+
+const audit = {
+    getByAssociation: (assocId, page = 0, size = 50) => apiRequest(`/v1/audit?associationId=${assocId}&page=${page}&size=${size}`),
+    getByEntity: (entityType, entityId) => apiRequest(`/v1/audit/entity/${entityType}/${entityId}`),
+    getByDateRange: (assocId, from, to) => apiRequest(`/v1/audit/range?associationId=${assocId}&from=${from}&to=${to}`),
+    count: (assocId) => apiRequest(`/v1/audit/count?associationId=${assocId}`),
+};
+
+const signatures = {
+    getAll: (assocId) => apiRequest(`/v1/signatures?associationId=${assocId}`),
+    getActive: (assocId) => apiRequest(`/v1/signatures/active?associationId=${assocId}`),
+    upsert: (data) => apiRequest('/v1/signatures', { method: 'POST', body: data }),
+    uploadImage: async (sigId, file) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        return apiRequest(`/v1/signatures/${sigId}/image`, { method: 'POST', body: formData });
+    },
+    getImageUrl: async (sigId) => {
+        const baseUrl = await getApiUrl();
+        return `${baseUrl}/v1/signatures/${sigId}/image`;
+    },
+    deleteImage: (sigId) => apiRequest(`/v1/signatures/${sigId}/image`, { method: 'DELETE' }),
+    delete: (sigId) => apiRequest(`/v1/signatures/${sigId}`, { method: 'DELETE' }),
+};
+
+const communications = {
+    getTemplates: (assocId) => apiRequest(`/v1/communications/templates?associationId=${assocId}`),
+    createTemplate: (data) => apiRequest('/v1/communications/templates', { method: 'POST', body: data }),
+    updateTemplate: (id, data) => apiRequest(`/v1/communications/templates/${id}`, { method: 'PUT', body: data }),
+    deleteTemplate: (id) => apiRequest(`/v1/communications/templates/${id}`, { method: 'DELETE' }),
+    getAll: (assocId) => apiRequest(`/v1/communications?associationId=${assocId}`),
+    getById: (id) => apiRequest(`/v1/communications/${id}`),
+    create: (data) => apiRequest('/v1/communications', { method: 'POST', body: data }),
+    update: (id, data) => apiRequest(`/v1/communications/${id}`, { method: 'PUT', body: data }),
+    delete: (id) => apiRequest(`/v1/communications/${id}`, { method: 'DELETE' }),
+    resolveRecipients: (id) => apiRequest(`/v1/communications/${id}/resolve-recipients`, { method: 'POST' }),
+    getRecipients: (id) => apiRequest(`/v1/communications/${id}/recipients`),
+    send: (id, sentBy) => apiRequest(`/v1/communications/${id}/send?sentBy=${sentBy}`, { method: 'POST' }),
+};
+
+const csvImport = {
+    getHistory: (assocId) => apiRequest(`/v1/imports?associationId=${assocId}`),
+    previewMembers: (file, assocId) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        return apiRequest(`/v1/members/import-csv/preview?associationId=${assocId}`, { method: 'POST', body: formData });
+    },
+    previewActivityParticipants: (file, assocId, activityId) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        return apiRequest(`/v1/activities/${activityId}/import-csv?associationId=${assocId}`, { method: 'POST', body: formData });
+    },
+    previewEventParticipants: (file, assocId, eventId) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        return apiRequest(`/v1/events/${eventId}/import-csv?associationId=${assocId}`, { method: 'POST', body: formData });
+    },
+    importMembers: (file, assocId) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        return apiRequest(`/v1/members/import-csv?associationId=${assocId}`, { method: 'POST', body: formData });
+    },
+    confirmImport: (id) => apiRequest(`/v1/imports/${id}/confirm`, { method: 'POST' }),
+};
+
+const fiscal = {
+    closeYear: (assocId, year, userId) => apiRequest(`/v1/fiscal/close-year?associationId=${assocId}&year=${year}&userId=${userId}`, { method: 'POST' }),
+    getClosure: (assocId, year) => apiRequest(`/v1/fiscal/closure?associationId=${assocId}&year=${year}`),
+    runInvoiceCheck: (assocId, year, userId) => apiRequest(`/v1/fiscal/invoice-check?associationId=${assocId}&year=${year}&userId=${userId}`, { method: 'POST' }),
+    getInvoiceCheckHistory: (assocId) => apiRequest(`/v1/fiscal/invoice-checks?associationId=${assocId}`),
+};
+
+const medicalCertificates = {
+    getByMember: (memberId, assocId) => apiRequest(`/v1/medical-certificates?memberId=${memberId}&associationId=${assocId}`),
+    getByAssociation: (assocId) => apiRequest(`/v1/medical-certificates/by-association?associationId=${assocId}`),
+    getExpiring: (assocId, days = 30) => apiRequest(`/v1/medical-certificates/expiring?associationId=${assocId}&days=${days}`),
+    getExpired: (assocId) => apiRequest(`/v1/medical-certificates/expired?associationId=${assocId}`),
+    save: (data) => apiRequest('/v1/medical-certificates', { method: 'POST', body: data }),
+    upload: (id, file) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        return apiRequest(`/v1/medical-certificates/${id}/upload`, { method: 'POST', body: formData });
+    },
+    delete: (id) => apiRequest(`/v1/medical-certificates/${id}`, { method: 'DELETE' }),
+};
+
+const federation = {
+    getProviders: () => apiRequest('/v1/federation/providers'),
+    register: (data, providerCode = 'CONI_IT') => apiRequest(`/v1/federation/register?providerCode=${providerCode}`, { method: 'POST', body: data }),
+    verify: (number, checksum, providerCode = 'CONI_IT') => apiRequest(`/v1/federation/verify?number=${number}&checksum=${checksum}&providerCode=${providerCode}`),
+};
+
 // ========================================
 // EXPORT
 // ========================================
@@ -359,6 +527,31 @@ export const associago = {
 
     getAssociationProfile: (id) => apiRequest(`/associations/${id}`),
     updateAssociationProfile: (id, data) => apiRequest(`/associations/${id}`, { method: 'PUT', body: data }),
+
+    // Locations
+    getLocations: (assocId) => apiRequest(`/v1/associations/${assocId}/locations`),
+    createLocation: (assocId, data) => apiRequest(`/v1/associations/${assocId}/locations`, { method: 'POST', body: data }),
+    updateLocation: (assocId, locId, data) => apiRequest(`/v1/associations/${assocId}/locations/${locId}`, { method: 'PUT', body: data }),
+    deleteLocation: (assocId, locId) => apiRequest(`/v1/associations/${assocId}/locations/${locId}`, { method: 'DELETE' }),
+
+    // Documents
+    getDocuments: (assocId) => apiRequest(`/v1/associations/${assocId}/documents`),
+    uploadDocument: (assocId, file, docType, title) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('documentType', docType);
+        if (title) formData.append('title', title);
+        return apiRequest(`/v1/associations/${assocId}/documents`, { method: 'POST', body: formData });
+    },
+    deleteDocument: (assocId, docId) => apiRequest(`/v1/associations/${assocId}/documents/${docId}`, { method: 'DELETE' }),
+
+    // Deadlines
+    getDeadlines: (assocId) => apiRequest(`/v1/associations/${assocId}/deadlines`),
+    getPendingDeadlines: (assocId) => apiRequest(`/v1/associations/${assocId}/deadlines/pending`),
+    createDeadline: (assocId, data) => apiRequest(`/v1/associations/${assocId}/deadlines`, { method: 'POST', body: data }),
+    updateDeadline: (assocId, dlId, data) => apiRequest(`/v1/associations/${assocId}/deadlines/${dlId}`, { method: 'PUT', body: data }),
+    completeDeadline: (assocId, dlId) => apiRequest(`/v1/associations/${assocId}/deadlines/${dlId}/complete`, { method: 'POST' }),
+    deleteDeadline: (assocId, dlId) => apiRequest(`/v1/associations/${assocId}/deadlines/${dlId}`, { method: 'DELETE' }),
     uploadLogo: (id, file) => {
         const formData = new FormData();
         formData.append('file', file);
@@ -384,7 +577,22 @@ export const associago = {
     coupons,
     paymentMethods,
     stats,
-    notifications
+    notifications,
+    budgets,
+    balances,
+    certificates,
+    resources,
+    cashRegisters,
+    audit,
+    signatures,
+    communications,
+    csvImport,
+    fiscal,
+    medicalCertificates,
+    federation,
+
+    // App metadata
+    getBackendInfo: () => apiRequest('/v1/app/info'),
 };
 
 export default associago;

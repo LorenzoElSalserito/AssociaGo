@@ -21,7 +21,15 @@ const ManualDashboard = () => {
         { id: '07_inventory.md', title: '7. Gestione Inventario' },
         { id: '08_volunteers.md', title: '8. Gestione Volontari' },
         { id: '09_coupons.md', title: '9. Coupon e Sconti' },
-        { id: '10_settings.md', title: '10. Impostazioni' }
+        { id: '10_settings.md', title: '10. Impostazioni' },
+        { id: '11_certificates.md', title: '11. Attestati e Certificati' },
+        { id: '12_budget.md', title: '12. Bilancio Preventivo' },
+        { id: '13_balance.md', title: '13. Bilancio Consuntivo' },
+        { id: '14_attendance.md', title: '14. Registro Presenze' },
+        { id: '15_communications.md', title: '15. Comunicazioni' },
+        { id: '16_signatures.md', title: '16. Firme Istituzionali' },
+        { id: '17_notifications.md', title: '17. Notifiche' },
+        { id: '18_compliance.md', title: '18. Conformità e Audit' }
     ];
 
     useEffect(() => {
