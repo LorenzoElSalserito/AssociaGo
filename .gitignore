@@ -101,7 +101,7 @@ local.properties
 # ==========================================
 # Temporary or documentation files not needed in repo
 AssociaGo_PRD_Migration_v3.0.1.md
-AssociaGo_PRD_v4.0.md
+AssociaGo_PRD.md
 AssociaGo_PRD*
 package_librepm.json
 build-desktop_librepm.yml
