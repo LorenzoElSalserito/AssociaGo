@@ -169,6 +169,8 @@
   "Remove this association from list?": "¿Eliminar esta asociación de la lista?",
   "Invalid password": "Contraseña inválida",
   "All fields are required": "Todos los campos son obligatorios",
+  "Invalid fiscal code format. Expected: {{example}}": "Formato de código fiscal no válido. Esperado: {{example}}",
+  "Format": "Formato",
   "Setup failed": "Configuración fallida",
   "Desktop Edition": "Edición de Escritorio",
   "Keep me logged in": "Mantenerme conectado",

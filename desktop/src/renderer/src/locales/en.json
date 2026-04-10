@@ -169,6 +169,8 @@
   "Remove this association from list?": "Remove this association from list?",
   "Invalid password": "Invalid password",
   "All fields are required": "All fields are required",
+  "Invalid fiscal code format. Expected: {{example}}": "Invalid fiscal code format. Expected: {{example}}",
+  "Format": "Format",
   "Setup failed": "Setup failed",
   "Desktop Edition": "Desktop Edition",
   "Keep me logged in": "Keep me logged in",

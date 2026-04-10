@@ -16,7 +16,7 @@
     "build": "electron-vite build",
     "postinstall": "electron-builder install-app-deps",
     "build:jre": "node scripts/build-jre.js",
-    "package:prepare": "cd .. && ./gradlew bootJar && cd desktop && npm run build:jre && npm run build",
+    "package:prepare": "node scripts/package-prepare.js",
     "build:unpack": "npm run package:prepare && electron-builder --dir",
     "build:win": "npm run package:prepare && electron-builder --win",
     "build:mac": "npm run package:prepare && electron-builder --mac",

@@ -169,6 +169,8 @@
   "Remove this association from list?": "Diesen Verein aus der Liste entfernen?",
   "Invalid password": "Ungültiges Passwort",
   "All fields are required": "Alle Felder sind erforderlich",
+  "Invalid fiscal code format. Expected: {{example}}": "Ungültiges Steuernummernformat. Erwartet: {{example}}",
+  "Format": "Format",
   "Setup failed": "Einrichtung fehlgeschlagen",
   "Desktop Edition": "Desktop-Edition",
   "Keep me logged in": "Angemeldet bleiben",

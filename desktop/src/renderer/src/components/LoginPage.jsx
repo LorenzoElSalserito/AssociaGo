@@ -4,6 +4,49 @@ import { associago } from "../api.js";
 import { Globe, Lock, Building, Mail, ArrowRight, Plus, Trash2, FileText, Hash, Eye, EyeOff } from 'lucide-react';
 import icon6 from '../assets/6.svg';
 
+// Per-language fiscal code / VAT rules used by the entity registration form.
+// Country prefix (DE/FR/ES) is optional where the user might enter only the
+// numeric/alphanumeric part. The UK has multiple valid identifier formats
+// (Charity, CRN, UTR, VAT) so it uses a custom validator instead of a regex.
+const UK_FISCAL_CODE_PATTERNS = [
+    { name: "Charity Number",         regex: /^[0-9]{6,7}$/ },         // 6 or 7 digits
+    { name: "Company Reg. Number",    regex: /^[0-9]{8}$/ },           // 8 digits
+    { name: "Company Reg. Number",    regex: /^[A-Z]{2}[0-9]{6}$/ },   // 2 letters + 6 digits (e.g. CE123456)
+    { name: "Unique Taxpayer Ref.",   regex: /^[0-9]{10}$/ },          // UTR: 10 digits
+    { name: "VAT Number",             regex: /^GB[0-9]{9}$/ }          // VAT: GB + 9 digits
+];
+
+function normalizeFiscalCode(value) {
+    return (value || "").trim().toUpperCase().replace(/\s+/g, "");
+}
+
+function validateUkFiscalCode(value) {
+    const v = normalizeFiscalCode(value);
+    return UK_FISCAL_CODE_PATTERNS.some(p => p.regex.test(v));
+}
+
+const FISCAL_CODE_RULES = {
+    it: { regex: /^[0-9]{11}$/,                  maxLength: 11, example: "12345678901" },
+    de: { regex: /^(DE)?[0-9]{9}$/,              maxLength: 11, example: "DE123456789" },
+    fr: { regex: /^(FR)?[A-Z0-9]{2}[0-9]{9}$/,   maxLength: 13, example: "FRXX123456789" },
+    es: { regex: /^(ES)?[A-Z][0-9]{7}[A-Z0-9]$/, maxLength: 11, example: "ESA1234567B" },
+    en: {
+        validator: validateUkFiscalCode,
+        maxLength: 11,
+        // The UI hint lists every accepted UK identifier so the user knows
+        // they can enter Charity Number, CRN, UTR or VAT Number.
+        example: "GB123456789 / 12345678 / 1234567 / CE123456"
+    }
+};
+
+function validateFiscalCodeForLanguage(value, language) {
+    const rule = FISCAL_CODE_RULES[language] || FISCAL_CODE_RULES.it;
+    if (typeof rule.validator === "function") {
+        return rule.validator(value);
+    }
+    return rule.regex.test(normalizeFiscalCode(value));
+}
+
 export default function LoginPage({ onLogin }) {
     const { t, i18n } = useTranslation();
 
@@ -124,6 +167,12 @@ export default function LoginPage({ onLogin }) {
         e.preventDefault();
         if (!formData.name || !formData.email || !formData.password || !formData.fiscalCode) {
             setError(t("All fields are required"));
+            return;
+        }
+
+        if (!validateFiscalCodeForLanguage(formData.fiscalCode, i18n.language)) {
+            const example = (FISCAL_CODE_RULES[i18n.language] || FISCAL_CODE_RULES.it).example;
+            setError(t("Invalid fiscal code format. Expected: {{example}}", { example }));
             return;
         }
 
@@ -280,9 +329,12 @@ export default function LoginPage({ onLogin }) {
                                 <label className="form-label small fw-bold text-muted">{t("Fiscal Code (C.F.)")}</label>
                                 <div className="input-group">
                                     <span className="input-group-text bg-light border-end-0"><Hash size={18} className="text-muted"/></span>
-                                    <input type="text" className="form-control bg-light border-start-0" required placeholder="970..."
+                                    <input type="text" className="form-control bg-light border-start-0" required
+                                        placeholder={(FISCAL_CODE_RULES[i18n.language] || FISCAL_CODE_RULES.it).example}
+                                        maxLength={(FISCAL_CODE_RULES[i18n.language] || FISCAL_CODE_RULES.it).maxLength}
                                         value={formData.fiscalCode} onChange={e => setFormData({...formData, fiscalCode: e.target.value.toUpperCase()})} />
                                 </div>
+                                <small className="text-muted">{t("Format")}: {(FISCAL_CODE_RULES[i18n.language] || FISCAL_CODE_RULES.it).example}</small>
                             </div>
 
                             <div className="mb-3">
