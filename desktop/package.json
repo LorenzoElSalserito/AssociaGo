@@ -1,7 +1,7 @@
 {
   "name": "associago-desktop",
-  "version": "0.1.0",
-  "description": "AssociaGo is a comprehensive management software designed for associations, non-profit organizations, and clubs. It provides a robust platform for managing members, finances, events, activities, inventory, and volunteers",
+  "version": "0.1.2",
+  "description": "AssociaGo is a comprehensive management software designed for associations, non-profit organizations, and clubs.",
   "main": "./out/main/index.js",
   "author": {
     "name": "Lorenzo DM",
@@ -11,6 +11,8 @@
   "scripts": {
     "format": "prettier --write .",
     "lint": "eslint . --report-unused-disable-directives",
+    "test": "node --test test/*.test.mjs",
+    "test:e2e:manual": "cross-env ASSOCIAGO_MANUAL_E2E=1 electron-vite build && electron --no-sandbox test/manual-e2e.cjs",
     "start": "electron-vite preview",
     "dev": "electron-vite dev",
     "build": "electron-vite build",
@@ -74,6 +76,7 @@
   "build": {
     "appId": "com.lorenzodm.associago.desktop",
     "productName": "AssociaGo",
+    "artifactName": "associago_v0.1.2.${ext}",
     "executableName": "associago-desktop",
     "directories": {
       "output": "dist-electron"
@@ -104,6 +107,7 @@
         ]
       }
     ],
+    "afterAllArtifactBuild": "scripts/deb-add-license.js",
     "mac": {
       "category": "public.app-category.productivity",
       "icon": "build/icon.icns",
@@ -150,8 +154,7 @@
           ]
         }
       ],
-      "publisherName": "Lorenzo DM",
-      "artifactName": "associago-desktop-setup-${version}.${ext}"
+      "publisherName": "Lorenzo DM"
     },
     "nsis": {
       "oneClick": false,
@@ -162,7 +165,6 @@
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "AssociaGo",
-      "artifactName": "associago-desktop-setup-${version}.${ext}",
       "perMachine": true,
       "allowElevation": true,
       "installerLanguages": [
@@ -174,9 +176,9 @@
       "uninstallDisplayName": "AssociaGo ${version}"
     },
     "linux": {
-      "icon": "build/icon.png",
+      "icon": "build/icons",
       "category": "Office",
-      "artifactName": "associago-desktop_${version}_amd64.${ext}",
+      "synopsis": "Management software for associations, non-profits, third-sector enterprises and clubs",
       "target": [
         "AppImage",
         "snap",
@@ -184,8 +186,12 @@
       ],
       "desktop": {
         "Name": "AssociaGo",
-        "StartupWMClass": "associago-desktop"
+        "StartupWMClass": "associago-desktop",
+        "Icon": "/usr/share/icons/hicolor/1080x1080/apps/associago-desktop.png"
       }
+    },
+    "snap": {
+      "summary": "Management software for associations, non-profits, third-sector enterprises and clubs"
     }
   }
 }

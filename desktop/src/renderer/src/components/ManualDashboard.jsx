@@ -4,6 +4,7 @@ import remarkGfm from 'remark-gfm';
 import { Card, Row, Col, Spinner, ListGroup } from 'react-bootstrap';
 import { BookOpen, ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { fetchManualDocument } from './manualLoader.mjs';
 
 const ManualDashboard = () => {
     const { t, i18n } = useTranslation();
@@ -39,24 +40,12 @@ const ManualDashboard = () => {
     const loadDocument = async (filename) => {
         setLoading(true);
         try {
-            const lang = i18n.language || 'it';
-
-            // Try to fetch localized version first
-            let response = await fetch(`/docs/${lang}/${filename}`);
-
-            // Fallback to Italian (in 'it' folder) if localized version not found
-            if (!response.ok) {
-                response = await fetch(`/docs/it/${filename}`);
-            }
-
-            // Fallback to English if Italian not found (unlikely but safe)
-            if (!response.ok) {
-                 response = await fetch(`/docs/en/${filename}`);
-            }
-
-            if (!response.ok) throw new Error("Document not found");
-
-            const text = await response.text();
+            const text = await fetchManualDocument(
+                fetch,
+                document.baseURI,
+                i18n.language,
+                filename
+            );
             setContent(text);
         } catch (error) {
             console.error("Error loading doc:", error);
