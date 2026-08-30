@@ -1,6 +1,6 @@
 {
   "name": "associago-desktop",
-  "version": "0.1.2",
+  "version": "0.1.6",
   "description": "AssociaGo is a comprehensive management software designed for associations, non-profit organizations, and clubs.",
   "main": "./out/main/index.js",
   "author": {
@@ -18,13 +18,15 @@
     "build": "electron-vite build",
     "postinstall": "electron-builder install-app-deps",
     "build:jre": "node scripts/build-jre.js",
+    "version:bump": "node scripts/version-bump.js",
+    "version:show": "node scripts/version-bump.js --no-bump --dry-run",
     "package:prepare": "node scripts/package-prepare.js",
     "verify:packaging": "node scripts/verify-packaging-assets.js",
     "build:unpack": "npm run package:prepare && electron-builder --dir",
-    "build:win": "npm run package:prepare && electron-builder --win",
-    "build:mac": "npm run package:prepare && electron-builder --mac",
-    "build:linux": "npm run package:prepare && electron-builder --linux",
-    "dist": "npm run package:prepare && electron-builder",
+    "build:win": "npm run version:bump && npm run package:prepare && electron-builder --win",
+    "build:mac": "npm run version:bump && npm run package:prepare && electron-builder --mac",
+    "build:linux": "npm run version:bump && npm run package:prepare && electron-builder --linux",
+    "dist": "npm run version:bump && npm run package:prepare && electron-builder",
     "dist:win": "npm run build:win",
     "dist:mac": "npm run build:mac",
     "dist:linux": "npm run build:linux"
@@ -76,7 +78,7 @@
   "build": {
     "appId": "com.lorenzodm.associago.desktop",
     "productName": "AssociaGo",
-    "artifactName": "associago_v0.1.2.${ext}",
+    "artifactName": "associago_v${version}.${ext}",
     "executableName": "associago-desktop",
     "directories": {
       "output": "dist-electron"
@@ -107,7 +109,7 @@
         ]
       }
     ],
-    "afterAllArtifactBuild": "scripts/deb-add-license.js",
+    "afterAllArtifactBuild": "scripts/after-all-artifact-build.js",
     "mac": {
       "category": "public.app-category.productivity",
       "icon": "build/icon.icns",
@@ -178,7 +180,7 @@
     "linux": {
       "icon": "build/icons",
       "category": "Office",
-      "synopsis": "Management software for associations, non-profits, third-sector enterprises and clubs",
+      "synopsis": "Management software for associations, non-profits and clubs",
       "target": [
         "AppImage",
         "snap",
@@ -190,8 +192,12 @@
         "Icon": "/usr/share/icons/hicolor/1080x1080/apps/associago-desktop.png"
       }
     },
+    "deb": {
+      "packageCategory": "misc",
+      "priority": "optional"
+    },
     "snap": {
-      "summary": "Management software for associations, non-profits, third-sector enterprises and clubs"
+      "summary": "Management software for associations, non-profits and clubs"
     }
   }
 }

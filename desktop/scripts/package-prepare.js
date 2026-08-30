@@ -52,10 +52,40 @@ function copyIcons() {
     }
 }
 
+// build/libs accumulates one JAR per past release and extraResources copies
+// them all into resources/backend. The main process picks the first *.jar it
+// finds there, so a stale JAR can shadow the current backend. Keep only the
+// JAR matching the version being packaged.
+function pruneStaleBackendJars() {
+    const version = JSON.parse(fs.readFileSync(path.join(desktopDir, 'package.json'), 'utf8')).version;
+    const libsDir = path.join(repoRoot, 'build', 'libs');
+    if (!fs.existsSync(libsDir)) {
+        console.error(`[package-prepare] ${libsDir} not found after bootJar`);
+        process.exit(1);
+    }
+
+    const jars = fs.readdirSync(libsDir).filter((name) => name.endsWith('.jar'));
+    const current = jars.filter((name) => name.includes(`-${version}.jar`) || name.includes(`-${version}-plain.jar`));
+    if (current.length === 0) {
+        console.error(`[package-prepare] No backend JAR for version ${version} in ${libsDir}`);
+        console.error(`[package-prepare] Found: ${jars.join(', ') || '(none)'}`);
+        console.error('[package-prepare] build.gradle version is out of sync with package.json');
+        process.exit(1);
+    }
+
+    console.log(`\n[package-prepare] Pruning stale backend JARs (keeping version ${version})`);
+    for (const name of jars) {
+        if (current.includes(name)) continue;
+        fs.rmSync(path.join(libsDir, name));
+        console.log(`  Removed stale ${name}`);
+    }
+}
+
 const gradleCmd = isWin ? 'gradlew.bat' : './gradlew';
 const npmCmd = isWin ? 'npm.cmd' : 'npm';
 
 run('Building backend JAR (gradle bootJar)', gradleCmd, ['bootJar'], repoRoot);
+pruneStaleBackendJars();
 run('Building bundled JRE (build:jre)', npmCmd, ['run', 'build:jre'], desktopDir);
 run('Building renderer/main bundle (build)', npmCmd, ['run', 'build'], desktopDir);
 
