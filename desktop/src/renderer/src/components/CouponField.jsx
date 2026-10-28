@@ -48,7 +48,6 @@ const CouponField = ({ target, code, onCodeChange, onPreview }) => {
   // Event price depends on member/guest: refresh an applied preview when the target changes.
   useEffect(() => {
     if (preview) apply();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [targetKey]);
 
   const clear = () => {
