@@ -7,7 +7,7 @@ import AssemblyDetail from './AssemblyDetail';
 import RowActions from './common/RowActions';
 
 const AssemblyList = ({ associationId, shell }) => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const [assemblies, setAssemblies] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
@@ -118,13 +118,13 @@ const AssemblyList = ({ associationId, shell }) => {
                                                     </div>
                                                     <div>
                                                         <div className="fw-bold text-dark">{assembly.title}</div>
-                                                        <div className="small text-muted">{assembly.type}</div>
+                                                        <div className="small text-muted">{assembly.type ? t(assembly.type) : ""}</div>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td>
                                                 <div className="text-muted small">
-                                                    {new Date(assembly.date).toLocaleDateString()} {new Date(assembly.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                                                    {new Date(assembly.date).toLocaleDateString(i18n.language)} {new Date(assembly.date).toLocaleTimeString(i18n.language, {hour: '2-digit', minute:'2-digit'})}
                                                 </div>
                                             </td>
                                             <td>
@@ -135,7 +135,7 @@ const AssemblyList = ({ associationId, shell }) => {
                                             </td>
                                             <td>
                                                 <Badge bg={assembly.status === 'CLOSED' ? 'secondary' : 'success'} className="fw-normal px-2 py-1">
-                                                    {assembly.status}
+                                                    {t(assembly.status)}
                                                 </Badge>
                                             </td>
                                             <td className="text-end pe-4" onClick={(e) => e.stopPropagation()}>

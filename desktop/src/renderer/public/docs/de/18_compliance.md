@@ -1,54 +1,55 @@
 # 18. Compliance und Audit
 
-Der Bereich **Audit** zeichnet automatisch alle sensiblen Vorgänge auf der Plattform auf und gewährleistet die vollständige Nachverfolgbarkeit, die von der Gesetzgebung des Dritten Sektors gefordert wird.
+Die derzeit verfügbaren Compliance-Werkzeuge befinden sich in der Registerkarte **Einstellungen › Register**: Standorte, institutionelle Dokumente und Fristen des Vereins.
 
-## 18.1 Was ist das Audit-Log
-Das Audit-Log ist ein unveränderliches Register, das dokumentiert:
-- **Wer** den Vorgang durchgeführt hat (Benutzer).
-- **Was** gemacht wurde (Art der Aktion).
-- **Wann** es geschehen ist (genauer Zeitstempel).
-- **An welcher Entität** die Aktion durchgeführt wurde (Mitglied, Transaktion, Veranstaltung usw.).
-- **Welche Werte** sich geändert haben (vorher/nachher, wenn verfügbar).
+**Änderungsprotokoll.** AssociaGo erfasst automatisch jede **Erstellung**, **Änderung** und **Löschung** der wichtigsten Daten: Mitglieder und Mitgliedschaften, Buchungen und Rechnungen, Aktivitäten, Veranstaltungen und Teilnehmer, Versammlungen und Anträge, Inventar und Ausleihen, Freiwillige, Schichten und Erstattungen, Gutscheine, Haushaltspläne, Abschlüsse, Zertifikate, Mitteilungen, Vereinsprofil, Unterschriften und Datenbankeinstellungen.
 
-## 18.2 Erfasste Vorgänge
-Das System zeichnet automatisch die wichtigsten Vorgänge auf, darunter:
-- Anlegen, Ändern und Löschen von Mitgliedern.
-- Erfassung und Änderung von Finanztransaktionen.
-- Erstellung und Versand von Mitteilungen.
-- Genehmigung von Abschlüssen.
-- Ausstellung von Bescheinigungen.
-- Änderungen an den Vereinseinstellungen.
-- Verwaltung der Anwesenheiten.
+Zum Einsehen öffnen Sie **Einstellungen › Protokoll**. Die Tabelle zeigt, beginnend mit dem neuesten Eintrag:
+- **Datum und Uhrzeit** des Vorgangs;
+- **Bereich** (zum Beispiel Mitglieder, Finanzen, Veranstaltungen);
+- **Aktion**: Erstellt, Geändert oder Gelöscht;
+- **Datensatz**: die Art der Daten und ihre Kennnummer;
+- **Details**: bei Änderungen die Namen der geänderten Felder.
 
-## 18.3 Einsicht in das Log
+Sie können nach **Bereich**, **Aktion** und Datumsbereich (**Von**, **Bis**) filtern; **Filter zurücksetzen** kehrt zur vollständigen Liste zurück. Die Einträge sind in Seiten zu 25 aufgeteilt.
 
-### Zugriff
-Das Audit-Log ist über die System-APIs einsehbar. Die verfügbaren Informationen umfassen:
+Was **nicht** erfasst wird:
+- die Werte der Felder, weder vor noch nach der Änderung: nur ihre Namen;
+- Passwörter, Zugangscodes, Datenbank-Zugangsdaten, Bilder von Logos und Unterschriften;
+- wer den Vorgang ausgeführt hat: Die Anmeldung erfolgt pro Verein, nicht pro Benutzer.
 
-### Verfügbare Filter
-- **Nach Verein**: Zeigt nur die Vorgänge eines bestimmten Vereins an.
-- **Nach Entität**: Filtern nach Entitätstyp (z. B. "MEMBER", "TRANSACTION") und spezifischer ID.
-- **Nach Datum**: Wählen Sie einen Zeitraum mit Start- und Enddatum.
-- **Nach Benutzer**: Filtern der Aktionen eines bestimmten Benutzers.
+> Jeder Verein sieht nur sein eigenes Protokoll. Das Protokoll kann in der App nicht bearbeitet werden und wird zusammen mit dem Verein gelöscht.
 
-### Paginierung
-Die Ergebnisse sind paginiert, um große Datenmengen zu verwalten. Folgendes kann angegeben werden:
-- **Seite**: Nummer der aktuellen Seite.
-- **Größe**: Anzahl der Datensätze pro Seite (Standard 50).
+## 18.1 Standorte
 
-## 18.4 Vorgangsanzahl
-Es steht ein Endpunkt zur Verfügung, um die Gesamtanzahl der für einen Verein erfassten Vorgänge abzurufen — nützlich für Dashboards und Statistiken.
+Füllen Sie die Zeile oben aus und klicken Sie auf **Hinzufügen**:
+- Typ: **Rechtssitz**, **Betriebssitz** oder **Projektsitz**;
+- **Name**, **Adresse**, **Stadt** und Provinz (**Prov.**).
 
-## 18.5 Technische Merkmale
-- **Unabhängige Transaktion**: Jeder Audit-Eintrag wird in einer separaten Transaktion geschrieben. Selbst wenn der Hauptvorgang fehlschlägt, wird der Versuch dennoch im Log erfasst.
-- **Unveränderlichkeit**: Audit-Einträge können weder geändert noch gelöscht werden.
-- **Indizierung**: Das Log ist nach Verein, Entität, Benutzer und Datum indiziert, um schnelle Suchen zu gewährleisten.
+Die Tabelle zeigt **Typ**, **Name**, **Adresse** und **Kontakte**. Der Papierkorb löscht den Standort.
 
-## 18.6 Bedeutung für den Dritten Sektor
-Die Nachverfolgbarkeit der Vorgänge ist eine grundlegende Anforderung für:
-- **Gesetzliche Prüfung**: Organisationen mit Einnahmen über bestimmten Schwellenwerten unterliegen der Prüfungspflicht.
-- **Steuerliche Kontrollen**: Die Finanzbehörden können detaillierte Dokumentation anfordern.
-- **Transparenz**: Mitglieder haben ein Recht auf Einsicht in die Vereinsdokumente.
-- **GDPR-Compliance**: Das Log dokumentiert, wer Vorgänge an personenbezogenen Daten durchgeführt hat.
+> Die Spalte **Kontakte** bleibt leer: Das Formular hat keine Felder für Telefon und E-Mail des Standorts.
 
-> **Hinweis**: Das Audit-Log ist eine interne Sicherheitsfunktion. Der Zugriff auf das Log sollte auf die Vereinsadministratoren und Rechnungsprüfer beschränkt sein.
+## 18.2 Dokumente
+
+Um Statut, Satzungen und andere Unterlagen zu archivieren:
+1. Wählen Sie den Typ: **Statut**, **Satzung** oder **Anhang**;
+2. geben Sie einen **Titel** ein;
+3. wählen Sie die Datei und klicken Sie auf **Hochladen**.
+
+Die Datei wird in den Datenordner von AssociaGo kopiert. Die Tabelle zeigt **Typ**, **Titel** und in der Spalte **Datei** den Pfad, unter dem sie gespeichert ist. Der Papierkorb löscht sowohl die Zeile als auch die kopierte Datei.
+
+> In der App kann das Dokument nicht geöffnet oder heruntergeladen werden: Um es einzusehen, öffnen Sie die Datei über den angegebenen Pfad.
+
+## 18.3 Fristen
+
+Um Pflichten wie Versicherungsverlängerungen, Erklärungen oder Pflichtversammlungen festzuhalten:
+- **Titel** und Fälligkeitsdatum;
+- Kategorie: **Steuerlich**, **Rechtlich**, **Governance**, **Versicherung** oder **Andere**;
+- ein Zahlenfeld, voreingestellt auf 30: die Tage der Vorwarnung.
+
+Klicken Sie auf **Hinzufügen**. Die Tabelle zeigt **Titel**, **Fälligkeitsdatum**, **Kategorie** und **Status**. Ist die Pflicht erledigt, klicken Sie auf **Als erledigt markieren**: Die Frist wechselt auf erledigt und die Schaltfläche verschwindet. Der Papierkorb löscht sie.
+
+> Die Fristen sind eine Erinnerung, die von Hand eingesehen werden muss. Die Tage der Vorwarnung werden gespeichert, aber die App verschickt weder Hinweise noch Benachrichtigungen, markiert keine überschrittenen Fristen und legt wiederkehrende Fristen nicht neu an.
+
+> Löschvorgänge in dieser Registerkarte (Standorte, Dokumente, Fristen) erfolgen sofort und ohne Bestätigung.

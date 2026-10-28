@@ -45,6 +45,7 @@ public class UserController {
                     existingUser.setPhone(userDetails.getPhone());
                     existingUser.setBirthDate(userDetails.getBirthDate());
                     existingUser.setBirthPlace(userDetails.getBirthPlace());
+                    existingUser.setGender(userDetails.getGender());
                     existingUser.setAddress(userDetails.getAddress());
                     existingUser.setCity(userDetails.getCity());
                     existingUser.setZipCode(userDetails.getZipCode());

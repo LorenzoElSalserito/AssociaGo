@@ -43,7 +43,13 @@ public class ActivityParticipant {
     private BigDecimal discountAmount = BigDecimal.ZERO;
 
     @Column(name = "discount_type")
-    private String discountType; // '%', 'EUR'
+    private String discountType; // coupon discount type: 'PERCENTAGE', 'FIXED_AMOUNT'
+
+    @Column(name = "coupon_id")
+    private Long couponId;
+
+    @Column(name = "amount_due")
+    private BigDecimal amountDue;
 
     @Column(name = "invoice_id")
     private Long invoiceId;
@@ -95,6 +101,10 @@ public class ActivityParticipant {
     public void setDiscountAmount(BigDecimal discountAmount) { this.discountAmount = discountAmount; }
     public String getDiscountType() { return discountType; }
     public void setDiscountType(String discountType) { this.discountType = discountType; }
+    public Long getCouponId() { return couponId; }
+    public void setCouponId(Long couponId) { this.couponId = couponId; }
+    public BigDecimal getAmountDue() { return amountDue; }
+    public void setAmountDue(BigDecimal amountDue) { this.amountDue = amountDue; }
     public Long getInvoiceId() { return invoiceId; }
     public void setInvoiceId(Long invoiceId) { this.invoiceId = invoiceId; }
     public String getPaymentMethod() { return paymentMethod; }

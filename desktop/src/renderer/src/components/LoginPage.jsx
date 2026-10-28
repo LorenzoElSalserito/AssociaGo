@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useTranslation } from 'react-i18next';
 import { associago } from "../api.js";
 import { Globe, Lock, Building, Mail, ArrowRight, Plus, Trash2, Hash, Eye, EyeOff, ShieldCheck } from 'lucide-react';
-import icon6 from '../assets/6.svg';
+import icon6 from '../assets/brand-mark.png';
 
 // Per-language fiscal code / VAT rules used by the entity registration form.
 // Country prefix (DE/FR/ES) is optional where the user might enter only the
@@ -304,18 +304,18 @@ export default function LoginPage({ onLogin }) {
         }
     };
 
-    if (view === "loading") return <div className="d-flex vh-100 justify-content-center align-items-center bg-light"><div className="spinner-border text-primary"></div></div>;
+    if (view === "loading") return <div className="ag-login d-flex vh-100 justify-content-center align-items-center"><div className="spinner-border text-primary" role="status" aria-label={t("Loading...")}></div></div>;
 
     return (
-        <div className="min-vh-100 d-flex align-items-center justify-content-center" style={{ background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)' }}>
-            <div className="card border-0 shadow-lg login-card" style={{ width: 'min(620px, 92vw)', borderRadius: '20px', overflow: 'hidden' }}>
+        <div className="ag-login min-vh-100 d-flex align-items-center justify-content-center">
+            <div className="card border-0 shadow-lg login-card">
 
-                <div className="bg-primary px-4 pt-4 pb-4 text-center text-white position-relative">
+                <div className="ag-login-header px-4 pt-4 pb-4 text-center text-white position-relative">
                     <div className="position-absolute top-0 end-0 p-3 d-flex align-items-center gap-2 lang-switch">
                         <Globe size={16} className="text-white opacity-75" />
                         <select
                             className="form-select form-select-sm fw-semibold text-primary shadow-sm border-0"
-                            style={{ width: 'auto', backgroundColor: '#fff' }}
+                            style={{ width: 'auto' }}
                             value={i18n.language}
                             onChange={(e) => { i18n.changeLanguage(e.target.value); associago.setPreferences({ language: e.target.value }); }}
                             aria-label={t("Language")}
@@ -328,7 +328,7 @@ export default function LoginPage({ onLogin }) {
                         </select>
                     </div>
                     <div className="mb-2">
-                        <img src={icon6} alt="Icon" style={{ width: 110, height: 110 }} />
+                        <img src={icon6} alt="AssociaGo" className="ag-login-brand" />
                     </div>
                     <h3 className="fw-bold mb-0">AssociaGo</h3>
                     <h4 className="opacity-75 mb-0">{t("Desktop Edition")}</h4>
@@ -338,22 +338,19 @@ export default function LoginPage({ onLogin }) {
                     {error && <div className="alert alert-danger py-2 small d-flex align-items-center"><i className="bi bi-exclamation-circle me-2"></i> {error}</div>}
 
                     {view === "list" && (
-                        <>
+                        <div key="list" className="ag-view">
                             <h5 className="text-center mb-4 text-muted">{t("Select Association")}</h5>
-                            <div className="d-grid gap-2 mb-4">
+                            <div className="d-grid gap-2 mb-4 ag-stagger">
                                 {associations.map(assoc => (
-                                    <div key={assoc.id} className="btn btn-outline-light text-dark border d-flex align-items-center justify-content-between p-3 text-start shadow-sm hover-shadow"
-                                         onClick={() => handleAssociationClick(assoc)} style={{ transition: 'all 0.2s' }}>
-                                        <div className="d-flex align-items-center overflow-hidden">
-                                            <div className="rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center me-3 flex-shrink-0" style={{width: 40, height: 40}}>
-                                                <span className="fw-bold">{assoc.nome ? assoc.nome.substring(0,2).toUpperCase() : "??"}</span>
-                                            </div>
-                                            <div className="text-truncate">
-                                                <div className="fw-bold text-truncate">{assoc.nome}</div>
-                                                <div className="small text-muted text-truncate">{assoc.tipo} • {assoc.email}</div>
-                                            </div>
+                                    <div key={assoc.id} className="ag-choice" role="button" tabIndex={0}
+                                         onClick={() => handleAssociationClick(assoc)}
+                                         onKeyDown={(e) => { if (e.target === e.currentTarget && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); handleAssociationClick(assoc); } }}>
+                                        <div className="ag-choice-avatar">{assoc.nome ? assoc.nome.substring(0,2).toUpperCase() : "??"}</div>
+                                        <div className="text-truncate flex-grow-1">
+                                            <div className="fw-bold text-truncate">{assoc.nome}</div>
+                                            <div className="small text-muted text-truncate">{assoc.tipo} • {assoc.email}</div>
                                         </div>
-                                        <button className="btn btn-link text-danger p-0 ms-2 opacity-50 hover-opacity-100" onClick={(e) => handleDelete(e, assoc.id)}>
+                                        <button type="button" className="btn btn-link text-danger p-1 ag-choice-delete" onClick={(e) => handleDelete(e, assoc.id)} aria-label={t("Remove association")}>
                                             <Trash2 size={16} />
                                         </button>
                                     </div>
@@ -362,11 +359,11 @@ export default function LoginPage({ onLogin }) {
                             <button className="btn btn-link w-100 text-decoration-none text-muted" onClick={() => setView("create")}>
                                 <Plus size={18} className="me-1" /> {t("Add another association")}
                             </button>
-                        </>
+                        </div>
                     )}
 
                     {view === "login-password" && (
-                        <form onSubmit={handlePasswordSubmit}>
+                        <form key="login-password" onSubmit={handlePasswordSubmit} className="ag-view ag-stagger">
                             <div className="text-center mb-4">
                                 <h5 className="fw-bold">{selectedAssoc?.nome}</h5>
                                 <p className="text-muted small">{selectedAssoc?.email}</p>
@@ -399,11 +396,13 @@ export default function LoginPage({ onLogin }) {
                     )}
 
                     {view === "create" && (
-                        <form onSubmit={handleCreateSubmit}>
+                        <form key="create" onSubmit={handleCreateSubmit} className="ag-view ag-stagger">
                             <div className="text-center mb-4">
                                 <h5 className="fw-bold">{t("Setup New Association")}</h5>
                                 <p className="text-muted small">{t("Initialize your local database")}</p>
                             </div>
+
+                            <div className="ag-wizard-section"><span className="ag-wizard-section-index">1</span>{t("Association details")}</div>
 
                             <div className="row g-2 mb-3">
                                 <div className="col-8">
@@ -438,6 +437,8 @@ export default function LoginPage({ onLogin }) {
                                 <small className="text-muted">{t("Format")}: {(FISCAL_CODE_RULES[i18n.language] || FISCAL_CODE_RULES.it).example}</small>
                             </div>
 
+                            <div className="ag-wizard-section mt-4"><span className="ag-wizard-section-index">2</span>{t("Administrator access")}</div>
+
                             <div className="mb-3">
                                 <label className="form-label small fw-bold text-muted">{t("Admin Email")}</label>
                                 <div className="input-group">
@@ -465,7 +466,7 @@ export default function LoginPage({ onLogin }) {
                             </div>
 
                             <div className="d-grid gap-2">
-                                <button type="submit" className="btn btn-primary py-2 fw-bold" disabled={loading}>
+                                <button type="submit" className="btn btn-primary py-2 fw-bold ag-btn-arrow" disabled={loading}>
                                     {loading ? <span className="spinner-border spinner-border-sm"/> : <>{t("Initialize Database")} <ArrowRight size={16} className="ms-1"/></>}
                                 </button>
                                 {associations.length > 0 && (
@@ -477,8 +478,6 @@ export default function LoginPage({ onLogin }) {
                 </div>
             </div>
             <style>{`
-                .hover-shadow:hover { background-color: #f8f9fa !important; border-color: #0d6efd !important; transform: translateY(-1px); }
-                .hover-opacity-100:hover { opacity: 1 !important; }
                 .login-card .lang-switch select { min-width: 64px; }
                 .login-card h3 { letter-spacing: .5px; }
                 .recovery-modal-backdrop { background: rgba(15, 23, 42, .55); }

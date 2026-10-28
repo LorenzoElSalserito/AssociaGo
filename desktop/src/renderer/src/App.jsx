@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { associago } from './api';
+import { Search, Sun, Moon } from 'lucide-react';
 
 // Layout Components
 import LeftNav from "./components/LeftNav";
@@ -58,13 +59,32 @@ function App() {
   const { t, i18n } = useTranslation();
 
   const [appState, setAppState] = useState('LOADING');
+  const [connected, setConnected] = useState(true);
+  const [connecting, setConnecting] = useState(false);
+  const [startupError, setStartupError] = useState(false);
+  useEffect(() => {
+    const update = event => setConnected(event.detail.connected);
+    window.addEventListener('associago:connection', update);
+    return () => window.removeEventListener('associago:connection', update);
+  }, []);
   const [activeId, setActiveId] = useState('dashboard');
+  // Optional item to open once the destination page mounts, e.g. { page: 'events', eventId }.
+  const [navTarget, setNavTarget] = useState(null);
 
   const [currentAssociation, setCurrentAssociation] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
 
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [theme, setTheme] = useState('light');
+  const [zoom, setZoom] = useState(() => {
+    const saved = Number(localStorage.getItem('associago_zoom'));
+    return [50,75,100,125,150,175,200].includes(saved) ? saved : 100;
+  });
+  useEffect(() => {
+    localStorage.setItem('associago_zoom', String(zoom));
+    if (window.api?.setZoom) window.api.setZoom(zoom).catch(console.error);
+    else document.documentElement.style.zoom = String(zoom / 100);
+  }, [zoom]);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalType, setModalType] = useState(null);
   const [modalProps, setModalProps] = useState({});
@@ -99,10 +119,11 @@ function App() {
     try {
       const { baseUrl } = await associago.init();
       console.log('API Ready:', baseUrl);
+      setStartupError(false);
       setAppState('LOGIN');
     } catch (err) {
       console.error("Init failed:", err);
-      setTimeout(initApp, 2000);
+      setStartupError(true);
     }
   };
 
@@ -124,6 +145,8 @@ function App() {
     setAppState('LOADING');
     associago.setCurrentAssociation(null);
     associago.setAuthToken(null);
+    // Logging out must also end "Keep me logged in", or the login page would sign straight back in.
+    associago.setPreferences({ autologin: null });
     setTimeout(() => {
         setCurrentAssociation(null);
         setCurrentUser(null);
@@ -202,7 +225,10 @@ function App() {
   const activePage = PAGES.find(p => p.id === activeId) || PAGES[0];
 
   const shell = useMemo(() => ({
-    navigate: setActiveId,
+    navigate: (id, target = null) => { setNavTarget(target ? { page: id, ...target } : null); setActiveId(id); },
+    navTarget,
+    clearNavTarget: () => setNavTarget(null),
+    pages: PAGES.map(({ id, label }) => ({ id, label })),
     openModal,
     closeModal,
     currentUser,
@@ -210,8 +236,10 @@ function App() {
     currentAssociationId: currentAssociation?.id, // Fix for SettingsDashboard
     theme,
     setTheme,
+    zoom,
+    setZoom,
     savePreferences // Expose savePreferences to shell
-  }), [currentUser, currentAssociation, theme, i18n.language]);
+  }), [currentUser, currentAssociation, theme, zoom, i18n.language, PAGES, navTarget]);
 
   const profileItems = [
     { id: "settings", label: t('nav.settings'), icon: "bi-gear", onClick: () => setActiveId("settings") },
@@ -220,13 +248,14 @@ function App() {
     { id: "logout", label: t('Logout'), icon: "bi-box-arrow-right", danger: true, onClick: handleLogout }
   ];
 
-  if (appState === 'LOADING') return <SplashScreen message={t('app.loading')} />;
+  if (appState === 'LOADING') return <SplashScreen message={t(startupError ? 'connection.unavailable' : 'app.loading')} onRetry={startupError ? initApp : undefined} />;
   if (appState === 'LOGIN') return <LoginPage onLogin={handleLogin} />;
 
   const PageComponent = activePage.component;
 
   return (
     <div className="jl-root">
+      <a className="ag-skip-link" href="#main-content">{t("navigation.skip")}</a>
       <div className="jl-appframe">
         <div className="jl-shell">
             <CommandPalette shell={shell} isOpen={commandPaletteOpen} onClose={() => setCommandPaletteOpen(false)} />
@@ -234,9 +263,18 @@ function App() {
             <main className="jl-main">
                 <TopHeader
                     title={activePage.label}
+                    context={currentAssociation?.nome}
                     actions={
                         <>
-                            <NotificationBell userId={currentUser?.id} />
+                            <button type="button" className="btn btn-light ag-search-trigger" onClick={() => setCommandPaletteOpen(true)} aria-label={t('navigation.search')}>
+                                <Search size={18} /><span>{t('navigation.search')}</span><kbd>Ctrl / ⌘ K</kbd>
+                            </button>
+                            <button type="button" className="btn btn-light" aria-label={t(theme === 'dark' ? 'Light' : 'Dark')} onClick={() => {
+                                const nextTheme = theme === 'dark' ? 'light' : 'dark';
+                                setTheme(nextTheme);
+                                associago.setPreferences({ theme: nextTheme });
+                            }}>{theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}</button>
+                            <NotificationBell associationId={currentAssociation?.id} shell={shell} />
                             <ProfileMenu
                                 initials={currentAssociation?.nome?.substring(0, 2)?.toUpperCase() || "AG"}
                                 title={currentAssociation?.nome}
@@ -246,7 +284,16 @@ function App() {
                         </>
                     }
                 />
-                <section className="jl-content">
+                {!connected && <div className="alert alert-warning m-3 mb-0" role="alert">
+                    <span>{t('connection.unavailable')}</span>
+                    <button type="button" className="btn btn-outline-primary ms-3" disabled={connecting} onClick={async () => {
+                        setConnecting(true);
+                        try { await associago.reconnect(); setConnected(true); }
+                        catch { setConnected(false); }
+                        finally { setConnecting(false); }
+                    }}>{t('Retry')}</button>
+                </div>}
+                <section className="jl-content" id="main-content" tabIndex={-1} data-page={activeId}>
                     <div className="jl-page p-4">
                         <ErrorBoundary>
                             <PageComponent shell={shell} associationId={currentAssociation?.id} />
@@ -268,20 +315,13 @@ function App() {
                     <div className="toast-body">
                         {toast.message}
                     </div>
-                    <button type="button" className="btn-close btn-close-white me-2 m-auto" onClick={() => setToast(null)} aria-label="Close"></button>
+                    <button type="button" className="btn-close btn-close-white me-2 m-auto" onClick={() => setToast(null)} aria-label={t('Close')}></button>
                 </div>
             </div>
         </div>
       )}
 
-      <style>{`
-        .jl-root { height: 100vh; width: 100vw; overflow: hidden; background-color: var(--bs-body-bg); color: var(--bs-body-color); }
-        .jl-appframe { height: 100%; display: flex; flex-direction: column; }
-        .jl-shell { display: flex; flex: 1; height: 100%; overflow: hidden; }
-        .jl-main { flex: 1; display: flex; flex-direction: column; min-width: 0; height: 100%; }
-        .jl-content { flex: 1; overflow-y: auto; position: relative; }
-        .jl-page { max-width: 1600px; margin: 0 auto; width: 100%; }
-      `}</style>
+
     </div>
   );
 }

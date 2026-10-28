@@ -115,7 +115,7 @@ const CouponList = ({ associationId, shell }) => {
                                             </td>
                                             <td>
                                                 {coupon.discountType === 'PERCENTAGE' ? `${coupon.discountValue}%` : `€${coupon.discountValue}`}
-                                                {coupon.minAmount > 0 && <div className="small text-muted">Min: €{coupon.minAmount}</div>}
+                                                {coupon.minAmount > 0 && <div className="small text-muted">{t('couponList.minAmount', { amount: coupon.minAmount })}</div>}
                                             </td>
                                             <td>
                                                 <div className="small text-muted">

@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { associago } from '../api';
 
 const CommunicationDashboard = ({ associationId, shell }) => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const [tab, setTab] = useState('messages');
     const [communications, setCommunications] = useState([]);
     const [templates, setTemplates] = useState([]);
@@ -183,7 +183,7 @@ const CommunicationDashboard = ({ associationId, shell }) => {
                     <Col md={3}>
                         <Card className="border-0 shadow-sm text-center p-3">
                             <div className="text-muted small">{t('Sent At')}</div>
-                            <div className="fw-bold fs-6">{selectedComm.sentAt ? new Date(selectedComm.sentAt).toLocaleString() : '-'}</div>
+                            <div className="fw-bold fs-6">{selectedComm.sentAt ? new Date(selectedComm.sentAt).toLocaleString(i18n.language) : '-'}</div>
                         </Card>
                     </Col>
                 </Row>
@@ -212,8 +212,8 @@ const CommunicationDashboard = ({ associationId, shell }) => {
                                     <tr key={r.id}>
                                         <td className="ps-4">{r.name}</td>
                                         <td>{r.email}</td>
-                                        <td><Badge bg={r.status === 'SENT' ? 'success' : r.status === 'FAILED' ? 'danger' : 'secondary'}>{r.status || 'PENDING'}</Badge></td>
-                                        <td>{r.sentAt ? new Date(r.sentAt).toLocaleString() : '-'}</td>
+                                        <td><Badge bg={r.status === 'SENT' ? 'success' : r.status === 'FAILED' ? 'danger' : 'secondary'}>{t(r.status || 'PENDING')}</Badge></td>
+                                        <td>{r.sentAt ? new Date(r.sentAt).toLocaleString(i18n.language) : '-'}</td>
                                     </tr>
                                 ))}
                                 {recipients.length === 0 && <tr><td colSpan="4" className="text-center py-4 text-muted">{t('No recipients resolved yet.')}</td></tr>}
@@ -280,7 +280,7 @@ const CommunicationDashboard = ({ associationId, shell }) => {
                                         </td>
                                         <td>{statusBadge(c.status)}</td>
                                         <td>{c.totalRecipients || 0}</td>
-                                        <td>{c.createdAt ? new Date(c.createdAt).toLocaleDateString() : '-'}</td>
+                                        <td>{c.createdAt ? new Date(c.createdAt).toLocaleDateString(i18n.language) : '-'}</td>
                                         <td className="text-end pe-4" onClick={e => e.stopPropagation()}>
                                             {c.status === 'DRAFT' && (
                                                 <Button variant="light" size="sm" className="me-1" onClick={() => { setEditingComm(c); setForm({ subject: c.subject, bodyHtml: c.bodyHtml || '', bodyText: c.bodyText || '', senderEmail: c.senderEmail || '', senderName: c.senderName || '', segmentFilter: c.segmentFilter || '' }); setShowForm(true); }}>

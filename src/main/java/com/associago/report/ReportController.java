@@ -12,6 +12,8 @@ import com.associago.finance.FinancialService;
 import com.associago.finance.Transaction;
 import com.associago.member.Member;
 import com.associago.member.MemberService;
+import com.associago.membership.repository.UserAssociationRepository;
+import com.associago.shared.SignatureResolver;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -20,8 +22,13 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1/reports")
@@ -34,11 +41,14 @@ public class ReportController {
     private final AssociationService associationService;
     private final ActivityService activityService;
     private final EventService eventService;
+    private final UserAssociationRepository userAssociationRepository;
+    private final SignatureResolver signatureResolver;
 
     public ReportController(ReportService reportService, MemberService memberService,
                             FinancialService financialService, AssemblyService assemblyService,
                             AssociationService associationService, ActivityService activityService,
-                            EventService eventService) {
+                            EventService eventService, UserAssociationRepository userAssociationRepository,
+                            SignatureResolver signatureResolver) {
         this.reportService = reportService;
         this.memberService = memberService;
         this.financialService = financialService;
@@ -46,6 +56,8 @@ public class ReportController {
         this.associationService = associationService;
         this.activityService = activityService;
         this.eventService = eventService;
+        this.userAssociationRepository = userAssociationRepository;
+        this.signatureResolver = signatureResolver;
     }
 
     private Association getAssociation(Long associationId) {
@@ -53,11 +65,11 @@ public class ReportController {
     }
 
     @GetMapping("/members/{id}/card")
-    public ResponseEntity<byte[]> getMembershipCard(@PathVariable Long id, @RequestHeader(value = "X-Association-Id", required = false) Long associationId) throws IOException {
+    public ResponseEntity<byte[]> getMembershipCard(@PathVariable Long id, @RequestHeader(value = "X-Association-Id", required = false) Long associationId, Locale locale) throws IOException {
         Member member = memberService.getMemberById(id).orElseThrow(() -> new RuntimeException("Member not found"));
         Association association = getAssociation(associationId != null ? associationId : 1L); // Fallback to 1 for now
         
-        byte[] pdf = reportService.generateMembershipCard(member, association);
+        byte[] pdf = reportService.generateMembershipCard(member, association, locale);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=tessera_" + id + ".pdf")
@@ -66,7 +78,7 @@ public class ReportController {
     }
 
     @GetMapping("/finance/transactions/{id}/receipt")
-    public ResponseEntity<byte[]> getTransactionReceipt(@PathVariable Long id, @RequestHeader(value = "X-Association-Id", required = false) Long associationId) throws IOException {
+    public ResponseEntity<byte[]> getTransactionReceipt(@PathVariable Long id, @RequestHeader(value = "X-Association-Id", required = false) Long associationId, Locale locale) throws IOException {
         Transaction transaction = financialService.getTransactionById(id).orElseThrow(() -> new RuntimeException("Transaction not found"));
         Member member = null;
         if (transaction.getUserId() != null) {
@@ -74,7 +86,7 @@ public class ReportController {
         }
         Association association = getAssociation(associationId != null ? associationId : transaction.getAssociationId());
 
-        byte[] pdf = reportService.generateTransactionReceipt(transaction, member, association);
+        byte[] pdf = reportService.generateTransactionReceipt(transaction, member, association, locale);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=ricevuta_" + id + ".pdf")
@@ -83,12 +95,12 @@ public class ReportController {
     }
 
     @GetMapping("/finance/year/{year}")
-    public ResponseEntity<byte[]> getFinancialReport(@PathVariable int year, @RequestHeader(value = "X-Association-Id", required = false) Long associationId) throws IOException {
+    public ResponseEntity<byte[]> getFinancialReport(@PathVariable int year, @RequestHeader(value = "X-Association-Id", required = false) Long associationId, Locale locale) throws IOException {
         Map<String, BigDecimal> summary = financialService.getYearOverYearComparison(year);
         List<Transaction> transactions = financialService.getAllTransactions(); // Should be filtered by year ideally
         Association association = getAssociation(associationId != null ? associationId : 1L);
 
-        byte[] pdf = reportService.generateFinancialReport(year, summary, transactions, association);
+        byte[] pdf = reportService.generateFinancialReport(year, summary, transactions, association, locale);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=bilancio_" + year + ".pdf")
@@ -100,12 +112,13 @@ public class ReportController {
     public ResponseEntity<byte[]> getComparisonReport(
             @RequestParam int year1,
             @RequestParam int year2,
-            @RequestHeader(value = "X-Association-Id", required = false) Long associationId
+            @RequestHeader(value = "X-Association-Id", required = false) Long associationId,
+            Locale locale
     ) throws IOException {
         Map<String, BigDecimal> summary = financialService.getCustomComparison(year1, year2);
         Association association = getAssociation(associationId != null ? associationId : 1L);
 
-        byte[] pdf = reportService.generateComparisonReport(year1, year2, summary, association);
+        byte[] pdf = reportService.generateComparisonReport(year1, year2, summary, association, locale);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=confronto_" + year1 + "_" + year2 + ".pdf")
@@ -114,12 +127,12 @@ public class ReportController {
     }
 
     @GetMapping("/members/list")
-    public ResponseEntity<byte[]> getMemberList(@RequestHeader(value = "X-Association-Id", required = false) Long associationId) throws IOException {
+    public ResponseEntity<byte[]> getMemberList(@RequestHeader(value = "X-Association-Id", required = false) Long associationId, Locale locale) throws IOException {
         List<Member> members = new ArrayList<>();
         memberService.getAllMembers().forEach(members::add);
         Association association = getAssociation(associationId != null ? associationId : 1L);
 
-        byte[] pdf = reportService.generateMemberList(members, association);
+        byte[] pdf = reportService.generateMemberList(members, association, locale);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=elenco_soci.pdf")
@@ -128,12 +141,12 @@ public class ReportController {
     }
 
     @GetMapping("/events/{id}/report")
-    public ResponseEntity<byte[]> getEventReport(@PathVariable Long id, @RequestHeader(value = "X-Association-Id", required = false) Long associationId) throws IOException {
+    public ResponseEntity<byte[]> getEventReport(@PathVariable Long id, @RequestHeader(value = "X-Association-Id", required = false) Long associationId, Locale locale) throws IOException {
         Event event = eventService.getEventById(id).orElseThrow(() -> new RuntimeException("Event not found"));
         int participantCount = eventService.getParticipants(id).size();
         Association association = getAssociation(associationId != null ? associationId : event.getAssociationId());
 
-        byte[] pdf = reportService.generateEventReport(event, participantCount, association);
+        byte[] pdf = reportService.generateEventReport(event, participantCount, association, locale);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=report_evento_" + id + ".pdf")
@@ -142,12 +155,12 @@ public class ReportController {
     }
 
     @GetMapping("/activities/{id}/report")
-    public ResponseEntity<byte[]> getActivityReport(@PathVariable Long id, @RequestHeader(value = "X-Association-Id", required = false) Long associationId) throws IOException {
+    public ResponseEntity<byte[]> getActivityReport(@PathVariable Long id, @RequestHeader(value = "X-Association-Id", required = false) Long associationId, Locale locale) throws IOException {
         Activity activity = activityService.findById(id).orElseThrow(() -> new RuntimeException("Activity not found"));
         int participantCount = activityService.findParticipantsByActivityId(id).size();
         Association association = getAssociation(associationId != null ? associationId : activity.getAssociationId());
 
-        byte[] pdf = reportService.generateActivityReport(activity, participantCount, association);
+        byte[] pdf = reportService.generateActivityReport(activity, participantCount, association, locale);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=report_attivita_" + id + ".pdf")
@@ -156,17 +169,39 @@ public class ReportController {
     }
 
     @GetMapping("/assemblies/{id}/minutes")
-    public ResponseEntity<byte[]> getAssemblyMinutes(@PathVariable Long id, @RequestHeader(value = "X-Association-Id", required = false) Long associationId) throws IOException {
+    public ResponseEntity<byte[]> getAssemblyMinutes(@PathVariable Long id, @RequestHeader(value = "X-Association-Id", required = false) Long associationId, Locale locale) throws IOException {
         Assembly assembly = assemblyService.getAssemblyById(id).orElseThrow(() -> new RuntimeException("Assembly not found"));
         var participants = assemblyService.getParticipants(id);
         var motions = assemblyService.getMotions(id);
         Association association = getAssociation(associationId != null ? associationId : assembly.getAssociationId());
 
-        byte[] pdf = reportService.generateAssemblyMinutes(assembly, participants, motions, association);
+        var signers = association.getId() == null ? List.<SignatureResolver.SignerInfo>of()
+                : signatureResolver.resolveSigners(association.getId(), List.of("president", "secretary"));
+
+        byte[] pdf = reportService.generateAssemblyMinutes(assembly, participants, memberNames(participants), motions,
+                signers, association, locale);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=verbale_" + id + ".pdf")
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(pdf);
+    }
+
+    /** Display names of participants and proxy holders, keyed by user_associations id. */
+    private Map<Long, String> memberNames(List<com.associago.assembly.AssemblyParticipant> participants) {
+        Set<Long> ids = new HashSet<>();
+        for (var p : participants) {
+            if (p.getUserAssociationId() != null) ids.add(p.getUserAssociationId());
+            if (p.getProxyReceiverId() != null) ids.add(p.getProxyReceiverId());
+        }
+        Map<Long, String> names = new HashMap<>();
+        userAssociationRepository.findAllById(ids).forEach(ua -> {
+            var user = ua.getUser();
+            if (user != null) {
+                names.put(ua.getId(), (Objects.requireNonNullElse(user.getFirstName(), "") + " "
+                        + Objects.requireNonNullElse(user.getLastName(), "")).trim());
+            }
+        });
+        return names;
     }
 }

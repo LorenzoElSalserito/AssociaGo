@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, Table, Form, InputGroup, Badge, Spinner } from 'react-bootstrap';
-import { Search, Plus, Filter, Edit, Trash2, UserCheck, Clock } from 'lucide-react';
+import { Card, Button, Table, Form, InputGroup, Badge, Spinner, Alert } from 'react-bootstrap';
+import { Search, Plus, Filter, Edit, Trash2, UserCheck, Clock, Eye } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { associago } from '../api';
 import RowActions from './common/RowActions';
+import VolunteerDetail from './VolunteerDetail';
 
 const VolunteerList = ({ associationId, shell }) => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const [volunteers, setVolunteers] = useState([]);
+    const [selectedId, setSelectedId] = useState(null);
+    const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
 
@@ -20,14 +23,15 @@ const VolunteerList = ({ associationId, shell }) => {
     const fetchVolunteers = async () => {
         setLoading(true);
         try {
-            const baseUrl = await associago.getApiUrl();
-            const response = await fetch(`${baseUrl}/v1/volunteers?associationId=${associationId}`);
-            if (response.ok) {
-                const data = await response.json();
-                setVolunteers(data);
-            }
+            setError(null);
+            const [data, members] = await Promise.all([associago.volunteers.getAll(), associago.members.getAll()]);
+            setVolunteers(data.map(volunteer => {
+                const member = members.find(m => m.id === volunteer.memberId);
+                return { ...volunteer, name: member ? `${member.firstName} ${member.lastName}` : `#${volunteer.memberId}`, email: member?.email };
+            }));
         } catch (error) {
             console.error("Error fetching volunteers:", error);
+            setError(error.message);
         } finally {
             setLoading(false);
         }
@@ -41,8 +45,16 @@ const VolunteerList = ({ associationId, shell }) => {
         volunteer.name?.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
+    const handleDelete = async id => {
+        if (!window.confirm(t('Are you sure you want to delete this volunteer?'))) return;
+        try { await associago.volunteers.delete(id); await fetchVolunteers(); }
+        catch (error) { setError(error.message); }
+    };
+    if (selectedId) return <VolunteerDetail volunteerId={selectedId} shell={shell} onBack={() => { setSelectedId(null); fetchVolunteers(); }} />;
+
     return (
         <div className="fade-in">
+            {error && <Alert variant="danger">{error}</Alert>}
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <div>
                     <h2 className="fw-bold text-dark mb-1">{t('Volunteers')}</h2>
@@ -82,7 +94,7 @@ const VolunteerList = ({ associationId, shell }) => {
                             <thead className="bg-light">
                                 <tr>
                                     <th className="border-0 ps-4">{t('Name')}</th>
-                                    <th className="border-0">{t('Role')}</th>
+                                    <th className="border-0">{t('Skills')}</th>
                                     <th className="border-0">{t('Hours')}</th>
                                     <th className="border-0">{t('Status')}</th>
                                     <th className="border-0 text-end pe-4">{t('Actions')}</th>
@@ -103,20 +115,21 @@ const VolunteerList = ({ associationId, shell }) => {
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td>{volunteer.role}</td>
+                                            <td>{volunteer.skills || '—'}</td>
                                             <td>
                                                 <div className="d-flex align-items-center text-muted small">
                                                     <Clock size={14} className="me-1" />
-                                                    {volunteer.hours || 0}h
+                                                    {Number(volunteer.hours || 0).toLocaleString(i18n.language)}h
                                                 </div>
                                             </td>
                                             <td>
-                                                <Badge bg="success" className="fw-normal px-2 py-1 bg-opacity-10 text-success border border-success border-opacity-25">
-                                                    {t('Active')}
+                                                <Badge bg={volunteer.status === 'INACTIVE' ? 'secondary' : 'success'} className={`fw-normal px-2 py-1 bg-opacity-10 border border-opacity-25 ${volunteer.status === 'INACTIVE' ? 'text-secondary border-secondary' : 'text-success border-success'}`}>
+                                                    {t(volunteer.status === 'INACTIVE' ? 'Inactive' : 'Active')}
                                                 </Badge>
                                             </td>
                                             <td className="text-end pe-4">
                                                 <RowActions actions={[
+                                                    { key: 'view', icon: <Eye size={16} />, label: t('View Details'), onClick: () => setSelectedId(volunteer.id) },
                                                     {
                                                         key: 'edit',
                                                         icon: <Edit size={16} />,
@@ -124,9 +137,8 @@ const VolunteerList = ({ associationId, shell }) => {
                                                         onClick: () => shell.openModal('volunteer-form', { associationId, volunteerId: volunteer.id, onSuccess: fetchVolunteers }),
                                                     },
                                                     {
-                                                        // Mantenuto come da originale: handler delete
-                                                        // non implementato (placeholder pre-esistente).
                                                         key: 'delete',
+                                                        onClick: () => handleDelete(volunteer.id),
                                                         icon: <Trash2 size={16} />,
                                                         label: t('Delete'),
                                                         textClass: 'text-danger',

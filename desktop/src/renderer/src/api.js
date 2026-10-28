@@ -20,6 +20,17 @@ const STORAGE_KEY_AUTOLOGIN = 'associago_autologin_v1';
 const STORAGE_KEY_ASSOCIATIONS = 'associago_associations_list';
 const STORAGE_KEY_LANGUAGE = 'associago_language';
 
+// The UI registers i18next here; api.js stays dependency-free (tests import it standalone).
+let translate = (key) => key;
+export function setTranslator(fn) { translate = fn; }
+// Sent as Accept-Language so backend messages and PDFs follow the UI language.
+let uiLanguage = null;
+export function setRequestLanguage(language) { uiLanguage = language || null; }
+function requestLanguage() {
+    if (uiLanguage) return uiLanguage;
+    try { return globalThis.localStorage?.getItem(STORAGE_KEY_LANGUAGE) || 'it'; } catch { return 'it'; }
+}
+
 async function initializeApi() {
     if (API_BASE_URL) return API_BASE_URL;
     if (_initInFlight) return _initInFlight;
@@ -73,7 +84,7 @@ function shouldRetryNetworkError(error, options) {
 async function performFetch(endpoint, options = {}) {
     const baseUrl = await getApiUrl();
     const url = `${baseUrl}${endpoint}`;
-    const headers = { 'Accept': 'application/json', ...options.headers };
+    const headers = { 'Accept': 'application/json', 'Accept-Language': requestLanguage(), ...options.headers };
 
     if (!(options.body instanceof FormData) && !headers['Content-Type']) {
         headers['Content-Type'] = 'application/json';
@@ -85,20 +96,33 @@ async function performFetch(endpoint, options = {}) {
         config.body = JSON.stringify(options.body);
     }
 
-    const response = await fetch(url, config);
+    const response = await fetch(url, { ...config, signal: options.signal || AbortSignal.timeout(30000) });
+    window.dispatchEvent(new CustomEvent('associago:connection', { detail: { connected: true } }));
     if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `HTTP ${response.status}`);
+        throw new Error(errorData.message || translate('errors.http', { status: response.status }));
     }
     if (response.status === 204) return null;
 
     const contentType = response.headers.get("content-type");
-    if (contentType && (contentType.includes("pdf") || contentType.includes("image") || contentType.includes("octet-stream"))) {
+    if (contentType && (contentType.includes("pdf") || contentType.includes("image") || contentType.includes("octet-stream") || contentType.includes("text/csv"))) {
         return response.blob();
     }
 
     const text = await response.text();
     return text ? JSON.parse(text) : null;
+}
+
+function connectionFailure(error, endpoint, options) {
+    if (!(error instanceof TypeError) && error.name !== 'TimeoutError') return error;
+    // A failed write may have reached the server: never automatically replay it.
+    API_BASE_URL = null;
+    window.dispatchEvent(new CustomEvent('associago:connection', { detail: { connected: false } }));
+    console.error('[API] Backend connection failed', JSON.stringify({ endpoint: endpoint.split('?')[0], method: options.method || 'GET', cause: error.message }));
+    const failure = new Error(translate('errors.backendUnreachable'));
+    failure.code = 'BACKEND_UNREACHABLE';
+    failure.cause = error;
+    return failure;
 }
 
 async function apiRequest(endpoint, options = {}) {
@@ -107,16 +131,10 @@ async function apiRequest(endpoint, options = {}) {
     } catch (error) {
         if (shouldRetryNetworkError(error, options)) {
             API_BASE_URL = null;
-            try {
-                return await performFetch(endpoint, options);
-            } catch (retryError) {
-                console.error('[API] Error after retry:', retryError);
-                throw retryError;
-            }
+            try { return await performFetch(endpoint, options); }
+            catch (retryError) { throw connectionFailure(retryError, endpoint, options); }
         }
-
-        console.error('[API] Error:', error);
-        throw error;
+        throw connectionFailure(error, endpoint, options);
     }
 }
 
@@ -179,6 +197,9 @@ const events = {
     getParticipants: (id) => apiRequest(`/v1/events/${id}/participants`),
     addParticipant: (id, data) => apiRequest(`/v1/events/${id}/participants`, { method: 'POST', body: data }),
     removeParticipant: (partId) => apiRequest(`/v1/events/participants/${partId}`, { method: 'DELETE' }),
+    checkInParticipant: (id, partId) => apiRequest(`/v1/events/${id}/participants/${partId}/check-in`, { method: 'POST' }),
+    undoCheckIn: (id, partId) => apiRequest(`/v1/events/${id}/participants/${partId}/check-in`, { method: 'DELETE' }),
+    updateParticipantPayment: (id, partId, paymentStatus) => apiRequest(`/v1/events/${id}/participants/${partId}/payment-status`, { method: 'PUT', body: { paymentStatus } }),
 };
 
 const assemblies = {
@@ -194,10 +215,14 @@ const assemblies = {
     // Sub-resources
     getParticipants: (id) => apiRequest(`/v1/assemblies/${id}/participants`),
     addParticipant: (id, data) => apiRequest(`/v1/assemblies/${id}/participants`, { method: 'POST', body: data }),
+    updateParticipant: (partId, data) => apiRequest(`/v1/assemblies/participants/${partId}`, { method: 'PUT', body: data }),
     removeParticipant: (partId) => apiRequest(`/v1/assemblies/participants/${partId}`, { method: 'DELETE' }),
 
     getMotions: (id) => apiRequest(`/v1/assemblies/${id}/motions`),
     addMotion: (id, data) => apiRequest(`/v1/assemblies/${id}/motions`, { method: 'POST', body: data }),
+    updateMotion: (mId, data) => apiRequest(`/v1/assemblies/motions/${mId}`, { method: 'PUT', body: data }),
+    recordMotionVotes: (mId, data) => apiRequest(`/v1/assemblies/motions/${mId}/result`, { method: 'PUT', body: data }),
+    clearMotionVotes: (mId) => apiRequest(`/v1/assemblies/motions/${mId}/result`, { method: 'DELETE' }),
     deleteMotion: (mId) => apiRequest(`/v1/assemblies/motions/${mId}`, { method: 'DELETE' }),
 
     getDocuments: (id) => apiRequest(`/v1/assemblies/${id}/documents`),
@@ -265,11 +290,14 @@ const members = {
 };
 
 const users = {
+    update: (id, data) => apiRequest(`/v1/users/${id}`, { method: 'PUT', body: data }),
     create: (data) => apiRequest('/v1/users', { method: 'POST', body: data }),
     getAll: () => apiRequest('/v1/users'),
 };
 
 const memberships = {
+    getById: id => apiRequest(`/v1/memberships/${id}`),
+    update: (id, data) => apiRequest(`/v1/memberships/${id}`, { method: 'PUT', body: data }),
     getByAssociation: (assocId) => apiRequest(`/v1/memberships/association/${assocId || CURRENT_ASSOCIATION_ID}`),
     create: (data) => apiRequest('/v1/memberships', { method: 'POST', body: data }),
     delete: (id) => apiRequest(`/v1/memberships/${id}`, { method: 'DELETE' }),
@@ -279,7 +307,7 @@ const memberships = {
 const reports = {
     downloadFinancialReport: (year) => apiRequest(`/v1/reports/finance/year/${year || new Date().getFullYear()}`),
     downloadComparisonReport: (year1, year2) => apiRequest(`/v1/reports/finance/comparison?year1=${year1}&year2=${year2}`),
-    downloadActivityReport: (id) => apiRequest(`/v1/reports/activities/${id}`),
+    downloadActivityReport: (id) => apiRequest(`/v1/reports/activities/${id}/report`),
     downloadAssemblyMinutes: (id) => apiRequest(`/v1/reports/assemblies/${id}/minutes`),
     downloadTransactionReceipt: (id) => apiRequest(`/v1/reports/finance/transactions/${id}/receipt`),
     downloadMembershipCard: (id) => apiRequest(`/v1/reports/members/${id}/card`),
@@ -318,6 +346,7 @@ const coupons = {
     create: (data) => apiRequest('/v1/coupons', { method: 'POST', body: data }),
     update: (id, data) => apiRequest(`/v1/coupons/${id}`, { method: 'PUT', body: data }),
     delete: (id) => apiRequest(`/v1/coupons/${id}`, { method: 'DELETE' }),
+    validate: (data) => apiRequest('/v1/coupons/validate', { method: 'POST', body: { associationId: CURRENT_ASSOCIATION_ID, ...data } }),
 };
 
 const paymentMethods = {
@@ -336,6 +365,9 @@ const stats = {
 };
 
 const notifications = {
+    list: (limit = 50) => apiRequest(`/v1/notifications?limit=${limit}`),
+    unreadCount: () => apiRequest('/v1/notifications/unread-count'),
+    markAllRead: () => apiRequest('/v1/notifications/read-all', { method: 'PUT' }),
     getUserNotifications: (userId) => apiRequest(`/v1/notifications/user/${userId}`),
     getUnreadUserNotifications: (userId) => apiRequest(`/v1/notifications/user/${userId}/unread`),
     markAsRead: (id) => apiRequest(`/v1/notifications/${id}/read`, { method: 'PUT' }),
@@ -407,6 +439,14 @@ const cashRegisters = {
 
 const audit = {
     getByAssociation: (assocId, page = 0, size = 50) => apiRequest(`/v1/audit?associationId=${assocId}&page=${page}&size=${size}`),
+    search: (assocId, { area, action, from, to, page = 0, size = 25 } = {}) => {
+        const params = new URLSearchParams({ associationId: assocId, page, size });
+        if (area) params.append('area', area);
+        if (action) params.append('action', action);
+        if (from) params.append('from', from);
+        if (to) params.append('to', to);
+        return apiRequest(`/v1/audit?${params}`);
+    },
     getByEntity: (entityType, entityId) => apiRequest(`/v1/audit/entity/${entityType}/${entityId}`),
     getByDateRange: (assocId, from, to) => apiRequest(`/v1/audit/range?associationId=${assocId}&from=${from}&to=${to}`),
     count: (assocId) => apiRequest(`/v1/audit/count?associationId=${assocId}`),
@@ -442,6 +482,20 @@ const communications = {
     resolveRecipients: (id) => apiRequest(`/v1/communications/${id}/resolve-recipients`, { method: 'POST' }),
     getRecipients: (id) => apiRequest(`/v1/communications/${id}/recipients`),
     send: (id, sentBy) => apiRequest(`/v1/communications/${id}/send?sentBy=${sentBy}`, { method: 'POST' }),
+};
+
+const database = {
+    get: () => apiRequest('/v1/database'),
+    test: config => apiRequest('/v1/database/test', {method: 'POST', body: config}),
+    save: config => apiRequest('/v1/database', {method: 'POST', body: config})
+};
+
+const memberData = {
+    download: (id, format, example) => apiRequest(`/v1/data/members/${example ? 'template' : 'export'}?associationId=${id}&format=${format}`),
+    upload: (id, file, preview) => {
+        const body = new FormData(); body.append('file', file);
+        return apiRequest(`/v1/data/members/${preview ? 'preview' : 'import'}?associationId=${id}`, { method: 'POST', body });
+    }
 };
 
 const csvImport = {
@@ -501,9 +555,20 @@ const federation = {
 // ========================================
 
 export const associago = {
-    init: async () => { await initializeApi(); return { baseUrl: API_BASE_URL }; },
+    init: async () => { await initializeApi(); await apiRequest('/associations'); return { baseUrl: API_BASE_URL }; },
+    reconnect: async () => { API_BASE_URL = null; await apiRequest('/associations'); return true; },
     setCurrentAssociation: (id) => { CURRENT_ASSOCIATION_ID = id; },
     getApiUrl,
+    attendance: {
+        sessions: activityId => apiRequest(`/v1/attendance/activity/${activityId}`),
+        createSession: data => apiRequest('/v1/attendance/session', { method: 'POST', body: data }),
+        updateSession: (id, data) => apiRequest(`/v1/attendance/session/${id}`, { method: 'PUT', body: data }),
+        deleteSession: id => apiRequest(`/v1/attendance/session/${id}`, { method: 'DELETE' }),
+        records: id => apiRequest(`/v1/attendance/session/${id}/records`),
+        createRecord: data => apiRequest('/v1/attendance/record', { method: 'POST', body: data }),
+        updateRecord: (id, data) => apiRequest(`/v1/attendance/record/${id}`, { method: 'PUT', body: data })
+    },
+    createBackup: () => apiRequest('/v1/backup/create', { method: 'POST' }),
 
     // Auth & Setup (Legacy/Basic)
     login: async (associationId, password) => {
@@ -572,7 +637,8 @@ export const associago = {
         const autologin = localStorage.getItem(STORAGE_KEY_AUTOLOGIN);
         return {
             autologin: autologin ? JSON.parse(autologin) : null,
-            language: localStorage.getItem(STORAGE_KEY_LANGUAGE) || 'it'
+            language: localStorage.getItem(STORAGE_KEY_LANGUAGE) || 'it',
+            theme: localStorage.getItem('associago_theme') === 'dark' ? 'dark' : 'light'
         };
     },
     setPreferences: (prefs) => {
@@ -584,6 +650,7 @@ export const associago = {
             }
         }
         if (prefs.language) localStorage.setItem(STORAGE_KEY_LANGUAGE, prefs.language);
+        if (['light', 'dark'].includes(prefs.theme)) localStorage.setItem('associago_theme', prefs.theme);
     },
     setAuthToken: (token) => { /* Token management if needed */ },
 
@@ -659,6 +726,8 @@ export const associago = {
     signatures,
     communications,
     csvImport,
+    memberData,
+    database,
     fiscal,
     medicalCertificates,
     federation,

@@ -1,46 +1,45 @@
-# 5. Finance et Comptabilité (Finance)
+# 5. Finance et Comptabilité
 
-La section **Finance** offre un contrôle complet sur la comptabilité de l'association.
+La section **Finance** contient les recettes, les dépenses et les documents fiscaux de l'association.
 
-## 5.1 Tableau de Bord Financier
-La vue principale affiche :
-- **Revenus Totaux** : Somme de toutes les transactions entrantes.
-- **Dépenses Totales** : Somme de toutes les transactions sortantes.
-- **Solde Net** : Différence entre revenus et dépenses.
-- **Comparaison Annuelle** : Graphique montrant la tendance par rapport à l'année précédente.
+## 5.1 Récapitulatif
 
-## 5.2 Transactions
-Le tableau des transactions liste chaque mouvement financier.
+En haut de la page, vous trouvez :
+- **Revenus Totaux**, **Dépenses Totales** et **Solde Net** ;
+- un graphique qui compare, mois par mois, l'année en cours à l'année précédente ;
+- le panneau **Documents Fiscaux** avec le **Rapport Annuel** : un PDF avec les recettes, les dépenses et le solde de l'année.
 
-### Filtres Avancés
-Vous pouvez filtrer par :
-- **Type** : Revenu/Dépense.
-- **Catégorie** : (Cotisation, Don, Événement, Achat, Loyer, etc.).
-- **Date** : Plage temporelle.
+## 5.2 Enregistrer une transaction
 
-### Nouvelle Transaction
-Le formulaire permet d'enregistrer :
-- **Date et Montant**.
-- **Type et Catégorie**.
-- **Description**.
-- **Méthode de Paiement** : (Espèces, Virement Bancaire, etc.).
-- **Membre Lié** : Optionnel, pour lier la transaction à un membre.
+Appuyez sur **Nouvelle Transaction** et remplissez :
+- **Type** : Revenus ou Dépenses ;
+- **Montant**, **Date** et **Description** ;
+- **Catégorie** : un texte libre, par exemple « Cotisations », « Loyer » ou « Charges » ;
+- **Méthode de Paiement** : l'une des méthodes configurées dans Paramètres › Finance.
 
-### Actions
-- **Modifier/Supprimer** : Pour corriger les erreurs.
-- **Reçu** : Génération instantanée d'un reçu PDF pour la transaction.
+Si la méthode prévoit une commission, le tableau l'affiche dans la colonne **Com.**
 
-## 5.3 Comparaison Personnalisée
-Cette fonctionnalité puissante vous permet d'analyser les tendances financières en comparant deux années de votre choix.
-- **Sélection des Années** : Choisissez librement l'Année 1 et l'Année 2 à comparer.
-- **Graphique Comparatif** : Visualisez en un coup d'œil les différences de revenus et de dépenses entre les deux périodes.
-- **Détails** : Des cartes récapitulatives affichent les totaux et le solde net pour chaque année.
-- **Export PDF** : Téléchargez un rapport professionnel avec la comparaison détaillée, idéal pour les réunions du conseil d'administration ou l'assemblée des membres.
+### Renouvellement de cotisation
+Cochez **Est un Renouvellement d'Adhésion** pour lier le mouvement à un membre. Indiquez ensuite le **Membre**, la **Période** (Mensuel, Semestriel, Annuel) et l'**Année**.
 
-## 5.4 Méthodes de Paiement
-Dans l'onglet "Paramètres" (ou accessible depuis le tableau de bord), vous pouvez configurer les méthodes de paiement acceptées et les éventuelles commissions (fixes ou en pourcentage) appliquées.
+### Loyer
+**Enregistrer le Loyer** ouvre le formulaire déjà rempli comme dépense de la catégorie loyer.
 
-## 5.5 Rapports Fiscaux
-- **Rapport Annuel** : Génère un PDF complet avec le résumé financier de l'année sélectionnée.
-- **Analyse des Dépenses** : Graphiques et tableaux pour comprendre où les fonds sont dépensés.
-- **Export CSV** : Pour un traitement externe (ex. Excel).
+## 5.3 Liste et filtres
+
+Dans l'onglet **Transactions**, vous pouvez filtrer par type (**Tous les Types**, Revenus, Dépenses) et par plage de dates, avec **Date de Début** et **Date de Fin**. Appuyez sur **Appliquer les Filtres** pour mettre à jour la liste et sur **Effacer les Filtres** pour revenir à la vue complète.
+
+Chaque ligne propose ces actions :
+- **Modifier** et **Supprimer** ;
+- **Télécharger le reçu**, qui génère le reçu en PDF ;
+- **Envoyer un email**, qui ouvre le logiciel de messagerie avec un message déjà rempli.
+
+## 5.4 Écritures comptables et comparaisons
+
+- **Écritures comptables** affiche le journal en partie double : compte, débit et crédit.
+- **Comparaison personnalisée** compare deux années au choix. **Exporter le PDF comparatif** enregistre le résultat en PDF.
+- **Exporter le Rapport PDF**, en haut de la page, télécharge le rapport de l'année en cours.
+
+## 5.5 Méthodes de paiement
+
+Les méthodes de paiement, avec leurs éventuelles commissions, se configurent dans **Paramètres › Finance** (chapitre 10).

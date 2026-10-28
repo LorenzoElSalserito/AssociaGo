@@ -12,25 +12,26 @@ const ManualDashboard = () => {
     const [content, setContent] = useState('');
     const [loading, setLoading] = useState(false);
 
+    // Chapter titles live in the locale dictionaries (manual.chapters.cNN).
     const documents = [
-        { id: '01_intro.md', title: '1. Introduzione e Dashboard' },
-        { id: '02_members.md', title: '2. Gestione Soci' },
-        { id: '03_activities.md', title: '3. Gestione Attività' },
-        { id: '04_events.md', title: '4. Gestione Eventi' },
-        { id: '05_finance.md', title: '5. Finanze e Contabilità' },
-        { id: '06_assemblies.md', title: '6. Gestione Assemblee' },
-        { id: '07_inventory.md', title: '7. Gestione Inventario' },
-        { id: '08_volunteers.md', title: '8. Gestione Volontari' },
-        { id: '09_coupons.md', title: '9. Coupon e Sconti' },
-        { id: '10_settings.md', title: '10. Impostazioni' },
-        { id: '11_certificates.md', title: '11. Attestati e Certificati' },
-        { id: '12_budget.md', title: '12. Bilancio Preventivo' },
-        { id: '13_balance.md', title: '13. Bilancio Consuntivo' },
-        { id: '14_attendance.md', title: '14. Registro Presenze' },
-        { id: '15_communications.md', title: '15. Comunicazioni' },
-        { id: '16_signatures.md', title: '16. Firme Istituzionali' },
-        { id: '17_notifications.md', title: '17. Notifiche' },
-        { id: '18_compliance.md', title: '18. Conformità e Audit' }
+        { id: '01_intro.md', title: 'manual.chapters.c01' },
+        { id: '02_members.md', title: 'manual.chapters.c02' },
+        { id: '03_activities.md', title: 'manual.chapters.c03' },
+        { id: '04_events.md', title: 'manual.chapters.c04' },
+        { id: '05_finance.md', title: 'manual.chapters.c05' },
+        { id: '06_assemblies.md', title: 'manual.chapters.c06' },
+        { id: '07_inventory.md', title: 'manual.chapters.c07' },
+        { id: '08_volunteers.md', title: 'manual.chapters.c08' },
+        { id: '09_coupons.md', title: 'manual.chapters.c09' },
+        { id: '10_settings.md', title: 'manual.chapters.c10' },
+        { id: '11_certificates.md', title: 'manual.chapters.c11' },
+        { id: '12_budget.md', title: 'manual.chapters.c12' },
+        { id: '13_balance.md', title: 'manual.chapters.c13' },
+        { id: '14_attendance.md', title: 'manual.chapters.c14' },
+        { id: '15_communications.md', title: 'manual.chapters.c15' },
+        { id: '16_signatures.md', title: 'manual.chapters.c16' },
+        { id: '17_notifications.md', title: 'manual.chapters.c17' },
+        { id: '18_compliance.md', title: 'manual.chapters.c18' }
     ];
 
     useEffect(() => {
@@ -77,6 +78,7 @@ const ManualDashboard = () => {
                                         key={doc.id}
                                         action
                                         active={selectedDoc === doc.id}
+                                        aria-current={selectedDoc === doc.id ? 'page' : undefined}
                                         onClick={() => setSelectedDoc(doc.id)}
                                         className="border-0 py-3 px-4 d-flex justify-content-between align-items-center"
                                         style={{ cursor: 'pointer' }}
@@ -94,13 +96,13 @@ const ManualDashboard = () => {
 
                 <Col md={9}>
                     <Card className="border-0 shadow-sm min-vh-100">
-                        <Card.Body className="p-5">
+                        <Card.Body className="p-4 p-lg-5">
                             {loading ? (
                                 <div className="d-flex justify-content-center align-items-center h-100">
                                     <Spinner animation="border" variant="primary" />
                                 </div>
                             ) : (
-                                <div className="markdown-body">
+                                <div className="markdown-body fade-in" key={`${selectedDoc}-${i18n.language}`}>
                                     <ReactMarkdown remarkPlugins={[remarkGfm]}>
                                         {content}
                                     </ReactMarkdown>
@@ -120,6 +122,14 @@ const ManualDashboard = () => {
                 .markdown-body li { margin-bottom: 0.5rem; }
                 .markdown-body strong { font-weight: 600; color: var(--text-color); }
                 .markdown-body blockquote { border-left: 4px solid var(--primary-color); padding-left: 1rem; color: var(--text-muted); font-style: italic; margin-bottom: 1rem; }
+                .markdown-body { max-width: 860px; overflow-wrap: anywhere; }
+                .markdown-body a { color: var(--primary-color); }
+                .markdown-body code { background: var(--surface-muted); color: var(--text-color); padding: .1rem .35rem; border-radius: 4px; font-size: .875em; }
+                .markdown-body kbd { background: var(--surface-muted); color: var(--text-color); border: 1px solid var(--border-color); border-bottom-width: 2px; border-radius: 4px; padding: .05rem .4rem; font-size: .8125em; }
+                .markdown-body hr { border-color: var(--border-color); opacity: 1; margin: 2rem 0; }
+                .markdown-body table { display: block; overflow-x: auto; width: 100%; border-collapse: collapse; margin-bottom: 1.25rem; font-size: .9rem; }
+                .markdown-body th, .markdown-body td { border: 1px solid var(--border-color); padding: .55rem .8rem; text-align: left; vertical-align: top; }
+                .markdown-body th { background: var(--surface-muted); font-weight: 600; }
             `}</style>
         </div>
     );

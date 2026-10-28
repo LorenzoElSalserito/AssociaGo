@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Row, Col, Button, Table, Spinner, Badge, Form, Modal, Nav } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
-import { FileText, Download, PieChart, TrendingUp, TrendingDown, DollarSign, Mail, Filter, Edit, Trash2, X, Plus, Home, BookOpen, BarChart2 } from 'lucide-react';
+import { FileText, Download, TrendingUp, TrendingDown, DollarSign, Mail, Filter, Edit, Trash2, X, Plus, Home, BookOpen, BarChart2 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { associago } from '../api';
 
 const FiscalDashboard = ({ associationId, shell }) => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const [activeTab, setActiveTab] = useState('transactions');
     const [transactions, setTransactions] = useState([]);
     const [journalEntries, setJournalEntries] = useState([]);
@@ -115,7 +115,7 @@ const FiscalDashboard = ({ associationId, shell }) => {
     const handleCreateRentClick = () => {
         setEditingTransaction({
             date: new Date().toISOString().split('T')[0],
-            description: t('Rent Payment') + ' - ' + new Date().toLocaleString('default', { month: 'long' }),
+            description: t('Rent Payment') + ' - ' + new Date().toLocaleString(i18n.language, { month: 'long' }),
             amount: 0,
             type: 'EXPENSE',
             category: t('Rent'),
@@ -204,8 +204,8 @@ const FiscalDashboard = ({ associationId, shell }) => {
     };
 
     const handleSendMail = (tx) => {
-        const subject = encodeURIComponent(`Ricevuta Pagamento ${tx.referenceId || ''}`);
-        const body = encodeURIComponent(`Gentile socio,\n\nIn allegato la ricevuta del pagamento di € ${tx.amount} effettuato il ${new Date(tx.date).toLocaleDateString()}.\n\nCordiali saluti,\nIl Presidente`);
+        const subject = encodeURIComponent(t('receiptMail.subject', { reference: tx.referenceId || '' }).trim());
+        const body = encodeURIComponent(t('receiptMail.body', { amount: tx.amount, date: new Date(tx.date).toLocaleDateString(i18n.language) }));
         window.location.href = `mailto:?subject=${subject}&body=${body}`;
     };
 
@@ -276,7 +276,7 @@ const FiscalDashboard = ({ associationId, shell }) => {
                             <div className="d-flex justify-content-between align-items-start mb-2">
                                 <div>
                                     <p className="text-muted small text-uppercase fw-bold mb-1">{t('Total Income')}</p>
-                                    <h3 className="fw-bold text-success mb-0">€ {totalIncome.toLocaleString()}</h3>
+                                    <h3 className="fw-bold text-success mb-0">€ {totalIncome.toLocaleString(i18n.language)}</h3>
                                 </div>
                                 <div className="bg-success bg-opacity-10 text-success rounded-circle p-2">
                                     <TrendingUp size={20} />
@@ -292,7 +292,7 @@ const FiscalDashboard = ({ associationId, shell }) => {
                             <div className="d-flex justify-content-between align-items-start mb-2">
                                 <div>
                                     <p className="text-muted small text-uppercase fw-bold mb-1">{t('Total Expenses')}</p>
-                                    <h3 className="fw-bold text-danger mb-0">€ {totalExpenses.toLocaleString()}</h3>
+                                    <h3 className="fw-bold text-danger mb-0">€ {totalExpenses.toLocaleString(i18n.language)}</h3>
                                 </div>
                                 <div className="bg-danger bg-opacity-10 text-danger rounded-circle p-2">
                                     <TrendingDown size={20} />
@@ -309,7 +309,7 @@ const FiscalDashboard = ({ associationId, shell }) => {
                                 <div>
                                     <p className="text-muted small text-uppercase fw-bold mb-1">{t('Net Balance')}</p>
                                     <h3 className={`fw-bold mb-0 ${netBalance >= 0 ? 'text-primary' : 'text-danger'}`}>
-                                        € {netBalance.toLocaleString()}
+                                        € {netBalance.toLocaleString(i18n.language)}
                                     </h3>
                                 </div>
                                 <div className="bg-primary bg-opacity-10 text-primary rounded-circle p-2">
@@ -337,8 +337,8 @@ const FiscalDashboard = ({ associationId, shell }) => {
                                     <YAxis axisLine={false} tickLine={false} />
                                     <Tooltip cursor={{ fill: 'transparent' }} />
                                     <Legend />
-                                    <Bar dataKey="current" name={new Date().getFullYear().toString()} fill="#0d6efd" radius={[4, 4, 0, 0]} barSize={40} />
-                                    <Bar dataKey="previous" name={(new Date().getFullYear() - 1).toString()} fill="#e9ecef" radius={[4, 4, 0, 0]} barSize={40} />
+                                    <Bar dataKey="current" name={new Date().getFullYear().toString()} fill="var(--primary-color)" radius={[4, 4, 0, 0]} barSize={40} />
+                                    <Bar dataKey="previous" name={(new Date().getFullYear() - 1).toString()} fill="var(--chart-secondary)" radius={[4, 4, 0, 0]} barSize={40} />
                                 </BarChart>
                             </ResponsiveContainer>
                         </Card.Body>
@@ -363,25 +363,11 @@ const FiscalDashboard = ({ associationId, shell }) => {
                                             <div className="small text-muted">{t('Generate the annual fiscal report for your association.')}</div>
                                         </div>
                                     </div>
-                                    <Button variant="link" size="sm" onClick={handleDownloadReport}>
+                                    <Button variant="link" size="sm" onClick={handleDownloadReport} aria-label={t('Annual Report')}>
                                         <Download size={18} />
                                     </Button>
                                 </div>
 
-                                <div className="p-3 border rounded d-flex align-items-center justify-content-between hover-shadow transition">
-                                    <div className="d-flex align-items-center">
-                                        <div className="bg-success bg-opacity-10 text-success p-2 rounded me-3">
-                                            <PieChart size={20} />
-                                        </div>
-                                        <div>
-                                            <div className="fw-bold">{t('Expense Analysis')}</div>
-                                            <div className="small text-muted">{t('Detailed breakdown of expenses by category.')}</div>
-                                        </div>
-                                    </div>
-                                    <Button variant="link" size="sm">
-                                        <Download size={18} />
-                                    </Button>
-                                </div>
                             </div>
                         </Card.Body>
                     </Card>
@@ -449,11 +435,11 @@ const FiscalDashboard = ({ associationId, shell }) => {
                                 {transactions.length > 0 ? (
                                     transactions.map(tx => (
                                         <tr key={tx.id}>
-                                            <td className="ps-3 text-muted">{new Date(tx.date).toLocaleDateString()}</td>
+                                            <td className="ps-3 text-muted">{new Date(tx.date).toLocaleDateString(i18n.language)}</td>
                                             <td className="fw-medium">{tx.description}</td>
                                             <td><Badge bg="light" text="dark" className="border fw-normal">{tx.category}</Badge></td>
                                             <td className={`text-end pe-3 fw-bold ${tx.type === 'INCOME' ? 'text-success' : 'text-danger'}`}>
-                                                {tx.type === 'INCOME' ? '+' : '-'}€ {tx.amount.toLocaleString()}
+                                                {tx.type === 'INCOME' ? '+' : '-'}€ {tx.amount.toLocaleString(i18n.language)}
                                                 {tx.commissionAmount > 0 && (
                                                     <div className="small text-muted fw-normal">
                                                         {t('Comm.')}: €{tx.commissionAmount}
@@ -506,7 +492,7 @@ const FiscalDashboard = ({ associationId, shell }) => {
                                         <React.Fragment key={entry.id}>
                                             {entry.lines.map((line, idx) => (
                                                 <tr key={`${entry.id}-${idx}`} className={idx === 0 ? "border-top" : ""}>
-                                                    <td className="ps-3 text-muted">{idx === 0 ? new Date(entry.date).toLocaleDateString() : ''}</td>
+                                                    <td className="ps-3 text-muted">{idx === 0 ? new Date(entry.date).toLocaleDateString(i18n.language) : ''}</td>
                                                     <td className="fw-medium">{idx === 0 ? entry.description : ''}</td>
                                                     <td>
                                                         <Badge bg="light" text="dark" className="border fw-normal">
@@ -514,10 +500,10 @@ const FiscalDashboard = ({ associationId, shell }) => {
                                                         </Badge>
                                                     </td>
                                                     <td className="text-end pe-3 text-muted">
-                                                        {line.debit > 0 ? `€ ${line.debit.toLocaleString()}` : '-'}
+                                                        {line.debit > 0 ? `€ ${line.debit.toLocaleString(i18n.language)}` : '-'}
                                                     </td>
                                                     <td className="text-end pe-3 text-muted">
-                                                        {line.credit > 0 ? `€ ${line.credit.toLocaleString()}` : '-'}
+                                                        {line.credit > 0 ? `€ ${line.credit.toLocaleString(i18n.language)}` : '-'}
                                                     </td>
                                                 </tr>
                                             ))}
@@ -563,8 +549,8 @@ const FiscalDashboard = ({ associationId, shell }) => {
                                                     <YAxis axisLine={false} tickLine={false} />
                                                     <Tooltip cursor={{ fill: 'transparent' }} />
                                                     <Legend />
-                                                    <Bar dataKey="year1" name={year1.toString()} fill="#0d6efd" radius={[4, 4, 0, 0]} barSize={40} />
-                                                    <Bar dataKey="year2" name={year2.toString()} fill="#e9ecef" radius={[4, 4, 0, 0]} barSize={40} />
+                                                    <Bar dataKey="year1" name={year1.toString()} fill="var(--primary-color)" radius={[4, 4, 0, 0]} barSize={40} />
+                                                    <Bar dataKey="year2" name={year2.toString()} fill="var(--chart-secondary)" radius={[4, 4, 0, 0]} barSize={40} />
                                                 </BarChart>
                                             </ResponsiveContainer>
                                         </div>
@@ -575,16 +561,16 @@ const FiscalDashboard = ({ associationId, shell }) => {
                                                 <h6 className="fw-bold mb-3">{year1}</h6>
                                                 <div className="d-flex justify-content-between mb-2">
                                                     <span>{t('Income')}:</span>
-                                                    <span className="text-success fw-bold">€ {comparisonData.incomeYear1.toLocaleString()}</span>
+                                                    <span className="text-success fw-bold">€ {comparisonData.incomeYear1.toLocaleString(i18n.language)}</span>
                                                 </div>
                                                 <div className="d-flex justify-content-between mb-2">
                                                     <span>{t('Expenses')}:</span>
-                                                    <span className="text-danger fw-bold">€ {comparisonData.expenseYear1.toLocaleString()}</span>
+                                                    <span className="text-danger fw-bold">€ {comparisonData.expenseYear1.toLocaleString(i18n.language)}</span>
                                                 </div>
                                                 <hr />
                                                 <div className="d-flex justify-content-between">
                                                     <span>{t('Net Balance')}:</span>
-                                                    <span className="fw-bold">€ {(comparisonData.incomeYear1 - comparisonData.expenseYear1).toLocaleString()}</span>
+                                                    <span className="fw-bold">€ {(comparisonData.incomeYear1 - comparisonData.expenseYear1).toLocaleString(i18n.language)}</span>
                                                 </div>
                                             </Card.Body>
                                         </Card>
@@ -595,16 +581,16 @@ const FiscalDashboard = ({ associationId, shell }) => {
                                                 <h6 className="fw-bold mb-3">{year2}</h6>
                                                 <div className="d-flex justify-content-between mb-2">
                                                     <span>{t('Income')}:</span>
-                                                    <span className="text-success fw-bold">€ {comparisonData.incomeYear2.toLocaleString()}</span>
+                                                    <span className="text-success fw-bold">€ {comparisonData.incomeYear2.toLocaleString(i18n.language)}</span>
                                                 </div>
                                                 <div className="d-flex justify-content-between mb-2">
                                                     <span>{t('Expenses')}:</span>
-                                                    <span className="text-danger fw-bold">€ {comparisonData.expenseYear2.toLocaleString()}</span>
+                                                    <span className="text-danger fw-bold">€ {comparisonData.expenseYear2.toLocaleString(i18n.language)}</span>
                                                 </div>
                                                 <hr />
                                                 <div className="d-flex justify-content-between">
                                                     <span>{t('Net Balance')}:</span>
-                                                    <span className="fw-bold">€ {(comparisonData.incomeYear2 - comparisonData.expenseYear2).toLocaleString()}</span>
+                                                    <span className="fw-bold">€ {(comparisonData.incomeYear2 - comparisonData.expenseYear2).toLocaleString(i18n.language)}</span>
                                                 </div>
                                             </Card.Body>
                                         </Card>

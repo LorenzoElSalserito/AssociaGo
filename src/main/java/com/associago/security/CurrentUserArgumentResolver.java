@@ -57,8 +57,8 @@ public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolve
         } catch (IllegalStateException e) {
             // Nessun utente autenticato né via header né via OAuth2
             throw new IllegalStateException(
-                    "Utente non autenticato (AssociaGo). " +
-                            "Invia header '" + USER_ID_HEADER + "' o autentica via OAuth2."
+                    "User not authenticated (AssociaGo). " +
+                            "Send the '" + USER_ID_HEADER + "' header or authenticate via OAuth2."
             );
         }
     }

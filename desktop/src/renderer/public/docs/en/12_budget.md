@@ -1,46 +1,52 @@
 # 12. Forecast Budget
 
-The **Forecast Budget** section allows you to plan the expected income and expenses for the fiscal year, compare them with actual figures, and keep the association's financial sustainability under control.
+The **Budgets** page is used to plan a year's income and expenses and compare them with the transactions recorded in the accounts.
 
-## 12.1 Overview
-The forecast budget is a mandatory tool for many Third Sector (Terzo Settore) associations. AssociaGo makes it simple to compile and approve.
+## 12.1 Budget list
 
-## 12.2 Creating a Budget
-1. Click **"New Budget"**.
-2. Enter the **reference year** and an optional description.
-3. Click **"Create"**.
+The table shows **Title**, **Year** and **Status** (draft or approved), most recent first. Click a row to open the budget. The **trash** icon deletes it, after the **Are you sure?** confirmation.
 
-The budget is created in **Draft** status.
+## 12.2 Creating a budget
 
-## 12.3 Managing Budget Lines
-Each budget is composed of income and expense **lines** (items):
+Press **New Budget** and fill in:
+- **Title**;
+- **Year** (the current one is suggested);
+- **Notes**.
 
-### Adding an Item
-- Click **"Add Line"**.
-- Fill in:
-  - **Category**: Income or Expense.
-  - **Description**: (e.g., "Membership fees", "Office rent", "Teaching materials").
-  - **Forecast Amount**: The estimated amount.
+Press **Create**. The budget starts as a draft.
 
-### Editing an Item
-Click on the row to edit the description and forecast amount.
+> Title, year and notes cannot be changed after creation.
 
-### Deleting an Item
-Click the **trash** icon to remove a row.
+## 12.3 Budget lines
+
+In the detail view press **Add Line** and fill in:
+- **Category**: free text, for example "Membership fees" or "Premises rent";
+- **Section**: **Income** or **Expense**;
+- **Budgeted Amount**.
+
+Press **Add**. To change a line use the **pencil** icon (**Edit Line**, then **Save**); to remove it the **trash** icon, which deletes immediately without confirmation.
+
+The lines table has these columns:
+- **Budgeted** and **Actual**;
+- **Variance**: actual minus budgeted, green if positive and red if negative (the same rule applies to income and expenses);
+- **Progress**: bar of actual against budgeted, yellow above 80% and red above 100%.
 
 ## 12.4 Summary
-At the top of the page, a summary panel shows:
-- **Total Forecast Income**
-- **Total Forecast Expenses**
-- **Forecast Balance** (difference)
 
-## 12.5 Synchronization with Actuals
-By clicking **"Sync Actuals"**, the system automatically updates the actual amounts (the "Actuals" column) by reading the real transactions recorded in the accounting system for the reference year. This allows you to immediately compare forecasts with reality.
+Above the table, four boxes: **Budgeted Income**, **Actual Income**, **Budgeted Expenses** and **Actual Expenses**.
+
+> There is no forecast balance: the difference between income and expenses has to be calculated by hand.
+
+## 12.5 Syncing actuals
+
+**Sync Actuals** reads the association's transactions from 1 January to 31 December of the budget year and updates the **Actual** column.
+
+> Lines created from the interface are not linked to an accounting category. For this reason each line receives the total of all transactions in its section: with three expense lines, all three show the year's total expenses. The actual totals in the boxes are therefore multiplied by the number of lines.
 
 ## 12.6 Approval
-When the budget is complete:
-1. Click **"Approve"**.
-2. The status changes from **Draft** to **Approved**.
-3. An approved budget can no longer be modified.
 
-> **Note**: Approval of the forecast budget is generally an act of the general assembly. Make sure that approval in the system only occurs after the assembly's resolution.
+**Approve** moves the budget to the approved status and records who approved it and when. After approval the button disappears.
+
+> Approval does not lock anything: lines can still be edited and deleted, and the budget can be deleted.
+
+> **Note**: approving the forecast budget is normally an act of the assembly. Record it in the system after the resolution.

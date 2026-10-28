@@ -1,0 +1,75 @@
+:root, [data-bs-theme="light"] {
+  color-scheme: light;
+  --brand-navy: #172b4d;
+  --brand-primary: #3156ad;
+  --brand-hover: #25458f;
+  --primary-color: #3156ad;
+  --primary-gradient: #3156ad;
+  --primary-rgb: 49, 86, 173;
+  --body-bg: #f4f6fa;
+  --card-bg: #ffffff;
+  --surface-muted: #edf1f7;
+  --input-bg: #ffffff;
+  --text-color: #1c2738;
+  --text-muted: #536277;
+  --border-color: #d8e0ea;
+  --control-border: #8290a4;
+  --success-color: #18745b;
+  --success-rgb: 24, 116, 91;
+  --danger-color: #b52b3a;
+  --danger-rgb: 181, 43, 58;
+  --info-color: #236c91;
+  --info-rgb: 35, 108, 145;
+  --secondary-color: #536277;
+  --warning-color: #edc66b;
+  --card-shadow: 0 1px 2px rgb(23 43 77 / 4%);
+  --overlay-shadow: 0 12px 32px rgb(10 25 46 / 18%);
+  --card-border-radius: 8px;
+  --btn-border-radius: 6px;
+  --chart-secondary: #69839e;
+}
+[data-bs-theme="dark"] {
+  color-scheme: dark;
+  --body-bg: #101a29;
+  --card-bg: #19273a;
+  --surface-muted: #24354b;
+  --input-bg: #142033;
+  --text-color: #edf2fa;
+  --text-muted: #b2bfd1;
+  --border-color: #35475f;
+  --control-border: #788da8;
+  --primary-color: #a2bdff;
+  --primary-rgb: 162, 189, 255;
+  --success-color: #86d5b6;
+  --success-rgb: 134, 213, 182;
+  --danger-color: #ffa3ad;
+  --danger-rgb: 255, 163, 173;
+  --info-color: #8dcde9;
+  --info-rgb: 141, 205, 233;
+  --secondary-color: #b2bfd1;
+  --card-shadow: none;
+  --overlay-shadow: 0 12px 32px rgb(0 0 0 / 35%);
+  --chart-secondary: #7793b2;
+}
+:root, [data-bs-theme] {
+  --bs-body-bg: var(--body-bg);
+  --bs-body-color: var(--text-color);
+  --bs-emphasis-color: var(--text-color);
+  --bs-secondary-color: var(--text-muted);
+  --bs-tertiary-bg: var(--surface-muted);
+  --bs-secondary-bg: var(--surface-muted);
+  --bs-border-color: var(--border-color);
+  --bs-primary: var(--primary-color);
+  --bs-primary-rgb: var(--primary-rgb);
+  --bs-success-rgb: var(--success-rgb);
+  --bs-danger-rgb: var(--danger-rgb);
+  --bs-info-rgb: var(--info-rgb);
+  --bs-secondary-rgb: 83, 98, 119;
+  --bs-link-color: var(--primary-color);
+  --bs-link-color-rgb: var(--primary-rgb);
+  --bs-link-hover-color: var(--primary-color);
+  --bs-link-hover-color-rgb: var(--primary-rgb);
+  --bs-border-radius: 6px;
+  --bs-border-radius-lg: 8px;
+  --bs-font-sans-serif: 'Segoe UI', Inter, Roboto, 'Helvetica Neue', Arial, sans-serif;
+}

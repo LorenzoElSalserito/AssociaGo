@@ -77,11 +77,10 @@ public class SecurityConfig {
                         "/api/auth/csrf",
                         "/api/health"
                 ).permitAll()
-                // Endpoint bootstrap e setup (accessibili senza autenticazione per onboarding)
+                // Endpoint bootstrap (accessibili senza autenticazione per onboarding)
                 .requestMatchers(
                         "/api/bootstrap",
-                        "/api/bootstrap/**",
-                        "/api/setup/**"
+                        "/api/bootstrap/**"
                 ).permitAll()
                 // OAuth2 e login
                 .requestMatchers("/oauth2/**", "/login/**").permitAll()

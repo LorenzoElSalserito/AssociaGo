@@ -73,4 +73,6 @@ public class AuditEntry {
     public void setIpAddress(String ipAddress) { this.ipAddress = ipAddress; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
+
+    public String getArea() { return AuditAreas.areaOf(entityType); }
 }

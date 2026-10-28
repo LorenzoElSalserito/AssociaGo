@@ -1,39 +1,49 @@
 # 13. Balance Anual
 
-La sección **Balance** genera el informe financiero anual de la asociación, conforme a las directrices del Código del Tercer Sector.
+La página **Balance Anual** calcula la rendición de cuentas de un año a partir de los movimientos registrados en la contabilidad.
 
-## 13.1 Descripción general
-El balance es el documento que resume todos los ingresos y gastos efectivos de un ejercicio. En AssociaGo se calcula automáticamente a partir de las transacciones registradas.
+## 13.1 Lista de balances
 
-## 13.2 Cálculo del Balance
-1. Selecciona el **año** de referencia.
-2. Haz clic en **"Calcular Balance"**.
-3. El sistema analiza todas las transacciones del año y genera el informe con:
-   - **Ingresos** desglosados por categoría.
-   - **Gastos** desglosados por categoría.
-   - **Superávit/Déficit de gestión**.
-   - **Comparación interanual** (variación porcentual respecto al año anterior).
+La tabla muestra **Año**, **Título**, **Estado** y **Resultado neto** (verde si es positivo, rojo si es negativo). Haz clic en una fila para abrir el balance. El icono de la **papelera** lo elimina, tras la confirmación **¿Estás seguro?**.
 
-## 13.3 Verificación de Firmantes
-Antes de aprobar, el sistema verifica que los **firmantes institucionales** estén configurados correctamente. Haz clic en **"Verificar Firmantes"** para comprobar:
-- Presidente (obligatorio)
-- Secretario
-- Tesorero
+## 13.2 Calcular un balance
 
-Si faltan firmas institucionales, se mostrará un aviso con enlace directo a Ajustes > Firmas.
+1. Pulsa **Calcular balance**.
+2. En la ventana **Calcular balance anual** indica el **Año**.
+3. Pulsa **Calcular**.
 
-## 13.4 Aprobación
-1. Haz clic en **"Aprobar Balance"**.
-2. El estado pasa a **Aprobado**.
-3. El balance aprobado se vuelve inmutable y puede exportarse en PDF.
+El sistema toma los movimientos del 1 de enero al 31 de diciembre, los agrupa por categoría (los que no tienen categoría van a "Otros ingresos" u "Otros gastos") y crea el balance "Balance anual AÑO". El título y las partidas genéricas se escriben en el idioma de la interfaz en el momento del cálculo.
 
-## 13.5 Exportación PDF
-Haz clic en **"Descargar PDF"** para generar el documento oficial. El PDF incluye:
-- Encabezado con logotipo y datos de la asociación.
-- Informe de ingresos/gastos por categoría.
-- Totales y saldo.
-- Comparación con el año anterior (si está disponible).
-- Firmas institucionales con las imágenes de las firmas cargadas.
-- Fecha de aprobación.
+> Si para ese año ya existe un balance, se recalcula y se sobrescribe, aunque estuviera aprobado, y vuelve a un estado no aprobado.
 
-> **Nota**: El balance es un acto obligatorio para las entidades del Tercer Sector. Su redacción y aprobación asamblearia debe respetar los plazos legales (generalmente antes del 30 de abril del año siguiente).
+## 13.3 Detalle
+
+Arriba hay tres recuadros: **Ingresos Totales**, **Gastos Totales** y **Resultado neto**. Debajo, dos tablas, **Ingresos** y **Gastos**, con una fila por categoría y el total en negrita (TOTAL DE INGRESOS, TOTAL DE GASTOS).
+
+> La comparación con el año anterior se calcula, pero no se muestra ni en la página ni en el PDF.
+
+## 13.4 Firmantes
+
+Al abrirlo, el sistema comprueba por sí solo que **Presidente**, **Secretario** y **Tesorero** tengan un nombre en **Ajustes › Firmas** o en el **Organigrama** (**Ajustes › Perfil de la Asociación**). Si falta alguno aparece el aviso **Firmantes faltantes** seguido de los roles en forma de código inglés (president, secretary, treasurer).
+
+## 13.5 Aprobación
+
+**Aprobar** pasa el balance al estado aprobado. Sigue desactivado mientras falte aunque sea uno de los tres firmantes; tras la aprobación desaparece.
+
+> La aprobación no hace inmutable el balance: todavía se puede eliminar o recalcular.
+
+## 13.6 PDF
+
+**Descargar PDF** está disponible en cualquier estado, también antes de la aprobación, y guarda el archivo `bilancio_ANNO.pdf` en formato A4, en el idioma de la interfaz (etiquetas, fechas e importes). Contiene:
+- nombre, dirección, ciudad y código fiscal de la asociación;
+- título "BALANCE ANUAL AÑO" y periodo;
+- ingresos y gastos por categoría con los totales;
+- "SUPERÁVIT" o "DÉFICIT", fondo inicial y final;
+- sección "Firmas" para Presidente, Secretario y Tesorero: imagen de la firma de **Ajustes › Firmas** (capítulo 16), nombre y cargo; sin firma guardada, el nombre del Organigrama y una línea vacía;
+- fecha y hora de generación y número de página.
+
+> El PDF no contiene logotipo ni fecha de aprobación.
+
+En cada descarga se calcula una suma de comprobación SHA-256 del PDF. Las primeras 16 cifras aparecen junto al estado después de salir de la página y volver a abrirla.
+
+> **Nota**: el balance anual es obligatorio para las entidades del Tercer Sector y debe aprobarlo la asamblea en los plazos legales (normalmente antes del 30 de abril del año siguiente).

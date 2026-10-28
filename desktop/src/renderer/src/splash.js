@@ -1,4 +1,4 @@
-import logoUrl from './assets/5.svg'
+import logoUrl from './assets/brand-mark.png'
 
 const logo = document.getElementById('logo')
 

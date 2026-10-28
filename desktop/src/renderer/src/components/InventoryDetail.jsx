@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { associago } from '../api';
 
 const InventoryDetail = ({ itemId, shell, onBack }) => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const [item, setItem] = useState(null);
     const [loans, setLoans] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -121,8 +121,8 @@ const InventoryDetail = ({ itemId, shell, onBack }) => {
                                     {loans.map(l => (
                                         <tr key={l.id}>
                                             <td className="ps-4">#{l.userAssociationId}</td>
-                                            <td>{new Date(l.loanDate).toLocaleDateString()}</td>
-                                            <td>{l.actualReturnDate ? new Date(l.actualReturnDate).toLocaleDateString() : (l.expectedReturnDate ? new Date(l.expectedReturnDate).toLocaleDateString() + ' (Exp)' : '-')}</td>
+                                            <td>{new Date(l.loanDate).toLocaleDateString(i18n.language)}</td>
+                                            <td>{l.actualReturnDate ? new Date(l.actualReturnDate).toLocaleDateString(i18n.language) : (l.expectedReturnDate ? new Date(l.expectedReturnDate).toLocaleDateString(i18n.language) + ' ' + t('inventoryLoan.expectedSuffix') : '-')}</td>
                                             <td>
                                                 <Badge bg={l.status === 'ACTIVE' ? 'warning' : 'success'} text={l.status === 'ACTIVE' ? 'dark' : 'white'}>
                                                     {t(l.status)}

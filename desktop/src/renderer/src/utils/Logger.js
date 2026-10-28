@@ -16,7 +16,7 @@ class Logger {
             ACTION: 'color: #198754; font-weight: bold;'
         };
 
-        console.log(`%c${level}`, style[level], `[${timestamp}] ${message}`, data ? data : '');
+        console.log(`[${level}] [${timestamp}] ${message}`, data ? JSON.stringify(data) : '');
 
         // Qui si potrebbe aggiungere l'invio al processo Main di Electron per salvare su file
         if (window.electron && window.electron.ipcRenderer) {

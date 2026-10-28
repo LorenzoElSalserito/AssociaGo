@@ -1,64 +1,56 @@
 # 15. Comunicaciones
 
-La sección **Comunicaciones** permite enviar correos electrónicos institucionales a los socios, gestionar plantillas predefinidas y rastrear el estado de entrega.
+La página **Comunicaciones** (barra lateral, grupo **Gobernanza**) sirve para preparar y enviar correos a los socios. Tiene dos pestañas: **Mensajes** y **Plantillas**; junto a cada una, un contador indica cuántos elementos contiene.
 
-## 15.1 Descripción general
-La página está dividida en dos pestañas:
-- **Mensajes**: La lista de comunicaciones creadas y enviadas.
-- **Plantillas**: Las plantillas reutilizables para agilizar la creación de mensajes.
+## 15.1 Plantillas
 
-## 15.2 Gestión de Plantillas
+En la pestaña **Plantillas** pulsa **Nueva plantilla** y rellena:
+- **Nombre** (obligatorio; sin él, el botón **Crear** sigue desactivado);
+- **Asunto**;
+- **Cuerpo (HTML)**: el texto del mensaje. Puedes usar los marcadores `{{name}}` (nombre y apellido del destinatario) y `{{associationName}}` (nombre de la asociación).
 
-### Crear una Plantilla
-1. Desde la pestaña **Plantillas**, haz clic en **"Nueva Plantilla"**.
-2. Completa:
-   - **Nombre**: Nombre identificativo (ej. "Convocatoria de Asamblea").
-   - **Asunto**: El asunto del correo electrónico.
-   - **Cuerpo HTML**: El texto del mensaje.
-   - **Cuerpo Texto**: Versión solo texto (para clientes de correo que no soportan HTML).
-   - **Categoría**: General, Renovación, Evento, Actividad, Asamblea, Fiscal.
-3. Utiliza los **campos de combinación** en el texto:
-   - `{{name}}` — Nombre completo del destinatario.
-   - `{{associationName}}` — Nombre de la asociación.
-4. Haz clic en **"Guardar"**.
+La tabla muestra **Nombre de plantilla** y **Asunto**. Las acciones de cada fila son editar (lápiz y después **Guardar**) y eliminar (papelera, con confirmación).
 
-### Aplicar una Plantilla
-Al crear un nuevo mensaje, es posible seleccionar una plantilla del menú desplegable. El asunto y el cuerpo se precargarán con los datos de la plantilla.
+## 15.2 Crear un mensaje
 
-## 15.3 Creación y Envío de Mensajes
+En la pestaña **Mensajes** pulsa **Nuevo Mensaje**.
+- **Aplicar plantilla**: solo aparece si existe al menos una plantilla y solo para los mensajes nuevos. Copia el asunto y el cuerpo de la plantilla en el mensaje.
+- **Asunto** (obligatorio).
+- **Nombre del remitente** y **Email del remitente**. El correo pasa a ser el remitente del mensaje; si lo dejas vacío se usa `noreply@associago.local`. El nombre del remitente se guarda, pero no aparece en el correo.
+- **Filtro de segmento**: campo de texto libre. Si contiene la palabra `active`, el mensaje va solo a los socios con inscripción activa; cualquier otro texto, o el campo vacío, significa todos los socios de la asociación con una dirección de correo.
+- **Cuerpo del mensaje (HTML)**, con los mismos marcadores que las plantillas.
 
-### Crear un Mensaje
-1. Desde la pestaña **Mensajes**, haz clic en **"Nuevo Mensaje"**.
-2. Completa:
-   - **Asunto**: El asunto del correo electrónico.
-   - **Cuerpo**: El contenido del mensaje.
-   - **Filtro de destinatarios**: Filtra los socios por estado (ej. solo Activos).
-3. Haz clic en **"Guardar como Borrador"** o procede al envío.
+Pulsa **Crear**. El mensaje nace en estado **Borrador**.
 
-### Resolver los Destinatarios
-Antes del envío, haz clic en **"Resolver Destinatarios"** para:
-- Visualizar la lista completa de los socios que recibirán el mensaje.
-- Verificar las direcciones de correo electrónico.
-- Comprobar el número total de destinatarios.
+La tabla de mensajes muestra **Asunto**, **Estado**, número de **Destinatarios** y **Fecha** de creación. Solo los borradores se pueden editar (lápiz); la papelera elimina el mensaje tras una confirmación.
 
-### Enviar
-1. Haz clic en **"Enviar"**.
-2. El sistema envía los correos electrónicos a través del servidor SMTP configurado en los ajustes.
-3. El estado pasa de **Borrador** a **En envío** y luego a **Enviado**.
+## 15.3 Destinatarios y envío
 
-## 15.4 Estadísticas de Entrega
-Para cada mensaje enviado, la vista de detalle muestra:
-- **Total destinatarios**: Número de correos enviados.
-- **Entregados**: Correos entregados con éxito.
-- **Fallidos**: Correos no entregados (con detalle del error).
-- **Fecha de envío**: Marca temporal del envío.
+Haz clic en un mensaje para abrir su detalle. Para un borrador:
+1. pulsa **Resolver destinatarios**: la app calcula la lista a partir de los socios de la asociación, según el Filtro de segmento, y muestra cuántos destinatarios ha encontrado. Cada dirección de correo aparece una sola vez; si vuelves a pulsar, la lista se recalcula desde cero;
+2. pulsa **Enviar** (activo solo después de resolver los destinatarios) y confirma.
 
-## 15.5 Estados de los Mensajes
-| Estado | Significado |
-|--------|-------------|
-| Borrador | Mensaje guardado pero aún no enviado. |
-| En envío | Envío en curso. |
-| Enviado | Todos los mensajes han sido procesados. |
-| Fallido | El envío ha encontrado errores. |
+El correo se envía como texto simple: el contenido escrito en el editor se convierte manteniendo párrafos y saltos de línea, sin formato. Antes de una comunicación importante, prueba un envío a una dirección tuya.
 
-> **Nota**: Para utilizar las comunicaciones por correo electrónico, es necesario configurar un servidor SMTP en los ajustes de la aplicación (variables de entorno SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD).
+## 15.4 Detalle y estadísticas
+
+Arriba hay cuatro recuadros: **Destinatarios totales**, **Entregados**, **Fallidos** y **Enviado el**. Debajo encuentras el **Contenido del mensaje** y la tabla **Destinatarios** con nombre, correo, estado (Pendiente, Enviado o Fallido) y hora de envío.
+
+"Entregados" significa que el servidor de correo aceptó el mensaje, no que haya llegado al buzón del socio.
+
+Al terminar el envío, el mensaje pasa a **Enviado**; si el servidor no aceptó ningún correo, pasa a **Fallido**. En caso de envíos parciales revisa el recuadro **Fallidos** y la columna de estado de los destinatarios.
+
+## 15.5 Configurar el servidor de correo
+
+En la app no hay una pantalla para el servidor de correo: debe configurarlo el administrador definiendo estas variables de entorno antes de iniciar AssociaGo.
+
+| Variable | Para qué sirve | Valor si no existe |
+|---|---|---|
+| `SMTP_HOST` | dirección del servidor de correo saliente | `localhost` |
+| `SMTP_PORT` | puerto del servidor (normalmente 587 o 25) | `25` |
+| `SMTP_USER` | nombre de usuario del buzón | vacío |
+| `SMTP_PASSWORD` | contraseña del buzón | vacía |
+| `SMTP_AUTH` | `true` si el servidor pide usuario y contraseña | `false` |
+| `SMTP_TLS` | `true` para usar la conexión cifrada STARTTLS | `false` |
+
+Sin estos ajustes, la app busca un servidor de correo en el propio equipo: casi nunca lo hay, así que todos los correos acaban en **Fallidos**.

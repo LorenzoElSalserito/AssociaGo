@@ -1,64 +1,56 @@
 # 15. Communications
 
-La section **Communications** permet d'envoyer des emails institutionnels aux membres, de gerer des modeles predefinis et de suivre l'etat de livraison.
+La page **Communications** (barre latérale, groupe **Gouvernance**) sert à préparer et envoyer des emails aux membres. Elle comporte deux onglets : **Messages** et **Modèles** ; à côté de chacun, un compteur indique le nombre d'éléments qu'il contient.
 
-## 15.1 Vue d'ensemble
-La page est divisee en deux onglets :
-- **Messages** : La liste des communications creees et envoyees.
-- **Modeles** : Les templates reutilisables pour accelerer la creation des messages.
+## 15.1 Modèles
 
-## 15.2 Gestion des Modeles
+Dans l'onglet **Modèles**, appuyez sur **Nouveau modèle** et remplissez :
+- **Nom** (obligatoire, sans lui le bouton **Créer** reste désactivé) ;
+- **Objet** ;
+- **Corps (HTML)** : le texte du message. Vous pouvez utiliser les espaces réservés `{{name}}` (prénom et nom du destinataire) et `{{associationName}}` (nom de l'association).
 
-### Creer un Modele
-1. Depuis l'onglet **Modeles**, cliquez sur **"Nouveau Modele"**.
-2. Remplissez :
-   - **Nom** : Nom identifiant (ex. "Convocation Assemblee Generale").
-   - **Objet** : L'objet de l'email.
-   - **Corps HTML** : Le texte du message.
-   - **Corps Texte** : Version texte brut (pour les clients email ne supportant pas le HTML).
-   - **Categorie** : Generale, Renouvellement, Evenement, Activite, Assemblee, Fiscale.
-3. Utilisez les **champs de fusion** dans le texte :
-   - `{{name}}` — Nom complet du destinataire.
-   - `{{associationName}}` — Nom de l'association.
-4. Cliquez sur **"Enregistrer"**.
+Le tableau affiche **Nom du modèle** et **Objet**. Les actions de chaque ligne sont la modification (crayon, puis **Enregistrer**) et la suppression (corbeille, avec confirmation).
 
-### Appliquer un Modele
-Lors de la creation d'un nouveau message, il est possible de selectionner un modele dans le menu deroulant. L'objet et le corps seront pre-remplis avec les donnees du template.
+## 15.2 Créer un message
 
-## 15.3 Creation et Envoi de Messages
+Dans l'onglet **Messages**, appuyez sur **Nouveau Message**.
+- **Appliquer le modèle** : n'apparaît que s'il existe au moins un modèle et seulement pour les nouveaux messages. Copie l'objet et le corps du modèle dans le message.
+- **Objet** (obligatoire).
+- **Nom de l'expéditeur** et **Email de l'expéditeur**. L'email devient l'expéditeur du message ; si vous le laissez vide, `noreply@associago.local` est utilisé. Le nom de l'expéditeur est enregistré mais n'apparaît pas dans l'email.
+- **Filtre de segment** : champ de texte libre. S'il contient le mot `active`, le message ne part qu'aux membres dont l'adhésion est active ; tout autre texte, ou un champ vide, signifie tous les membres de l'association ayant une adresse email.
+- **Corps du message (HTML)**, avec les mêmes espaces réservés que les modèles.
 
-### Creer un Message
-1. Depuis l'onglet **Messages**, cliquez sur **"Nouveau Message"**.
-2. Remplissez :
-   - **Objet** : L'objet de l'email.
-   - **Corps** : Le contenu du message.
-   - **Filtre des destinataires** : Filtrez les membres par statut (ex. uniquement les Actifs).
-3. Cliquez sur **"Enregistrer comme Brouillon"** ou procedez a l'envoi.
+Appuyez sur **Créer**. Le message est créé à l'état **Brouillon**.
 
-### Resoudre les Destinataires
-Avant l'envoi, cliquez sur **"Resoudre les Destinataires"** pour :
-- Visualiser la liste complete des membres qui recevront le message.
-- Verifier les adresses email.
-- Controler le nombre total de destinataires.
+Le tableau des messages affiche **Objet**, **Statut**, le nombre de **Destinataires** et la **Date** de création. Seuls les brouillons peuvent être modifiés (crayon) ; la corbeille supprime le message après confirmation.
 
-### Envoyer
-1. Cliquez sur **"Envoyer"**.
-2. Le systeme envoie les emails via le serveur SMTP configure dans les parametres.
-3. L'etat passe de **Brouillon** a **En cours d'envoi** puis a **Envoye**.
+## 15.3 Destinataires et envoi
 
-## 15.4 Statistiques de Livraison
-Pour chaque message envoye, la vue detaillee affiche :
-- **Total des destinataires** : Nombre d'emails envoyes.
-- **Delivres** : Emails distribues avec succes.
-- **Echoues** : Emails non delivres (avec detail de l'erreur).
-- **Date d'envoi** : Horodatage de l'envoi.
+Cliquez sur un message pour en ouvrir le détail. Pour un brouillon :
+1. appuyez sur **Résoudre les destinataires** : l'application calcule la liste à partir des membres de l'association, selon le Filtre de segment, et affiche le nombre de destinataires trouvés. Chaque adresse email n'apparaît qu'une fois ; si vous appuyez à nouveau, la liste est recalculée depuis le début ;
+2. appuyez sur **Envoyer** (actif seulement après avoir résolu les destinataires) et confirmez.
 
-## 15.5 Etats des Messages
-| Etat | Signification |
-|------|---------------|
-| Brouillon | Message enregistre mais pas encore envoye. |
-| En cours d'envoi | Envoi en cours. |
-| Envoye | Tous les messages ont ete traites. |
-| Echoue | L'envoi a rencontre des erreurs. |
+L'email part en texte brut : le contenu rédigé dans l'éditeur est converti en conservant les paragraphes et les retours à la ligne, sans mise en forme. Avant une communication importante, faites un envoi d'essai vers l'une de vos adresses.
 
-> **Note** : Pour utiliser les communications par email, il est necessaire de configurer un serveur SMTP dans les parametres de l'application (variables d'environnement SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD).
+## 15.4 Détail et statistiques
+
+En haut, quatre encadrés : **Destinataires totaux**, **Livrés**, **Échecs** et **Envoyé le**. En dessous se trouvent le **Contenu du message** et le tableau **Destinataires** avec le nom, l'email, le statut (En attente, Envoyé ou Échoué) et l'heure d'envoi.
+
+« Livrés » signifie que le serveur de messagerie a accepté l'email, pas qu'il est arrivé dans la boîte du membre.
+
+Une fois l'envoi terminé, le message passe à **Envoyé** ; si aucun email n'a été accepté par le serveur, il passe à **Échoué**. En cas d'envois partiels, vérifiez l'encadré **Échecs** et la colonne statut des destinataires.
+
+## 15.5 Configurer le serveur de messagerie
+
+L'application n'a pas d'écran pour le serveur email : il doit être configuré par l'administrateur en définissant ces variables d'environnement avant de lancer AssociaGo.
+
+| Variable | À quoi elle sert | Valeur si absente |
+|---|---|---|
+| `SMTP_HOST` | adresse du serveur de courrier sortant | `localhost` |
+| `SMTP_PORT` | port du serveur (généralement 587 ou 25) | `25` |
+| `SMTP_USER` | nom d'utilisateur de la boîte | vide |
+| `SMTP_PASSWORD` | mot de passe de la boîte | vide |
+| `SMTP_AUTH` | `true` si le serveur demande un utilisateur et un mot de passe | `false` |
+| `SMTP_TLS` | `true` pour utiliser la connexion chiffrée STARTTLS | `false` |
+
+Sans ces paramètres, l'application cherche un serveur de messagerie sur l'ordinateur lui-même : il n'y en a presque jamais, donc tous les emails finissent parmi les **Échecs**.

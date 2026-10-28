@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Button, Row, Col, Spinner, Table, Badge, Image } from 'react-bootstrap';
+import { Card, Button, Row, Col, Spinner, Alert, Image } from 'react-bootstrap';
 import { associago } from '../api';
 import { useTranslation } from 'react-i18next';
 import { TrendingUp, TrendingDown, DollarSign, Download, Calendar, Users, Activity, ArrowRight, Building } from 'lucide-react';
 
 const Dashboard = ({ shell, associationId }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const [showAllActivity, setShowAllActivity] = useState(false);
+  const [error, setError] = useState(null);
+  const money = value => new Intl.NumberFormat(i18n.language, { style: 'currency', currency: 'EUR' }).format(value);
+  const activityDestination = type => ({ PAYMENT: 'fiscal', MEMBER_NEW: 'members', EVENT: 'events' }[type] || 'activities');
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [logoUrl, setLogoUrl] = useState(null);
@@ -19,11 +23,13 @@ const Dashboard = ({ shell, associationId }) => {
     if (!associationId) return;
 
     setLoading(true);
+    setError(null);
     try {
       const data = await associago.dashboard.getStats(associationId);
       setStats(data);
     } catch (error) {
       console.error("Failed to fetch dashboard data", error);
+      setError(error.message);
     } finally {
       setLoading(false);
     }
@@ -46,39 +52,42 @@ const Dashboard = ({ shell, associationId }) => {
     </div>
   );
 
-  if (!stats) return null;
+  if (error || !stats) return <Alert variant="danger" role="alert">
+    <p>{t('dashboard.loadError')}</p>
+    <Button variant="outline-primary" onClick={loadDashboard}>{t('Retry')}</Button>
+  </Alert>;
 
   return (
-    <div className="fade-in">
+    <div className="fade-in ag-dashboard">
       {/* Welcome Header */}
-      <div className="d-flex justify-content-between align-items-center mb-5">
+      <div className="ag-page-heading">
         <div className="d-flex align-items-center">
             <div className="me-3 position-relative">
                 <div className="border rounded bg-light d-flex align-items-center justify-content-center overflow-hidden shadow-sm"
                      style={{width: '64px', height: '64px'}}>
                     {logoUrl ? (
-                        <Image src={logoUrl} alt="Logo" style={{width: '100%', height: '100%', objectFit: 'cover'}}
-                               onError={(e) => e.target.style.display = 'none'} />
+                        <Image src={logoUrl} alt={t('Association Logo')} style={{width: '100%', height: '100%', objectFit: 'cover'}}
+                               onError={() => setLogoUrl(null)} />
                     ) : (
                         <Building size={32} className="text-muted" />
                     )}
                 </div>
             </div>
             <div>
-                <h6 className="text-uppercase text-primary fw-bold small mb-1">{shell.currentAssociation?.nome || "Associazione"}</h6>
+                <h6 className="text-uppercase text-primary fw-bold small mb-1">{shell.currentAssociation?.nome || t('auditLog.area.ASSOCIATION')}</h6>
                 <h2 className="fw-bold text-dark mb-0">{t('Dashboard')}</h2>
             </div>
         </div>
         <div className="text-end">
             <span className="badge bg-light text-dark border px-3 py-2 rounded-pill">
                 <Calendar size={14} className="me-2 text-muted" />
-                {new Date().toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                {new Date().toLocaleDateString(i18n.language, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
             </span>
         </div>
       </div>
 
       {/* KPI Cards */}
-      <Row className="g-4 mb-5">
+      <Row className="g-4 mb-4 ag-dashboard-kpis">
         {/* Members KPI */}
         <Col md={4}>
             <Card className="border-0 shadow-sm h-100 overflow-hidden">
@@ -96,8 +105,7 @@ const Dashboard = ({ shell, associationId }) => {
                         <span className="text-success fw-bold me-2">+{stats.members.newThisMonth}</span>
                         {t('new this month')}
                     </div>
-                    {/* Decorative bg */}
-                    <Users size={120} className="position-absolute text-primary opacity-5" style={{right: -20, bottom: -20}} />
+                    <div className="ag-kpi-link"><Button variant="link" className="p-0" onClick={() => shell.navigate('members')}>{t('nav.members')} <ArrowRight size={16} /></Button></div>
                 </Card.Body>
             </Card>
         </Col>
@@ -109,7 +117,7 @@ const Dashboard = ({ shell, associationId }) => {
                     <div className="d-flex justify-content-between align-items-start mb-4">
                         <div>
                             <h6 className="text-muted text-uppercase small fw-bold mb-1">{t('Treasury Balance')}</h6>
-                            <h2 className="fw-bold mb-0">€ {stats.treasury.balance.toLocaleString(undefined, {minimumFractionDigits: 2})}</h2>
+                            <h2 className="fw-bold mb-0">{money(stats.treasury.balance)}</h2>
                         </div>
                         <div className="bg-success bg-opacity-10 text-success rounded-circle p-3">
                             <DollarSign size={24} />
@@ -118,14 +126,15 @@ const Dashboard = ({ shell, associationId }) => {
                     <div className="d-flex align-items-center text-muted small">
                         <span className="text-success fw-bold me-2">
                             <TrendingUp size={14} className="me-1"/>
-                            +€{stats.treasury.incomeMonth}
+                            +{money(stats.treasury.incomeMonth)}
                         </span>
                         <span className="mx-2">•</span>
                         <span className="text-danger fw-bold">
                             <TrendingDown size={14} className="me-1"/>
-                            -€{stats.treasury.expenseMonth}
+                            −{money(stats.treasury.expenseMonth)}
                         </span>
                     </div>
+                    <div className="ag-kpi-link"><Button variant="link" className="p-0" onClick={() => shell.navigate('fiscal')}>{t('nav.fiscal')} <ArrowRight size={16} /></Button></div>
                 </Card.Body>
             </Card>
         </Col>
@@ -147,11 +156,12 @@ const Dashboard = ({ shell, associationId }) => {
                         <div className="text-muted small text-truncate">
                             <span className="fw-bold text-dark">{t('Next')}:</span> {stats.events.nextEvent.title}
                             <br/>
-                            <span className="opacity-75">{new Date(stats.events.nextEvent.date).toLocaleDateString()}</span>
+                            <span className="opacity-75">{new Date(stats.events.nextEvent.date).toLocaleDateString(i18n.language)}</span>
                         </div>
                     ) : (
                         <div className="text-muted small">{t('No upcoming events')}</div>
                     )}
+                    <div className="ag-kpi-link"><Button variant="link" className="p-0" onClick={() => shell.navigate('events')}>{t('nav.events')} <ArrowRight size={16} /></Button></div>
                 </Card.Body>
             </Card>
         </Col>
@@ -163,14 +173,14 @@ const Dashboard = ({ shell, associationId }) => {
             <Card className="border-0 shadow-sm h-100">
                 <Card.Header className="bg-white border-bottom-0 pt-4 pb-0 d-flex justify-content-between align-items-center">
                     <h5 className="mb-0 fw-bold">{t('Recent Activity')}</h5>
-                    <Button variant="link" className="text-decoration-none small p-0" onClick={() => {}}>
-                        {t('View All')} <ArrowRight size={16} />
+                    <Button variant="link" className="text-decoration-none small p-0" onClick={() => setShowAllActivity(!showAllActivity)} aria-expanded={showAllActivity}>
+                        {t(showAllActivity ? 'Less' : 'View All')} <ArrowRight size={16} />
                     </Button>
                 </Card.Header>
                 <Card.Body>
                     <div className="list-group list-group-flush">
-                        {stats.recentActivity.map(activity => (
-                            <div key={activity.id} className="list-group-item border-0 px-0 py-3 d-flex align-items-center">
+                        {(showAllActivity ? stats.recentActivity : stats.recentActivity.slice(0, 5)).map(activity => (
+                            <div key={activity.id} className="ag-activity-row">
                                 <div className={`rounded-circle p-2 me-3 ${
                                     activity.type === 'PAYMENT' ? 'bg-success bg-opacity-10 text-success' :
                                     activity.type === 'MEMBER_NEW' ? 'bg-primary bg-opacity-10 text-primary' :
@@ -183,9 +193,10 @@ const Dashboard = ({ shell, associationId }) => {
                                 <div className="flex-grow-1">
                                     <div className="fw-medium text-dark">{activity.description}</div>
                                     <small className="text-muted">
-                                        {new Date(activity.date).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })}
+                                        {new Date(activity.date).toLocaleString(i18n.language, { dateStyle: 'medium', timeStyle: 'short' })}
                                     </small>
                                 </div>
+                                <Button variant="light" size="sm" aria-label={`${t('Open')}: ${activity.description}`} onClick={() => shell.navigate(activityDestination(activity.type))}><ArrowRight size={16} /></Button>
                             </div>
                         ))}
                         {stats.recentActivity.length === 0 && (
@@ -200,17 +211,17 @@ const Dashboard = ({ shell, associationId }) => {
         </Col>
 
         <Col lg={4}>
-            <Card className="border-0 shadow-sm h-100 bg-primary text-white" style={{background: 'linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%)'}}>
+            <Card className="ag-quick-actions h-100">
                 <Card.Body className="d-flex flex-column justify-content-center p-4">
                     <h4 className="fw-bold mb-3">{t('Quick Actions')}</h4>
                     <div className="d-grid gap-3">
-                        <Button variant="outline-light" className="text-white text-primary fw-bold text-start py-3 px-4 shadow-sm" onClick={() => shell.openModal('member-form', { associationId })}>
+                        <Button variant="primary" onClick={() => shell.openModal('member-form', { associationId, associationType: shell.currentAssociation?.tipo, onSuccess: loadDashboard })}>
                             <Users size={18} className="me-2" /> {t('Register New Member')}
                         </Button>
-                        <Button variant="outline-light" className="text-white fw-bold text-start py-3 px-4" onClick={() => shell.openModal('event-form', { associationId })}>
+                        <Button variant="outline-primary" onClick={() => shell.openModal('event-form', { associationId, onSuccess: loadDashboard })}>
                             <Calendar size={18} className="me-2" /> {t('Create Event')}
                         </Button>
-                        <Button variant="outline-light" className="text-white fw-bold text-start py-3 px-4" onClick={() => shell.navigate('fiscal')}>
+                        <Button variant="outline-primary" onClick={() => shell.navigate('fiscal')}>
                             <DollarSign size={18} className="me-2" /> {t('Record Payment')}
                         </Button>
                     </div>

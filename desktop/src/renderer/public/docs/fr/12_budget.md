@@ -1,46 +1,52 @@
-# 12. Budget Previsionnel
+# 12. Budget prévisionnel
 
-La section **Budget Previsionnel** permet de planifier les recettes et les depenses prevues pour l'exercice, de les comparer avec les donnees reelles et de controler la viabilite financiere de l'association.
+La page **Budget** sert à planifier les recettes et les dépenses d'une année et à les comparer avec les mouvements enregistrés en comptabilité.
 
-## 12.1 Vue d'ensemble
-Le budget previsionnel est un outil obligatoire pour de nombreuses associations du secteur associatif. AssociaGo le rend simple a remplir et a approuver.
+## 12.1 Liste des budgets
 
-## 12.2 Creation du Budget
-1. Cliquez sur **"Nouveau Budget"**.
-2. Saisissez l'**annee de reference** et une description facultative.
-3. Cliquez sur **"Creer"**.
+Le tableau affiche **Titre**, **Année** et **Statut** (brouillon ou approuvé), du plus récent au plus ancien. Cliquez sur une ligne pour ouvrir le budget. L'icône **corbeille** le supprime, après la confirmation **Êtes-vous sûr ?**.
 
-Le budget est cree a l'etat **Brouillon**.
+## 12.2 Créer un budget
 
-## 12.3 Gestion des Lignes de Budget
-Chaque budget est compose de **lignes** (postes) de recettes et de depenses :
+Appuyez sur **Nouveau budget** et remplissez :
+- **Titre** ;
+- **Année** (l'année en cours est proposée) ;
+- **Notes**.
 
-### Ajouter un Poste
-- Cliquez sur **"Ajouter une Ligne"**.
-- Remplissez :
-  - **Categorie** : Recette ou Depense.
-  - **Description** : (ex. "Cotisations", "Loyer du local", "Materiel pedagogique").
-  - **Montant Prevu** : Le montant estime.
+Appuyez sur **Créer**. Le budget est créé à l'état de brouillon.
 
-### Modifier un Poste
-Cliquez sur la ligne pour modifier la description et le montant prevu.
+> Le titre, l'année et les notes ne peuvent pas être modifiés après la création.
 
-### Supprimer un Poste
-Cliquez sur l'icone **corbeille** pour supprimer une ligne.
+## 12.3 Lignes du budget
 
-## 12.4 Recapitulatif
-En haut de la page, un panneau recapitulatif affiche :
-- **Total des Recettes Prevues**
-- **Total des Depenses Prevues**
-- **Solde Prevu** (difference)
+Dans le détail, appuyez sur **Ajouter une ligne** et remplissez :
+- **Catégorie** : texte libre, par exemple « Cotisations » ou « Loyer du local » ;
+- **Section** : **Revenus** ou **Dépense** ;
+- **Montant budgétisé**.
 
-## 12.5 Synchronisation avec le Bilan Reel
-En cliquant sur **"Synchroniser le Bilan Reel"**, le systeme met a jour automatiquement les montants effectifs (colonne "Reel") en lisant les transactions reelles enregistrees dans la comptabilite pour l'annee de reference. Cela permet de comparer immediatement les previsions et la realite.
+Appuyez sur **Ajouter**. Pour modifier une ligne, utilisez l'icône **crayon** (**Modifier la ligne**, puis **Enregistrer**) ; pour la retirer, l'icône **corbeille**, qui supprime immédiatement sans confirmation.
+
+Le tableau des lignes comporte ces colonnes :
+- **Budgétisé** et **Réel** ;
+- **Écart** : réel moins budgétisé, en vert s'il est positif et en rouge s'il est négatif (le même critère vaut pour les recettes et les dépenses) ;
+- **Progrès** : barre du réel par rapport au budgétisé, jaune au-delà de 80 % et rouge au-delà de 100 %.
+
+## 12.4 Récapitulatif
+
+Au-dessus du tableau, quatre encadrés : **Revenus budgétisés**, **Revenus réels**, **Dépenses budgétisées** et **Dépenses réelles**.
+
+> Il n'y a pas de solde prévisionnel : la différence entre recettes et dépenses doit être calculée à la main.
+
+## 12.5 Synchroniser les montants réels
+
+**Synchroniser les réels** lit les mouvements de l'association du 1er janvier au 31 décembre de l'année du budget et met à jour la colonne **Réel**.
+
+> Les lignes créées depuis l'interface ne sont pas liées à une catégorie comptable. C'est pourquoi chaque ligne reçoit le total de tous les mouvements de sa section : avec trois lignes de dépenses, toutes trois affichent le total des dépenses de l'année. Les totaux réels des encadrés sont donc multipliés par le nombre de lignes.
 
 ## 12.6 Approbation
-Lorsque le budget est complet :
-1. Cliquez sur **"Approuver"**.
-2. L'etat passe de **Brouillon** a **Approuve**.
-3. Un budget approuve n'est plus modifiable.
 
-> **Note** : L'approbation du budget previsionnel est generalement un acte de l'assemblee generale. Assurez-vous que l'approbation dans le systeme n'intervienne qu'apres la deliberation de l'assemblee.
+**Approuver** fait passer le budget à l'état approuvé et enregistre qui l'a approuvé et quand. Après l'approbation, le bouton disparaît.
+
+> L'approbation ne verrouille rien : les lignes restent modifiables et supprimables, et le budget peut être supprimé.
+
+> **Remarque** : l'approbation du budget prévisionnel est en principe un acte de l'assemblée. Enregistrez-la dans le système après la délibération.

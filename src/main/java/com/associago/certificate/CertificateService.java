@@ -8,20 +8,18 @@ import com.associago.association.AssociationService;
 import com.associago.event.Event;
 import com.associago.event.EventParticipant;
 import com.associago.event.EventService;
-import com.associago.member.Member;
-import com.associago.member.MemberService;
+import com.associago.shared.SignatureResolver;
+import com.associago.shared.i18n.Messages;
+import com.associago.shared.pdf.PdfDocument;
+import com.associago.shared.pdf.PdfText;
+import com.associago.user.User;
+import com.associago.user.UserService;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
-import org.apache.pdfbox.pdmodel.font.PDType1Font;
-import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
-import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,11 +29,12 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HexFormat;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import javax.imageio.ImageIO;
 
 @Service
@@ -43,25 +42,29 @@ public class CertificateService {
 
     private final CertificateTemplateRepository templateRepository;
     private final IssuedCertificateRepository issuedRepository;
-    private final MemberService memberService;
+    private final UserService userService;
     private final ActivityService activityService;
     private final EventService eventService;
     private final AssociationService associationService;
-
-    private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private final SignatureResolver signatureResolver;
+    private final Messages messages;
 
     public CertificateService(CertificateTemplateRepository templateRepository,
                               IssuedCertificateRepository issuedRepository,
-                              MemberService memberService,
+                              UserService userService,
                               ActivityService activityService,
                               EventService eventService,
-                              AssociationService associationService) {
+                              AssociationService associationService,
+                              SignatureResolver signatureResolver,
+                              Messages messages) {
         this.templateRepository = templateRepository;
         this.issuedRepository = issuedRepository;
-        this.memberService = memberService;
+        this.userService = userService;
         this.activityService = activityService;
         this.eventService = eventService;
         this.associationService = associationService;
+        this.signatureResolver = signatureResolver;
+        this.messages = messages;
     }
 
     // --- Templates ---
@@ -107,11 +110,12 @@ public class CertificateService {
     public IssuedCertificate issueCertificate(Long templateId, Long userId, Long associationId,
                                                Long activityId, Long eventId, Long issuedBy) {
         CertificateTemplate template = getTemplate(templateId);
-        Member member = memberService.getMemberById(userId)
-                .orElseThrow(() -> new RuntimeException("Member not found: " + userId));
+        // issued_certificates.user_id references users(id): recipients are the people listed in Soci.
+        User recipient = userService.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Recipient not found: " + userId));
         Association association = associationService.findById(associationId).orElse(new Association());
 
-        String body = mergeCertificateBody(template.getBodyHtml(), member, association, activityId, eventId);
+        String body = mergeCertificateBody(template.getBodyHtml(), recipient, association, activityId, eventId);
 
         IssuedCertificate cert = new IssuedCertificate();
         cert.setAssociationId(associationId);
@@ -141,8 +145,9 @@ public class CertificateService {
         List<IssuedCertificate> issued = new ArrayList<>();
         for (ActivityParticipant p : participants) {
             if (p.isActive()) {
-                issued.add(issueCertificate(templateId, p.getId(), associationId,
-                        activityId, null, issuedBy));
+                if (p.getUser() != null) {
+                    issued.add(issueCertificate(templateId, p.getUser().getId(), associationId, activityId, null, issuedBy));
+                }
             }
         }
         return issued;
@@ -157,97 +162,89 @@ public class CertificateService {
         List<EventParticipant> participants = eventService.getParticipants(eventId);
         List<IssuedCertificate> issued = new ArrayList<>();
         for (EventParticipant p : participants) {
-            issued.add(issueCertificate(templateId, p.getId(), associationId,
-                    null, eventId, issuedBy));
+            // Guests have no user record and cannot receive a nominal certificate.
+            if (p.getUser() != null) {
+                issued.add(issueCertificate(templateId, p.getUser().getId(), associationId, null, eventId, issuedBy));
+            }
         }
         return issued;
     }
 
     /**
-     * Generates a PDF for a specific issued certificate.
+     * Generates a PDF for a specific issued certificate, in the requested language, signed by the
+     * template's signatory roles (Impostazioni › Firme, falling back to the Organigramma).
      */
-    public byte[] generatePdf(Long issuedCertificateId) throws IOException {
+    public byte[] generatePdf(Long issuedCertificateId, Locale locale) throws IOException {
         IssuedCertificate cert = issuedRepository.findById(issuedCertificateId)
                 .orElseThrow(() -> new RuntimeException("Issued certificate not found: " + issuedCertificateId));
-
         CertificateTemplate template = getTemplate(cert.getTemplateId());
-        boolean landscape = "LANDSCAPE".equals(template.getOrientation());
+        List<String> roles = signatoryRoles(template.getSignatoryRoles());
+        List<SignatureResolver.SignerInfo> signers = roles.isEmpty() || cert.getAssociationId() == null
+                ? List.of() : signatureResolver.resolveSigners(cert.getAssociationId(), roles);
 
-        try (PDDocument document = new PDDocument()) {
-            PDPage page = new PDPage(landscape ? new PDRectangle(PDRectangle.A4.getHeight(), PDRectangle.A4.getWidth()) : PDRectangle.A4);
-            document.addPage(page);
-
-            float pageWidth = page.getMediaBox().getWidth();
-            float pageHeight = page.getMediaBox().getHeight();
-
-            try (PDPageContentStream cs = new PDPageContentStream(document, page)) {
-                // Title
-                cs.beginText();
-                cs.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 24);
-                float titleWidth = new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD).getStringWidth(cert.getTitle()) / 1000 * 24;
-                cs.newLineAtOffset((pageWidth - titleWidth) / 2, pageHeight - 100);
-                cs.showText(cert.getTitle());
-                cs.endText();
-
-                // Certificate number & date
-                cs.beginText();
-                cs.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 10);
-                cs.newLineAtOffset(50, pageHeight - 140);
-                cs.showText("N. " + cert.getCertificateNumber() + "  —  " + cert.getIssueDate().format(DATE_FMT));
-                cs.endText();
-
-                // Body (plain text rendering of HTML snapshot)
-                String plainBody = cert.getBodySnapshot() != null
-                        ? cert.getBodySnapshot().replaceAll("<[^>]*>", "").replaceAll("&nbsp;", " ").trim()
-                        : "";
-                cs.beginText();
-                cs.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 12);
-                cs.setLeading(16);
-                cs.newLineAtOffset(60, pageHeight - 200);
-                for (String line : wrapText(plainBody, 80)) {
-                    cs.showText(line);
-                    cs.newLine();
-                }
-                cs.endText();
-
-                // Signatories footer
-                if (cert.getSignatories() != null && !cert.getSignatories().isEmpty()) {
-                    cs.beginText();
-                    cs.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_OBLIQUE), 10);
-                    cs.newLineAtOffset(50, 80);
-                    cs.showText("Firmatari: " + cert.getSignatories()
-                            .replaceAll("[\\[\\]\"{}]", "")
-                            .replace(",", ", "));
-                    cs.endText();
-                }
-
-                // QR Code (bottom-right corner)
-                if (cert.getQrCodeData() != null) {
-                    byte[] qrPng = renderQrCodePng(cert.getQrCodeData(), 150);
-                    if (qrPng != null) {
-                        PDImageXObject qrImage = PDImageXObject.createFromByteArray(document, qrPng, "qr.png");
-                        float qrSize = 80;
-                        cs.drawImage(qrImage, pageWidth - qrSize - 30, 20, qrSize, qrSize);
-                    }
-                }
-            }
-
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            document.save(baos);
-            byte[] pdfBytes = baos.toByteArray();
-
-            // Compute checksum
-            try {
-                String sha256 = HexFormat.of().formatHex(
-                        MessageDigest.getInstance("SHA-256").digest(pdfBytes));
-                cert.setChecksum(sha256);
-                issuedRepository.save(cert);
-            } catch (Exception e) {
-                // Non-critical
-            }
-
-            return pdfBytes;
+        byte[] pdfBytes = renderPdf(cert, template, signers, locale);
+        try {
+            cert.setChecksum(HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(pdfBytes)));
+            issuedRepository.save(cert);
+        } catch (Exception e) {
+            // Non-critical
         }
+        return pdfBytes;
+    }
+
+    /** Lays out the certificate: centred title, number and date, body, signatures and QR code. */
+    public byte[] renderPdf(IssuedCertificate cert, CertificateTemplate template,
+                            List<SignatureResolver.SignerInfo> signers, Locale locale) throws IOException {
+        boolean landscape = "LANDSCAPE".equals(template.getOrientation());
+        PDRectangle size = landscape ? new PDRectangle(PDRectangle.A4.getHeight(), PDRectangle.A4.getWidth()) : PDRectangle.A4;
+
+        try (PdfDocument pdf = new PdfDocument(size, null)) {
+            float pageWidth = pdf.width();
+            float pageHeight = pdf.height();
+            String title = cert.getTitle() == null ? "" : cert.getTitle();
+            pdf.textCentered(pageWidth / 2, pageHeight - 100, pdf.fit(title, pdf.bold, 24, pdf.contentWidth()), pdf.bold, 24);
+            pdf.textCentered(pageWidth / 2, pageHeight - 125, messages.get(locale, "certificate.numberAndDate",
+                    Objects.requireNonNullElse(cert.getCertificateNumber(), ""), PdfText.date(cert.getIssueDate(), locale)),
+                    pdf.regular, 10);
+
+            // Body (plain text rendering of the HTML snapshot)
+            String plainBody = cert.getBodySnapshot() != null
+                    ? cert.getBodySnapshot()
+                        .replaceAll("(?i)<br\\s*/?>|</p>", "\n")
+                        .replaceAll("<[^>]*>", "")
+                        .replace("&nbsp;", " ").replace("&amp;", "&").replace("&lt;", "<").replace("&gt;", ">")
+                        .trim()
+                    : "";
+            pdf.moveTo(pageHeight - 170);
+            pdf.paragraph(pdf.left() + 20, plainBody, pdf.regular, 13);
+
+            float qrSize = 80;
+            List<PdfDocument.SignatureBlock> blocks = (signers == null ? List.<SignatureResolver.SignerInfo>of() : signers).stream()
+                    .map(signer -> signer.toBlock(messages, locale))
+                    .toList();
+            if (!blocks.isEmpty()) {
+                pdf.moveTo(Math.min(pdf.y() - 20, 40 + qrSize + 115));
+                pdf.signatures(null, blocks);
+            }
+
+            if (cert.getQrCodeData() != null) {
+                byte[] qrPng = renderQrCodePng(cert.getQrCodeData(), 150);
+                pdf.image(qrPng, "qr.png", pageWidth - qrSize - 30, 20, qrSize, qrSize);
+            }
+            return pdf.finish(null);
+        }
+    }
+
+    /** Roles listed in the template JSON (e.g. ["PRESIDENT","SECRETARY"]), lower-cased for the resolver. */
+    static List<String> signatoryRoles(String signatoryRolesJson) {
+        if (signatoryRolesJson == null) return List.of();
+        List<String> roles = new ArrayList<>();
+        java.util.regex.Matcher matcher = java.util.regex.Pattern.compile("[A-Za-z_]+").matcher(signatoryRolesJson);
+        while (matcher.find()) {
+            String role = matcher.group().toLowerCase(Locale.ROOT);
+            if (!roles.contains(role)) roles.add(role);
+        }
+        return roles;
     }
 
     // --- QR Code ---
@@ -299,14 +296,14 @@ public class CertificateService {
 
     // --- Helpers ---
 
-    private String mergeCertificateBody(String bodyHtml, Member member, Association association,
+    private String mergeCertificateBody(String bodyHtml, User member, Association association,
                                          Long activityId, Long eventId) {
         String body = bodyHtml;
         body = body.replace("{{firstName}}", member.getFirstName() != null ? member.getFirstName() : "");
         body = body.replace("{{lastName}}", member.getLastName() != null ? member.getLastName() : "");
-        body = body.replace("{{fiscalCode}}", member.getFiscalCode() != null ? member.getFiscalCode() : "");
+        body = body.replace("{{fiscalCode}}", member.getTaxCode() != null ? member.getTaxCode() : "");
         body = body.replace("{{associationName}}", association.getName() != null ? association.getName() : "");
-        body = body.replace("{{date}}", LocalDate.now().format(DATE_FMT));
+        body = body.replace("{{date}}", PdfText.date(LocalDate.now(), messages.current()));
 
         if (activityId != null) {
             activityService.findById(activityId).ifPresent(a -> {
@@ -332,15 +329,15 @@ public class CertificateService {
         // Build JSON array from association officer data
         StringBuilder sb = new StringBuilder("[");
         if (signatoryRolesJson != null && signatoryRolesJson.contains("PRESIDENT") && association.getPresident() != null) {
-            sb.append("{\"name\":\"").append(association.getPresident()).append("\",\"role\":\"Presidente\"}");
+            sb.append("{\"name\":\"").append(association.getPresident()).append("\",\"role\":\"PRESIDENT\"}");
         }
         if (signatoryRolesJson != null && signatoryRolesJson.contains("SECRETARY") && association.getSecretary() != null) {
             if (sb.length() > 1) sb.append(",");
-            sb.append("{\"name\":\"").append(association.getSecretary()).append("\",\"role\":\"Segretario\"}");
+            sb.append("{\"name\":\"").append(association.getSecretary()).append("\",\"role\":\"SECRETARY\"}");
         }
         if (signatoryRolesJson != null && signatoryRolesJson.contains("TREASURER") && association.getTreasurer() != null) {
             if (sb.length() > 1) sb.append(",");
-            sb.append("{\"name\":\"").append(association.getTreasurer()).append("\",\"role\":\"Tesoriere\"}");
+            sb.append("{\"name\":\"").append(association.getTreasurer()).append("\",\"role\":\"TREASURER\"}");
         }
         sb.append("]");
         return sb.toString();
@@ -349,23 +346,5 @@ public class CertificateService {
     private String generateCertNumber(Long associationId) {
         long count = issuedRepository.countByAssociationId(associationId);
         return String.format("CERT-%d-%04d", LocalDate.now().getYear(), count + 1);
-    }
-
-    private List<String> wrapText(String text, int maxCharsPerLine) {
-        List<String> lines = new ArrayList<>();
-        if (text == null || text.isEmpty()) return lines;
-        String[] words = text.split("\\s+");
-        StringBuilder currentLine = new StringBuilder();
-        for (String word : words) {
-            if (currentLine.length() + word.length() + 1 > maxCharsPerLine) {
-                lines.add(currentLine.toString());
-                currentLine = new StringBuilder(word);
-            } else {
-                if (currentLine.length() > 0) currentLine.append(" ");
-                currentLine.append(word);
-            }
-        }
-        if (currentLine.length() > 0) lines.add(currentLine.toString());
-        return lines;
     }
 }

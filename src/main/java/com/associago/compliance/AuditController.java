@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/audit")
@@ -18,11 +19,25 @@ public class AuditController {
     }
 
     @GetMapping
-    public Page<AuditEntry> getByAssociation(
-            @RequestParam Long associationId,
+    public ResponseEntity<Page<AuditEntry>> getByAssociation(
+            @RequestParam(required = false) Long associationId,
+            @RequestHeader(value = "X-Association-Id", required = false) Long headerAssociationId,
+            @RequestParam(required = false) String area,
+            @RequestParam(required = false) String action,
+            @RequestParam(required = false) LocalDate from,
+            @RequestParam(required = false) LocalDate to,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "50") int size) {
-        return auditService.getByAssociation(associationId, page, size);
+        Long assoc = associationId != null ? associationId : headerAssociationId;
+        if (assoc == null) return ResponseEntity.badRequest().build();
+        return ResponseEntity.ok(auditService.search(assoc, area, action,
+                from == null ? null : from.atStartOfDay(),
+                to == null ? null : to.plusDays(1).atStartOfDay(), page, size));
+    }
+
+    @GetMapping("/areas")
+    public Map<String, List<String>> areas() {
+        return AuditAreas.areas();
     }
 
     @GetMapping("/entity/{entityType}/{entityId}")

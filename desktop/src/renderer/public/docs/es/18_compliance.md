@@ -1,54 +1,55 @@
 # 18. Conformidad y Auditoría
 
-La sección **Auditoría** registra automáticamente todas las operaciones sensibles realizadas en la plataforma, garantizando la trazabilidad completa requerida por la normativa del Tercer Sector.
+Las herramientas de conformidad disponibles hoy están en la pestaña **Ajustes › Registro**: sedes, documentos institucionales y vencimientos de la asociación.
 
-## 18.1 Qué es el Registro de Auditoría
-El registro de auditoría es un registro inmutable que documenta:
-- **Quién** realizó la operación (usuario).
-- **Qué** se hizo (tipo de acción).
-- **Cuándo** ocurrió (marca temporal precisa).
-- **Sobre qué entidad** se realizó la acción (socio, transacción, evento, etc.).
-- **Qué valores** cambiaron (antes/después, cuando está disponible).
+**Registro de actividad.** AssociaGo registra automáticamente cada **creación**, **modificación** y **eliminación** de los datos principales: socios y afiliaciones, movimientos y facturas, actividades, eventos y participantes, asambleas y mociones, inventario y préstamos, voluntarios, turnos y reembolsos, cupones, presupuestos, balances, certificados, comunicaciones, perfil de la asociación, firmas y configuración de la base de datos.
 
-## 18.2 Operaciones Registradas
-El sistema registra automáticamente las operaciones más relevantes, entre ellas:
-- Creación, modificación y eliminación de socios.
-- Registro y modificación de transacciones financieras.
-- Creación y envío de comunicaciones.
-- Aprobación de balances.
-- Emisión de certificados.
-- Modificaciones en los ajustes de la asociación.
-- Gestión de la asistencia.
+Para consultarlo abre **Ajustes › Registro de actividad**. La tabla, desde la entrada más reciente, muestra:
+- **Fecha y hora** de la operación;
+- **Área** (por ejemplo Socios, Finanzas, Eventos);
+- **Acción**: Creación, Modificación o Eliminación;
+- **Registro**: el tipo de dato y su número identificativo;
+- **Detalle**: en las modificaciones, los nombres de los campos cambiados.
 
-## 18.3 Consulta del Registro
+Puedes filtrar por **Área**, **Acción** e intervalo de fechas (**Desde**, **Hasta**); **Borrar filtros** vuelve a la lista completa. Las entradas se dividen en páginas de 25.
 
-### Acceso
-El registro de auditoría es consultable a través de las API del sistema. La información disponible incluye:
+Lo que **no** se registra:
+- los valores de los campos, ni antes ni después de la modificación: solo sus nombres;
+- contraseñas, códigos de acceso, credenciales de la base de datos, imágenes de logotipos y firmas;
+- quién ha realizado la operación: el acceso es por asociación, no por usuario individual.
 
-### Filtros Disponibles
-- **Por asociación**: Muestra solo las operaciones de una asociación específica.
-- **Por entidad**: Filtra por tipo de entidad (ej. "MEMBER", "TRANSACTION") e ID específico.
-- **Por fecha**: Selecciona un rango temporal con fechas de inicio y fin.
-- **Por usuario**: Filtra las acciones de un usuario específico.
+> Cada asociación solo ve su propio registro. El registro no se puede modificar desde la app y se borra junto con la asociación.
 
-### Paginación
-Los resultados están paginados para gestionar grandes volúmenes de datos. Es posible especificar:
-- **Página**: Número de la página actual.
-- **Tamaño**: Número de registros por página (por defecto 50).
+## 18.1 Sedes
 
-## 18.4 Conteo de Operaciones
-Existe un endpoint disponible para obtener el conteo total de las operaciones registradas para una asociación, útil para paneles de control y estadísticas.
+Rellena la fila superior y pulsa **Añadir**:
+- tipo: **Sede legal**, **Sede operativa** o **Sede proyecto**;
+- **Nombre**, **Dirección**, **Ciudad** y provincia (**Prov.**).
 
-## 18.5 Características Técnicas
-- **Transacción independiente**: Cada entrada de auditoría se escribe en una transacción separada. Aunque la operación principal falle, el intento queda registrado en el registro.
-- **Inmutabilidad**: Las entradas de auditoría no pueden ser modificadas ni eliminadas.
-- **Indexación**: El registro está indexado por asociación, entidad, usuario y fecha para garantizar búsquedas rápidas.
+La tabla muestra **Tipo**, **Nombre**, **Dirección** y **Contactos**. La papelera elimina la sede.
 
-## 18.6 Importancia para el Tercer Sector
-La trazabilidad de las operaciones es un requisito fundamental para:
-- **Revisión legal**: Las entidades con ingresos superiores a determinados importes están sujetas a revisión.
-- **Controles fiscales**: La Agencia Tributaria puede solicitar documentación detallada.
-- **Transparencia**: Los socios tienen derecho de acceso a los documentos asociativos.
-- **Cumplimiento del RGPD**: El registro documenta quién realizó operaciones sobre los datos personales.
+> La columna **Contactos** queda vacía: el formulario no tiene campos para el teléfono y el correo de la sede.
 
-> **Nota**: El registro de auditoría es una funcionalidad interna de seguridad. El acceso al registro debería estar limitado a los administradores de la asociación y a los auditores de cuentas.
+## 18.2 Documentos
+
+Para archivar estatutos, reglamentos y otros documentos:
+1. elige el tipo: **Estatuto**, **Reglamento** o **Adjunto**;
+2. escribe un **Título**;
+3. selecciona el archivo y pulsa **Subir**.
+
+El archivo se copia en la carpeta de datos de AssociaGo. La tabla muestra **Tipo**, **Título** y, en la columna **Archivo**, la ruta en la que se ha guardado. La papelera elimina tanto la fila como el archivo copiado.
+
+> Desde la app no se puede abrir ni descargar el documento: para consultarlo, abre el archivo desde la ruta indicada.
+
+## 18.3 Vencimientos
+
+Para anotar obligaciones como renovaciones de seguros, declaraciones o asambleas obligatorias:
+- **Título** y fecha de vencimiento;
+- categoría: **Fiscal**, **Legal**, **Gobernanza**, **Seguros** u **Otro**;
+- un campo numérico, predefinido en 30: los días de preaviso.
+
+Pulsa **Añadir**. La tabla muestra **Título**, **Fecha de vencimiento**, **Categoría** y **Estado**. Cuando la obligación esté cumplida pulsa **Marcar como completada**: el vencimiento pasa a completado y el botón desaparece. La papelera lo elimina.
+
+> Los vencimientos son un recordatorio que se consulta a mano. Los días de preaviso se guardan, pero la app no envía avisos ni notificaciones, no señala los vencimientos pasados y no vuelve a crear los recurrentes.
+
+> Las eliminaciones en esta pestaña (sedes, documentos, vencimientos) son inmediatas y no piden confirmación.

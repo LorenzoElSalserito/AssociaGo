@@ -1,46 +1,45 @@
-# 5. Finanzas y Contabilidad (Finance)
+# 5. Finanzas y Contabilidad
 
-La sección **Finanzas** ofrece un control completo sobre la contabilidad de la asociación.
+La sección **Finanzas** contiene los ingresos, los gastos y los documentos fiscales de la asociación.
 
-## 5.1 Tablero Financiero
-La vista principal muestra:
-- **Ingresos Totales**: Suma de todas las transacciones de entrada.
-- **Gastos Totales**: Suma de todas las transacciones de salida.
-- **Saldo Neto**: Diferencia entre ingresos y gastos.
-- **Comparación Anual**: Gráfico que muestra la tendencia respecto al año anterior.
+## 5.1 Resumen
 
-## 5.2 Transacciones
-La tabla de transacciones enumera cada movimiento financiero.
+En la parte superior de la página encuentras:
+- **Ingresos Totales**, **Gastos Totales** y **Saldo Neto**;
+- un gráfico que compara, mes a mes, el año en curso con el anterior;
+- el panel **Documentos Fiscales** con el **Informe Anual**: un PDF con ingresos, gastos y saldo del año.
 
-### Filtros Avanzados
-Es posible filtrar por:
-- **Tipo**: Ingreso/Gasto.
-- **Categoría**: (Cuota de Socio, Donación, Evento, Compra, Alquiler, etc.).
-- **Fecha**: Intervalo temporal.
+## 5.2 Registrar una transacción
 
-### Nueva Transacción
-El formulario permite registrar:
-- **Fecha e Importe**.
-- **Tipo y Categoría**.
-- **Descripción**.
-- **Método de Pago**: (Efectivo, Transferencia Bancaria, etc.).
-- **Socio Vinculado**: Opcional, para vincular la transacción a un miembro.
+Pulsa **Nueva Transacción** y rellena:
+- **Tipo**: Ingresos o Gastos;
+- **Importe**, **Fecha** y **Descripción**;
+- **Categoría**: un texto libre, por ejemplo "Cuotas", "Alquiler" o "Suministros";
+- **Método de Pago**: uno de los métodos configurados en Ajustes › Finanzas.
 
-### Acciones
-- **Editar/Eliminar**: Para corregir errores.
-- **Recibo**: Generación instantánea de un recibo PDF para la transacción.
+Si el método prevé una comisión, la tabla la muestra en la columna **Com.**
 
-## 5.3 Comparación Personalizada
-Esta potente función le permite analizar las tendencias financieras comparando dos años de su elección.
-- **Selección de Años**: Elija libremente el Año 1 y el Año 2 para comparar.
-- **Gráfico Comparativo**: Visualice de un vistazo las diferencias en ingresos y gastos entre los dos períodos.
-- **Detalles**: Tarjetas de resumen muestran totales y saldo neto para cada año.
-- **Exportación PDF**: Descargue un informe profesional con la comparación detallada, ideal para reuniones de la junta directiva o la asamblea de socios.
+### Renovación de cuota
+Marca **Es Renovación de Cuota** para vincular el movimiento a un socio. Indica después el **Socio**, el **Período** (Mensual, Semestral, Anual) y el **Año**.
 
-## 5.4 Métodos de Pago
-En la pestaña "Ajustes" (o accesible desde el tablero), es posible configurar los métodos de pago aceptados y las posibles comisiones (fijas o porcentuales) aplicadas.
+### Alquiler
+**Registrar Alquiler** abre el formulario ya rellenado como gasto de la categoría alquiler.
 
-## 5.5 Informes Fiscales
-- **Informe Anual**: Genera un PDF completo con el resumen financiero del año seleccionado.
-- **Análisis de Gastos**: Gráficos y tablas para entender dónde se gastan los fondos.
-- **Exportación CSV**: Para procesamiento externo (ej. Excel).
+## 5.3 Lista y filtros
+
+En la pestaña **Transacciones** puedes filtrar por tipo (**Todos los Tipos**, Ingresos, Gastos) y por intervalo de fechas, con **Fecha de Inicio** y **Fecha de Fin**. Pulsa **Aplicar Filtros** para actualizar la lista y **Borrar Filtros** para volver a la vista completa.
+
+Cada fila ofrece estas acciones:
+- **Editar** y **Eliminar**;
+- **Descargar recibo**, que genera el recibo en PDF;
+- **Enviar email**, que abre el programa de correo con un mensaje ya redactado.
+
+## 5.4 Asientos contables y comparaciones
+
+- **Asientos contables** muestra el libro diario en partida doble: cuenta, debe y haber.
+- **Comparación personalizada** compara dos años a elegir. **Exportar PDF comparativo** guarda el resultado en PDF.
+- **Exportar Informe PDF**, en la parte superior de la página, descarga el informe del año en curso.
+
+## 5.5 Métodos de pago
+
+Los métodos de pago, con sus posibles comisiones, se configuran en **Ajustes › Finanzas** (capítulo 10).

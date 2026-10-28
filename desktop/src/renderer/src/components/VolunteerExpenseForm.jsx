@@ -25,7 +25,7 @@ const VolunteerExpenseForm = ({ volunteerId, expense, onSuccess, onCancel }) => 
       if (expense?.id) {
         // Update logic if needed, currently API only supports status update via specific endpoint
         // Assuming create for now or simple update if implemented
-        alert("Update not fully implemented in this MVP form");
+        alert(t('volunteerExpense.updateUnsupported'));
       } else {
         await associago.volunteers.createExpense(payload);
       }

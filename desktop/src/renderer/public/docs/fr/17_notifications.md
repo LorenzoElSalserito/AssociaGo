@@ -1,39 +1,31 @@
 # 17. Notifications
 
-Le systeme de **Notifications** d'AssociaGo informe en temps reel des evenements importants de l'association.
+Les notifications se consultent depuis la **cloche** de l'en-tête, à côté du menu du profil. Elles rassemblent ce qui se passe dans l'association avec laquelle vous êtes connecté : chaque association ne voit que les siennes.
 
-## 17.1 Cloche des Notifications
-Dans l'en-tete de la page, a cote du profil utilisateur, se trouve l'icone de la **cloche** :
-- Un **badge rouge** avec le nombre indique les notifications non lues.
-- En cliquant sur la cloche, le panneau des notifications s'ouvre.
+## 17.1 La cloche
 
-## 17.2 Panneau des Notifications
-Le panneau affiche la liste des notifications classees de la plus recente a la plus ancienne :
+- Le **badge** sur la cloche indique le nombre de notifications non lues (au-delà de 9, il affiche **9+**).
+- Un clic, ou **Entrée** ou **Espace** lorsque la cloche a le focus, ouvre le panneau **Notifications** ; un clic à l'extérieur ou la touche **Échap** le ferme.
+- Le compteur se met à jour de lui-même toutes les 30 secondes.
 
-Pour chaque notification sont affiches :
-- **Titre** : Description breve de l'evenement.
-- **Message** : Detail supplementaire.
-- **Date et Heure** : Quand la notification a ete generee.
-- **Etat** : Lue (grisee) ou Non lue (mise en evidence).
+## 17.2 Le panneau
 
-### Actions Disponibles
-- **Marquer comme lue** : Cliquez sur la notification pour la marquer comme lue.
-- **Tout marquer comme lu** : Bouton en haut du panneau pour marquer toutes les notifications comme lues en une seule action.
+Les 50 dernières notifications sont classées de la plus récente à la plus ancienne. Chacune affiche le titre, le message et le moment de sa création (« il y a 5 minutes », « il y a 2 heures » ; au-delà d'un jour, la date). Celles qui ne sont pas lues ont un fond mis en évidence et un point à droite.
 
-## 17.3 Types de Notification
-Le systeme genere des notifications automatiques pour differents evenements :
+- Cliquez sur une notification (ou sélectionnez-la avec **Tab** et appuyez sur **Entrée**) : elle est marquée comme lue et l'élément associé s'ouvre. Un événement ouvre sa fiche dans la section **Événements** ; une adhésion ouvre la fiche du membre dans la section **Membres**.
+- **Tout marquer comme lu**, en haut, n'apparaît que s'il y a des notifications non lues.
+- S'il n'y en a aucune, le panneau affiche **Aucune notification**.
 
-| Type | Description |
-|------|-------------|
-| **INFO** | Informations generales (ex. "Nouveau membre inscrit"). |
-| **WARNING** | Avertissements necessitant une attention (ex. "Cartes d'adhesion arrivant a echeance"). |
-| **ALERT** | Situations urgentes (ex. "Echeance fiscale imminente"). |
-| **REMINDER** | Rappels programmes (ex. "Assemblee demain"). |
+Les textes des notifications suivent la langue choisie dans les paramètres. Les notifications créées par des versions antérieures d'AssociaGo conservent leur texte d'origine.
 
-## 17.4 Mise a Jour Automatique
-Les notifications sont mises a jour automatiquement toutes les **30 secondes** sans avoir besoin de recharger la page. Le badge sur la cloche se met a jour en temps reel.
+## 17.3 Quand elles sont créées
 
-## 17.5 Notifications Associees
-Certaines notifications sont associees a des entites specifiques (membre, evenement, activite). Le systeme enregistre le type et l'ID de l'entite concernee pour faciliter la navigation directe vers le contexte de la notification.
+| Notification | Quand |
+|---|---|
+| Nouvelle inscription à un événement | un membre ou un invité est ajouté aux participants d'un événement |
+| Événement annulé | un événement est annulé : une seule notification avec le nombre de participants à prévenir |
+| Adhésion renouvelée | une adhésion est renouvelée |
+| Adhésion expirée | contrôle nocturne (à 1 h 00) : l'adhésion est expirée |
+| Adhésion bientôt expirée | contrôle nocturne (à 1 h 00) : il reste exactement 7 jours avant l'échéance |
 
-> **Note** : Les notifications sont generees automatiquement par le systeme en reponse a des actions et des echeances. Il n'est actuellement pas possible de creer des notifications manuelles.
+Les contrôles nocturnes n'ont lieu que si AssociaGo est ouvert à cette heure-là. Les notifications sont destinées à l'association : elles ne sont pas envoyées aux membres. Pour écrire aux membres, utilisez les **Communications** (chapitre 15).

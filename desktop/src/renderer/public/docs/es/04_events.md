@@ -1,49 +1,53 @@
-# 4. Gestión de Eventos (Events)
+# 4. Gestión de Eventos
 
-La sección **Eventos** está dedicada a la gestión de iniciativas únicas, como fiestas, recaudaciones de fondos, congresos o reuniones.
+La página **Eventos y Cupones** contiene dos pestañas: **Eventos** (fiestas, reuniones, recaudaciones de fondos, conferencias) y **Cupones** (consulta el capítulo 9).
 
-## 4.1 Lista de Eventos
-La tabla muestra:
-- **Título**
-- **Fecha**: Día del evento.
-- **Ubicación**
-- **Estado**: (Planificado, Confirmado, En Curso, Completado, Cancelado).
+## 4.1 Lista de eventos
 
-## 4.2 Crear un Nuevo Evento
-El formulario permite introducir:
+Para cada evento la tabla muestra:
+- título;
+- fecha;
+- lugar;
+- estado.
 
-### Datos Generales
-- **Nombre y Descripción**.
-- **Tipo**: (Reunión, Fiesta, Recaudación de Fondos, Congreso, Conferencia).
-- **Estado**: Para seguir el progreso de la organización.
+**Buscar eventos...** filtra la lista. En cada fila están las acciones **Ver detalles**, **Editar** y **Eliminar**.
 
-### Fechas y Horarios
-- **Inicio y Fin**: Fecha y hora precisas.
+## 4.2 Crear un evento
 
-### Ubicación
-- **Nombre del Lugar y Dirección**.
+Pulsa **Añadir Evento** y rellena:
+- **Nombre del Evento** y **Tipo**, ambos obligatorios. Los tipos son Reunión / Asamblea, Fiesta, Recaudación de fondos, Congreso, Conferencia, Otro.
+- **Estado**: Planificado, Confirmado, En Curso, Completado o Cancelada. Los eventos cancelados no aparecen entre los próximos eventos del Tablero.
+- **Fecha de Inicio** (obligatoria), **Hora de Inicio**, **Fecha de Fin**, **Hora de Fin**.
+- **Ubicación**, **Dirección** y **Descripción**.
+- **Costo Socios** y **Costo No Socios**.
+- **Máx. Participantes**. Si lo dejas vacío, las plazas son ilimitadas.
+- Las opciones **Evento público**, **Requiere Inscripción** y **Generar Factura**.
 
-### Participación y Costos
-- **Máx. Participantes**: Número máximo de plazas.
-- **Costo Socios**: Precio reducido para los miembros.
-- **Costo No Socios**: Precio completo para externos.
+## 4.3 Ficha de detalle
 
-### Opciones
-- **Evento Público**: Si es visible también para no socios.
-- **Requiere Inscripción**: Obligatoria para participar.
-- **Generar Factura**: Para la contabilidad.
-
-## 4.3 Detalle del Evento
-Al hacer clic en un evento, se accede a su ficha detallada.
+### Indicadores
+- **Registrado**: número de inscritos, excluidos los cancelados y la lista de espera.
+- **Presente**: número de participantes que han registrado la entrada.
+- **Tasa de Asistencia**: presentes divididos entre inscritos.
+- **Ingresos**: suma de los pagos registrados; para quien está marcado como Pagado sin importe registrado cuenta la cuota debida, ya descontada.
 
 ### Participantes
-- **Lista**: Lista de inscritos.
-- **Añadir**: Inscripción manual de un socio.
-- **Check-in**: Funcionalidad para marcar la presencia real en el evento.
+**Añadir Participante** ofrece dos **tipos de participante**:
+- **Socio**: se elige de la lista de socios.
+- **Invitado (Externo)**: se indican nombre y correo.
 
-### Estadísticas
-- **Tasa de Participación**: Porcentaje de inscritos respecto al máximo.
-- **Ingresos**: Total recaudado de las inscripciones.
+La cuota debida es el **Costo Socios** para los socios y el **Costo No Socios** para los invitados. El campo opcional **Código de cupón** aplica un descuento (consulta 9.3); la tabla muestra la cuota debida y, si se ha usado, el cupón con el descuento.
 
-## 4.4 Informes
-Es posible generar un informe PDF con la lista de participantes y el resumen financiero del evento.
+Para cada participante la tabla muestra estado, asistencia y pago, con la acción para quitarlo. El campo **Buscar participante por nombre o email** filtra las filas: útil en la entrada con listas largas.
+
+En cada fila:
+- **Registrar entrada**: marca al participante como presente y registra la hora de llegada, que se muestra debajo del botón. El botón pasa a **Presente**; púlsalo de nuevo para deshacer la entrada. Quien tiene la inscripción cancelada no puede registrar la entrada.
+- **Estado del pago**: en el menú de la fila elige Pendiente, Pagado, Exento o Reembolsado. El cambio se guarda al instante.
+
+Tras cada acción los indicadores de arriba se actualizan.
+
+### Certificados
+Elige una plantilla y pulsa **Emisión masiva**: cada participante inscrito como socio recibe un certificado. Los invitados externos no reciben certificados nominativos.
+
+### Importación CSV
+Aquí importas los participantes desde un archivo CSV. El flujo (vista previa y luego confirmación) es el mismo que en las actividades: consulta el capítulo 3.

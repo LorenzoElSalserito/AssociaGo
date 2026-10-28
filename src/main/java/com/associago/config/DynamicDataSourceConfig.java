@@ -41,6 +41,7 @@ public class DynamicDataSourceConfig {
             new File(path).mkdirs();
             HikariConfig hikariConfig = new HikariConfig();
             hikariConfig.setDriverClassName("org.sqlite.JDBC");
+            hikariConfig.setConnectionInitSql("PRAGMA foreign_keys=ON");
             hikariConfig.setJdbcUrl("jdbc:sqlite:" + path + "/setup.db");
             return new HikariDataSource(hikariConfig);
         }
@@ -50,12 +51,12 @@ public class DynamicDataSourceConfig {
             new File(path).mkdirs();
             HikariConfig hikariConfig = new HikariConfig();
             hikariConfig.setDriverClassName("org.sqlite.JDBC");
-            hikariConfig.setJdbcUrl("jdbc:sqlite:" + path + "/associago.db");
+            hikariConfig.setConnectionInitSql("PRAGMA foreign_keys=ON");
+            hikariConfig.setJdbcUrl("jdbc:sqlite:" + path + (new File(path + "/associago.db").exists() ? "/associago.db" : "/setup.db"));
             return new HikariDataSource(hikariConfig);
         } else if ("MARIADB".equalsIgnoreCase(config.getDbType())) {
             logger.info("Starting MariaDB database.");
-            String url = String.format("jdbc:mariadb://%s:%s/%s", 
-                    config.getDbHost(), config.getDbPort(), config.getDbName());
+            String url = DatabaseConnectionSettings.url(config);
             HikariConfig hikariConfig = new HikariConfig();
             hikariConfig.setDriverClassName("org.mariadb.jdbc.Driver");
             hikariConfig.setJdbcUrl(url);

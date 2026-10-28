@@ -1,49 +1,53 @@
-# 4. Event Management (Events)
+# 4. Event Management
 
-The **Events** section is dedicated to managing single initiatives, such as parties, fundraisers, congresses, or meetings.
+The **Events & Coupons** page contains two tabs: **Events** (parties, meetings, fundraisers, conferences) and **Coupons** (see chapter 9).
 
-## 4.1 Event List
-The table shows:
-- **Title**
-- **Date**: Day of the event.
-- **Location**
-- **Status**: (Planned, Confirmed, In Progress, Completed, Cancelled).
+## 4.1 Event list
 
-## 4.2 Creating a New Event
-The form allows you to enter:
+For each event the table shows:
+- title;
+- date;
+- location;
+- status.
 
-### General Data
-- **Name and Description**.
-- **Type**: (Meeting, Party, Fundraiser, Congress, Conference).
-- **Status**: To track the organization progress.
+**Search events...** filters the list. Each row has the actions **View details**, **Edit** and **Delete**.
 
-### Dates and Times
-- **Start and End**: Precise date and time.
+## 4.2 Creating an event
 
-### Location
-- **Location Name and Address**.
+Press **Add Event** and fill in:
+- **Event Name** and **Type**, both required. The types are Meeting / Assembly, Party, Fundraiser, Congress, Conference, Other.
+- **Status**: Planned, Confirmed, In Progress, Completed or Cancelled. Cancelled events do not appear among the Dashboard's upcoming events.
+- **Start Date** (required), **Start Time**, **End Date**, **End Time**.
+- **Location**, **Address** and **Description**.
+- **Member Cost** and **Non-Member Cost**.
+- **Max Participants**. If you leave it empty, places are unlimited.
+- The options **Public Event**, **Require Registration** and **Generate Invoice**.
 
-### Participation and Costs
-- **Max Participants**: Maximum number of seats.
-- **Member Cost**: Discounted price for members.
-- **Non-Member Cost**: Full price for outsiders.
+## 4.3 Detail page
 
-### Options
-- **Public Event**: If visible to non-members too.
-- **Require Registration**: Mandatory to participate.
-- **Generate Invoice**: For accounting.
-
-## 4.3 Event Detail
-Clicking on an event takes you to its detail card.
+### Indicators
+- **Registered**: number of registrants, excluding cancelled ones and the waiting list.
+- **Checked In**: number of participants who have checked in.
+- **Attendance Rate**: checked in divided by registered.
+- **Revenue**: sum of the recorded payments; for anyone marked as Paid with no recorded amount, the fee due counts, already discounted.
 
 ### Participants
-- **List**: List of enrollees.
-- **Add**: Manual enrollment of a member.
-- **Check-in**: Functionality to mark actual attendance at the event.
+**Add Participant** offers two **participant types**:
+- **Member**: chosen from the member list.
+- **Guest (External)**: you enter name and email.
 
-### Statistics
-- **Participation Rate**: Percentage of enrollees compared to the maximum.
-- **Revenue**: Total collected from enrollments.
+The fee due is the **Member Cost** for members and the **Non-Member Cost** for guests. The optional **Coupon code** field applies a discount (see 9.3); the table shows the fee due and, if one was used, the coupon with its discount.
 
-## 4.4 Reporting
-You can generate a PDF report with the participant list and the financial summary of the event.
+For each participant the table shows status, attendance and payment, with the remove action. The **Search participant by name or email** field filters the rows: useful at the entrance with long lists.
+
+On each row:
+- **Check in**: marks the participant as present and records the arrival time, shown below the button. The button becomes **Checked in**; press it again to undo the check-in. Participants whose registration was cancelled cannot check in.
+- **Payment status**: from the menu on the row choose Pending, Paid, Waived or Refunded. The change is saved immediately.
+
+After each action the indicators at the top update.
+
+### Certificates
+Choose a template and press **Issue Batch**: every participant enrolled as a member receives a certificate. External guests do not receive named certificates.
+
+### CSV Import
+Here you import participants from a CSV file. The flow (preview, then confirm) is the same as for activities: see chapter 3.

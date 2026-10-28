@@ -1,64 +1,56 @@
 # 15. Comunicazioni
 
-La sezione **Comunicazioni** permette di inviare email istituzionali ai soci, gestire modelli predefiniti e tracciare lo stato di consegna.
+La pagina **Comunicazioni** (barra laterale, gruppo **Governance**) serve a preparare e inviare email ai soci. Ha due schede: **Messaggi** e **Modelli**; accanto a ciascuna un contatore indica quanti elementi contiene.
 
-## 15.1 Panoramica
-La pagina è divisa in due schede:
-- **Messaggi**: L'elenco delle comunicazioni create e inviate.
-- **Modelli**: I template riutilizzabili per velocizzare la creazione dei messaggi.
+## 15.1 Modelli
 
-## 15.2 Gestione Modelli
+Nella scheda **Modelli** premi **Nuovo Modello** e compila:
+- **Nome** (obbligatorio, senza il pulsante **Crea** resta disattivato);
+- **Oggetto**;
+- **Corpo (HTML)**: il testo del messaggio. Puoi usare i segnaposto `{{name}}` (nome e cognome del destinatario) e `{{associationName}}` (nome dell'associazione).
 
-### Creare un Modello
-1. Dalla scheda **Modelli**, clicca **"Nuovo Modello"**.
-2. Compila:
-   - **Nome**: Nome identificativo (es. "Convocazione Assemblea").
-   - **Oggetto**: L'oggetto dell'email.
-   - **Corpo HTML**: Il testo del messaggio.
-   - **Corpo Testo**: Versione solo testo (per client email che non supportano HTML).
-   - **Categoria**: Generale, Rinnovo, Evento, Attività, Assemblea, Fiscale.
-3. Utilizza i **campi di unione** nel testo:
-   - `{{name}}` — Nome completo del destinatario.
-   - `{{associationName}}` — Nome dell'associazione.
-4. Clicca **"Salva"**.
+La tabella mostra **Nome Modello** e **Oggetto**. Le azioni di ogni riga sono modifica (matita, poi **Salva**) ed eliminazione (cestino, con conferma).
 
-### Applicare un Modello
-Quando si crea un nuovo messaggio, è possibile selezionare un modello dal menu a tendina. L'oggetto e il corpo verranno precompilati con i dati del template.
+## 15.2 Creare un messaggio
 
-## 15.3 Creazione e Invio Messaggi
+Nella scheda **Messaggi** premi **Nuovo Messaggio**.
+- **Applica Modello**: compare solo se esiste almeno un modello e solo per i nuovi messaggi. Copia oggetto e corpo del modello nel messaggio.
+- **Oggetto** (obbligatorio).
+- **Nome Mittente** ed **Email Mittente**. L'email diventa il mittente del messaggio; se la lasci vuota si usa `noreply@associago.local`. Il nome mittente viene salvato ma non compare nell'email.
+- **Filtro Segmento**: campo di testo libero. Se contiene la parola `active` il messaggio va solo ai soci con iscrizione attiva; qualsiasi altro testo, o il campo vuoto, vuol dire tutti i soci dell'associazione con un indirizzo email.
+- **Corpo Messaggio (HTML)**, con gli stessi segnaposto dei modelli.
 
-### Creare un Messaggio
-1. Dalla scheda **Messaggi**, clicca **"Nuovo Messaggio"**.
-2. Compila:
-   - **Oggetto**: L'oggetto dell'email.
-   - **Corpo**: Il contenuto del messaggio.
-   - **Filtro destinatari**: Filtra i soci per stato (es. solo Attivi).
-3. Clicca **"Salva come Bozza"** o procedi all'invio.
+Premi **Crea**. Il messaggio nasce in stato **Bozza**.
 
-### Risolvere i Destinatari
-Prima dell'invio, clicca **"Risolvi Destinatari"** per:
-- Visualizzare l'elenco completo dei soci che riceveranno il messaggio.
-- Verificare gli indirizzi email.
-- Controllare il numero totale di destinatari.
+La tabella dei messaggi mostra **Oggetto**, **Stato**, numero di **Destinatari** e **Data** di creazione. Solo le bozze si possono modificare (matita); il cestino elimina il messaggio dopo una conferma.
 
-### Inviare
-1. Clicca **"Invia"**.
-2. Il sistema invia le email tramite il server SMTP configurato nelle impostazioni.
-3. Lo stato passa da **Bozza** a **In invio** e poi a **Inviato**.
+## 15.3 Destinatari e invio
 
-## 15.4 Statistiche di Consegna
-Per ogni messaggio inviato, la vista di dettaglio mostra:
-- **Totale destinatari**: Numero di email inviate.
-- **Consegnate**: Email recapitate con successo.
-- **Fallite**: Email non consegnate (con dettaglio errore).
-- **Data di invio**: Timestamp dell'invio.
+Fai clic su un messaggio per aprirne il dettaglio. Per una bozza:
+1. premi **Risolvi Destinatari**: l'app calcola l'elenco dai soci dell'associazione, in base al Filtro Segmento, e mostra quanti destinatari ha trovato. Ogni indirizzo email compare una sola volta; se premi di nuovo, l'elenco viene ricalcolato da zero;
+2. premi **Invia** (attivo solo dopo aver risolto i destinatari) e conferma.
 
-## 15.5 Stati dei Messaggi
-| Stato | Significato |
-|-------|-------------|
-| Bozza | Messaggio salvato ma non ancora inviato. |
-| In invio | Invio in corso. |
-| Inviato | Tutti i messaggi sono stati processati. |
-| Fallito | L'invio ha riscontrato errori. |
+L'email parte come testo semplice: il contenuto scritto nell'editor viene convertito mantenendo paragrafi e a capo, senza formattazione. Prima di una comunicazione importante prova un invio verso un tuo indirizzo.
 
-> **Nota**: Per utilizzare le comunicazioni email, è necessario configurare un server SMTP nelle impostazioni dell'applicazione (variabili d'ambiente SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD).
+## 15.4 Dettaglio e statistiche
+
+In alto quattro riquadri: **Destinatari Totali**, **Consegnati**, **Non riusciti** e **Inviato il**. Sotto trovi il **Contenuto Messaggio** e la tabella **Destinatari** con nome, email, stato (In attesa, Inviato o Fallito) e ora d'invio.
+
+"Consegnati" vuol dire che il server di posta ha accettato l'email, non che sia arrivata nella casella del socio.
+
+A invio terminato il messaggio passa a **Inviato**; se nessuna email è stata accettata dal server passa a **Fallito**. In caso di invii parziali controlla il riquadro **Non riusciti** e la colonna stato dei destinatari.
+
+## 15.5 Configurare il server di posta
+
+Nell'app non c'è una schermata per il server email: va configurato dall'amministratore impostando queste variabili d'ambiente prima di avviare AssociaGo.
+
+| Variabile | A cosa serve | Valore se assente |
+|---|---|---|
+| `SMTP_HOST` | indirizzo del server di posta in uscita | `localhost` |
+| `SMTP_PORT` | porta del server (di solito 587 oppure 25) | `25` |
+| `SMTP_USER` | nome utente della casella | vuoto |
+| `SMTP_PASSWORD` | password della casella | vuota |
+| `SMTP_AUTH` | `true` se il server chiede utente e password | `false` |
+| `SMTP_TLS` | `true` per usare la connessione cifrata STARTTLS | `false` |
+
+Senza queste impostazioni l'app cerca un server di posta sul computer stesso: quasi sempre non c'è, quindi tutte le email finiscono tra i **Non riusciti**.

@@ -2,6 +2,7 @@ package com.associago.csvimport;
 
 import com.associago.member.Member;
 import com.associago.member.MemberService;
+import com.associago.shared.i18n.Messages;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
 import org.springframework.stereotype.Service;
@@ -20,10 +21,12 @@ public class CsvImportService {
 
     private final ImportLogRepository importLogRepository;
     private final MemberService memberService;
+    private final Messages messages;
 
-    public CsvImportService(ImportLogRepository importLogRepository, MemberService memberService) {
+    public CsvImportService(ImportLogRepository importLogRepository, MemberService memberService, Messages messages) {
         this.importLogRepository = importLogRepository;
         this.memberService = memberService;
+        this.messages = messages;
     }
 
     public List<ImportLog> getHistory(Long associationId) {
@@ -156,7 +159,7 @@ public class CsvImportService {
                 List<String> rowErrors = validateRow(rowMap, "MEMBER");
                 if (!rowErrors.isEmpty()) {
                     errors++;
-                    errorDetails.add("Riga " + (i + 2) + ": " + String.join("; ", rowErrors));
+                    errorDetails.add(messages.get("import.row", i + 2, String.join("; ", rowErrors)));
                     continue;
                 }
 
@@ -177,7 +180,7 @@ public class CsvImportService {
                 imported++;
             } catch (Exception e) {
                 errors++;
-                errorDetails.add("Riga " + (i + 2) + ": " + e.getMessage());
+                errorDetails.add(messages.get("import.row", i + 2, messages.describe(e)));
             }
         }
 
@@ -219,8 +222,8 @@ public class CsvImportService {
         if ("MEMBER".equals(entityType)) {
             String firstName = row.getOrDefault("first_name", row.get("nome"));
             String lastName = row.getOrDefault("last_name", row.get("cognome"));
-            if (firstName == null || firstName.isEmpty()) errors.add("Nome mancante");
-            if (lastName == null || lastName.isEmpty()) errors.add("Cognome mancante");
+            if (firstName == null || firstName.isEmpty()) errors.add(messages.get("import.firstNameMissing"));
+            if (lastName == null || lastName.isEmpty()) errors.add(messages.get("import.lastNameMissing"));
         }
         return errors;
     }

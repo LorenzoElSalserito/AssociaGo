@@ -19,10 +19,12 @@ public class FlywayConfig {
     public Flyway flyway(DataSource dataSource) {
         // Always run migrations to ensure schema consistency, 
         // whether in setup mode (setup.db) or configured mode.
+        var config = configManager.loadConfig();
+        boolean remote = config.isConfigured() && "MARIADB".equalsIgnoreCase(config.getDbType());
         return Flyway.configure()
                 .dataSource(dataSource)
-                .locations("classpath:db/migration")
-                .baselineOnMigrate(true)
+                .locations(remote ? "classpath:db/mariadb" : "classpath:db/migration")
+                .baselineOnMigrate(!remote)
                 .load();
     }
 }

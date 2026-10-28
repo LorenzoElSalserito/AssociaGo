@@ -1,64 +1,56 @@
 # 15. Kommunikation
 
-Der Bereich **Kommunikation** ermöglicht den Versand offizieller E-Mails an Mitglieder, die Verwaltung vordefinierter Vorlagen und die Nachverfolgung des Zustellstatus.
+Die Seite **Kommunikation** (Seitenleiste, Gruppe **Governance**) dient dazu, E-Mails an die Mitglieder vorzubereiten und zu versenden. Sie hat zwei Registerkarten: **Nachrichten** und **Vorlagen**; neben jeder zeigt ein Zähler, wie viele Elemente sie enthält.
 
-## 15.1 Überblick
-Die Seite ist in zwei Registerkarten unterteilt:
-- **Nachrichten**: Die Liste der erstellten und versendeten Mitteilungen.
-- **Vorlagen**: Die wiederverwendbaren Templates zur schnelleren Erstellung von Nachrichten.
+## 15.1 Vorlagen
 
-## 15.2 Vorlagenverwaltung
+Klicken Sie in der Registerkarte **Vorlagen** auf **Neue Vorlage** und füllen Sie aus:
+- **Name** (Pflicht, ohne ihn bleibt die Schaltfläche **Erstellen** deaktiviert);
+- **Betreff**;
+- **Inhalt (HTML)**: der Text der Nachricht. Sie können die Platzhalter `{{name}}` (Vor- und Nachname des Empfängers) und `{{associationName}}` (Name des Vereins) verwenden.
 
-### Eine Vorlage erstellen
-1. Klicken Sie in der Registerkarte **Vorlagen** auf **"Neue Vorlage"**.
-2. Füllen Sie aus:
-   - **Name**: Bezeichnung (z. B. "Einladung Mitgliederversammlung").
-   - **Betreff**: Der E-Mail-Betreff.
-   - **HTML-Text**: Der Nachrichtentext.
-   - **Nur-Text**: Nur-Text-Version (für E-Mail-Clients, die kein HTML unterstützen).
-   - **Kategorie**: Allgemein, Verlängerung, Veranstaltung, Aktivität, Versammlung, Steuerlich.
-3. Verwenden Sie die **Seriendruckfelder** im Text:
-   - `{{name}}` — Vollständiger Name des Empfängers.
-   - `{{associationName}}` — Name des Vereins.
-4. Klicken Sie auf **"Speichern"**.
+Die Tabelle zeigt **Vorlagenname** und **Betreff**. Die Aktionen jeder Zeile sind Bearbeiten (Stift, dann **Speichern**) und Löschen (Papierkorb, mit Bestätigung).
 
-### Eine Vorlage anwenden
-Beim Erstellen einer neuen Nachricht kann eine Vorlage aus dem Dropdown-Menü ausgewählt werden. Betreff und Text werden mit den Daten der Vorlage vorausgefüllt.
+## 15.2 Nachricht anlegen
 
-## 15.3 Erstellung und Versand von Nachrichten
+Klicken Sie in der Registerkarte **Nachrichten** auf **Neue Nachricht**.
+- **Vorlage anwenden**: erscheint nur, wenn mindestens eine Vorlage existiert, und nur bei neuen Nachrichten. Kopiert Betreff und Inhalt der Vorlage in die Nachricht.
+- **Betreff** (Pflicht).
+- **Absendername** und **Absender-E-Mail**. Die E-Mail-Adresse wird zum Absender der Nachricht; lassen Sie sie leer, wird `noreply@associago.local` verwendet. Der Absendername wird gespeichert, erscheint aber nicht in der E-Mail.
+- **Segmentfilter**: freies Textfeld. Enthält es das Wort `active`, geht die Nachricht nur an Mitglieder mit aktiver Mitgliedschaft; jeder andere Text oder ein leeres Feld bedeutet alle Mitglieder des Vereins mit einer E-Mail-Adresse.
+- **Nachrichtentext (HTML)**, mit denselben Platzhaltern wie die Vorlagen.
 
-### Eine Nachricht erstellen
-1. Klicken Sie in der Registerkarte **Nachrichten** auf **"Neue Nachricht"**.
-2. Füllen Sie aus:
-   - **Betreff**: Der E-Mail-Betreff.
-   - **Text**: Der Nachrichteninhalt.
-   - **Empfängerfilter**: Filtern Sie Mitglieder nach Status (z. B. nur Aktive).
-3. Klicken Sie auf **"Als Entwurf speichern"** oder fahren Sie mit dem Versand fort.
+Klicken Sie auf **Erstellen**. Die Nachricht wird im Status **Entwurf** angelegt.
 
-### Empfänger auflösen
-Klicken Sie vor dem Versand auf **"Empfänger auflösen"**, um:
-- Die vollständige Liste der Mitglieder anzuzeigen, die die Nachricht erhalten werden.
-- Die E-Mail-Adressen zu überprüfen.
-- Die Gesamtzahl der Empfänger zu kontrollieren.
+Die Nachrichtentabelle zeigt **Betreff**, **Status**, Anzahl der **Empfänger** und **Datum** der Erstellung. Nur Entwürfe können bearbeitet werden (Stift); der Papierkorb löscht die Nachricht nach einer Bestätigung.
 
-### Versenden
-1. Klicken Sie auf **"Senden"**.
-2. Das System versendet die E-Mails über den in den Einstellungen konfigurierten SMTP-Server.
-3. Der Status wechselt von **Entwurf** zu **Wird gesendet** und dann zu **Gesendet**.
+## 15.3 Empfänger und Versand
 
-## 15.4 Zustellstatistiken
-Für jede versendete Nachricht zeigt die Detailansicht:
-- **Empfänger gesamt**: Anzahl der versendeten E-Mails.
-- **Zugestellt**: Erfolgreich zugestellte E-Mails.
-- **Fehlgeschlagen**: Nicht zugestellte E-Mails (mit Fehlerdetails).
-- **Versanddatum**: Zeitstempel des Versands.
+Klicken Sie auf eine Nachricht, um ihre Detailansicht zu öffnen. Bei einem Entwurf:
+1. Klicken Sie auf **Empfänger auflösen**: Die App ermittelt die Liste aus den Mitgliedern des Vereins anhand des Segmentfilters und zeigt an, wie viele Empfänger gefunden wurden. Jede E-Mail-Adresse erscheint nur einmal; klicken Sie erneut, wird die Liste von Grund auf neu berechnet;
+2. klicken Sie auf **Senden** (erst aktiv, nachdem die Empfänger aufgelöst wurden) und bestätigen Sie.
 
-## 15.5 Nachrichtenstatus
-| Status | Bedeutung |
-|--------|-----------|
-| Entwurf | Nachricht gespeichert, aber noch nicht versendet. |
-| Wird gesendet | Versand läuft. |
-| Gesendet | Alle Nachrichten wurden verarbeitet. |
-| Fehlgeschlagen | Beim Versand sind Fehler aufgetreten. |
+Die E-Mail wird als einfacher Text versendet: Der im Editor geschriebene Inhalt wird unter Beibehaltung von Absätzen und Zeilenumbrüchen umgewandelt, ohne Formatierung. Testen Sie vor einer wichtigen Mitteilung einen Versand an eine eigene Adresse.
 
-> **Hinweis**: Für die Nutzung der E-Mail-Kommunikation muss ein SMTP-Server in den Anwendungseinstellungen konfiguriert werden (Umgebungsvariablen SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD).
+## 15.4 Details und Statistiken
+
+Oben stehen vier Felder: **Empfänger gesamt**, **Zugestellt**, **Fehlgeschlagen** und **Gesendet am**. Darunter finden Sie den **Nachrichteninhalt** und die Tabelle **Empfänger** mit Name, E-Mail, Status (Ausstehend, Gesendet oder Fehlgeschlagen) und Versandzeit.
+
+„Zugestellt“ bedeutet, dass der Mailserver die E-Mail angenommen hat, nicht dass sie im Postfach des Mitglieds angekommen ist.
+
+Nach Abschluss des Versands wechselt die Nachricht zu **Gesendet**; hat der Server keine E-Mail angenommen, wechselt sie zu **Fehlgeschlagen**. Bei teilweisem Versand prüfen Sie das Feld **Fehlgeschlagen** und die Statusspalte der Empfänger.
+
+## 15.5 Mailserver konfigurieren
+
+In der App gibt es keinen Bildschirm für den E-Mail-Server: Er muss vom Administrator konfiguriert werden, indem vor dem Start von AssociaGo diese Umgebungsvariablen gesetzt werden.
+
+| Variable | Wozu sie dient | Wert, falls nicht gesetzt |
+|---|---|---|
+| `SMTP_HOST` | Adresse des Postausgangsservers | `localhost` |
+| `SMTP_PORT` | Port des Servers (meist 587 oder 25) | `25` |
+| `SMTP_USER` | Benutzername des Postfachs | leer |
+| `SMTP_PASSWORD` | Passwort des Postfachs | leer |
+| `SMTP_AUTH` | `true`, wenn der Server Benutzername und Passwort verlangt | `false` |
+| `SMTP_TLS` | `true`, um die verschlüsselte STARTTLS-Verbindung zu verwenden | `false` |
+
+Ohne diese Einstellungen sucht die App einen Mailserver auf dem Computer selbst: Fast immer gibt es dort keinen, daher landen alle E-Mails unter **Fehlgeschlagen**.

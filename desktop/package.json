@@ -1,6 +1,6 @@
 {
   "name": "associago-desktop",
-  "version": "0.1.6",
+  "version": "0.2.0",
   "description": "AssociaGo is a comprehensive management software designed for associations, non-profit organizations, and clubs.",
   "main": "./out/main/index.js",
   "author": {
@@ -29,7 +29,11 @@
     "dist": "npm run version:bump && npm run package:prepare && electron-builder",
     "dist:win": "npm run build:win",
     "dist:mac": "npm run build:mac",
-    "dist:linux": "npm run build:linux"
+    "dist:linux": "npm run build:linux",
+    "test:e2e:ui": "npm run build && node test/ui-e2e.cjs",
+    "test:e2e:wizard": "npm run build && node test/setup-wizard-e2e.cjs",
+    "test:e2e:features": "npm run build && node test/features-e2e.cjs",
+    "test:e2e:startup": "npm run build && node test/backend-startup-e2e.cjs"
   },
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.0",
@@ -55,6 +59,7 @@
     "zustand": "^4.5.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.1",
     "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.17",
     "electron": "^28.2.1",

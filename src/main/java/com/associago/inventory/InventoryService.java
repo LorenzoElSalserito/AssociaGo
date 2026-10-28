@@ -101,7 +101,8 @@ public class InventoryService {
 
     @Transactional
     public InventoryLoan createLoan(InventoryLoan loan) {
-        loan.setLoanDate(LocalDateTime.now());
+        // Keep the date chosen in the form; default to now only when none was given.
+        if (loan.getLoanDate() == null) loan.setLoanDate(LocalDateTime.now());
         if (loan.getStatus() == null) {
             loan.setStatus("ACTIVE");
         }

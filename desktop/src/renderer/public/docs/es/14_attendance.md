@@ -1,47 +1,34 @@
-# 14. Registro de Asistencia (Attendance)
+# 14. Registro de Asistencia
 
-La sección **Asistencia** permite registrar y monitorear la participación de los socios en las actividades de la asociación.
+La página **Asistencias** registra la asistencia por sesión: para cada actividad creas las sesiones (cada clase o encuentro) y en cada una marcas el estado de cada participante.
 
-## 14.1 Descripción general
-El registro de asistencia es fundamental para:
-- Documentar la participación efectiva en las actividades.
-- Generar certificados de asistencia basados en las presencias reales.
-- Cumplir con las obligaciones de trazabilidad para entidades del Tercer Sector.
-- Monitorear el nivel de participación de los socios.
+## 14.1 Sesiones de una actividad
 
-## 14.2 Lista de Asistencia
-La tabla principal muestra todos los registros de asistencia con:
-- **Socio**: Nombre y apellido del participante.
-- **Actividad**: La actividad o evento al que se refiere la asistencia.
-- **Fecha**: Fecha y hora del registro.
-- **Estado**: Presente, Ausente, Justificado.
+1. Elige la **Actividad** en el menú superior (se propone la primera).
+2. La tabla muestra las sesiones con **Fecha**, **Hora de inicio**, **Hora de fin** y **Notas**.
 
-### Filtros
-Utiliza los filtros disponibles para:
-- Filtrar por **actividad** específica.
-- Filtrar por **fecha** o rango de fechas.
-- Filtrar por **socio**.
+Las acciones de cada fila son **Gestionar asistencia** y el icono de la **papelera**, que elimina la sesión y sus asistencias tras la confirmación.
 
-## 14.3 Registro de Asistencia
-### Registro Individual
-1. Haz clic en **"Registrar Asistencia"**.
-2. Selecciona el **socio**.
-3. Selecciona la **actividad**.
-4. Elige la **fecha**.
-5. Establece el **estado** (Presente/Ausente/Justificado).
-6. Añade **notas** opcionales.
-7. Haz clic en **"Guardar"**.
+## 14.2 Crear una sesión
 
-### Check-in Rápido
-Para las actividades en curso, es posible realizar un check-in rápido:
-1. Selecciona la actividad actual.
-2. Marca los socios presentes en la lista de participantes.
-3. Confirma el check-in.
+1. Pulsa **Nueva sesión** (desactivado si no hay actividades).
+2. Rellena **Fecha** (obligatoria), **Hora de inicio**, **Hora de fin** y **Notas**. La hora de fin debe ser posterior a la de inicio.
+3. Pulsa **Guardar**. Aparece el mensaje **Guardado.**
 
-## 14.4 Informes de Asistencia
-El sistema genera estadísticas sobre la asistencia:
-- **Tasa de participación** por actividad.
-- **Historial de asistencia** por socio individual.
-- **Actividades más concurridas**.
+Después de guardar, en la misma página aparece la lista de participantes. **Atrás** vuelve a la lista de sesiones.
 
-> **Nota**: El registro de asistencia es particularmente importante para las Asociaciones Deportivas de Aficionados (ASD), donde la documentación de la asistencia es un requisito para la cobertura de seguros y para la validez de los certificados formativos.
+## 14.3 Marcar la asistencia
+
+Abre una sesión con **Gestionar asistencia**. Puedes corregir fecha, horas y notas y pulsar **Guardar**.
+
+En la tabla **Asistencias** hay una fila por cada participante de la actividad inscrito como socio. Para cada uno elige el **Estado**:
+- **Presente**
+- **Ausente**
+- **Con retraso**
+- **Justificado**
+
+Mientras no elijas nada, el estado es **Sin registrar**. Cada elección se guarda al momento, sin pulsar **Guardar**.
+
+Si la tabla está vacía, añade primero los participantes en la ficha de la actividad (capítulo 3). Las asistencias de versiones anteriores, si las hay, aparecen en un recuadro **Asistencias históricas conservadas**.
+
+> No hay filtros por socio ni por periodo, ni informes o estadísticas de asistencia. Los certificados no tienen en cuenta las asistencias registradas.

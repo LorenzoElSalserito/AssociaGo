@@ -9,7 +9,7 @@ const PaymentMethodForm = ({ associationId, method, onSuccess, onCancel }) => {
     defaultValues: method || {
       name: '',
       type: 'OTHER',
-      isActive: true,
+      active: true,
       hasCommission: false,
       fixedCommission: 0,
       percentageCommission: 0
@@ -46,7 +46,7 @@ const PaymentMethodForm = ({ associationId, method, onSuccess, onCancel }) => {
         <input
           {...register('name', { required: t('Name is required') })}
           className="form-control"
-          placeholder="e.g. PayPal, Stripe, Bonifico"
+          placeholder={t('paymentMethodForm.namePlaceholder')}
         />
         {errors.name && <span className="text-danger small">{errors.name.message}</span>}
       </div>
@@ -66,7 +66,7 @@ const PaymentMethodForm = ({ associationId, method, onSuccess, onCancel }) => {
           type="checkbox"
           className="form-check-input"
           id="isActive"
-          {...register('isActive')}
+          {...register('active')}
         />
         <label className="form-check-label" htmlFor="isActive">{t('Active')}</label>
       </div>

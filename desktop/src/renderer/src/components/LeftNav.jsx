@@ -23,7 +23,7 @@ import {
     CheckSquare,
     BookOpen as BookOpenIcon
 } from "lucide-react";
-import AppIcon from "../assets/6.svg";
+import AppIcon from "../assets/brand-mark.png";
 
 export default function LeftNav({ items, activeId, onSelect }) {
     const { t } = useTranslation();
@@ -36,7 +36,14 @@ export default function LeftNav({ items, activeId, onSelect }) {
         }
     }, []);
 
-    const visibleItems = useMemo(() => items, [items]);
+    const groups = useMemo(() => [
+        { label: 'navigation.overview', ids: ['dashboard'] },
+        { label: 'navigation.people', ids: ['members', 'volunteers', 'attendance'] },
+        { label: 'navigation.activities', ids: ['activities', 'events', 'inventory', 'coupons'] },
+        { label: 'navigation.administration', ids: ['fiscal', 'budget', 'balance'] },
+        { label: 'navigation.governance', ids: ['assemblies', 'certificates', 'communications'] },
+        { label: 'navigation.support', ids: ['manual', 'settings'] }
+    ].map(group => ({ ...group, items: group.ids.map(id => items.find(item => item.id === id)).filter(Boolean) })), [items]);
 
     const renderIcon = (iconName) => {
         switch (iconName) {
@@ -66,7 +73,7 @@ export default function LeftNav({ items, activeId, onSelect }) {
     };
 
     return (
-        <nav className={`jl-sidebar ${collapsed ? "collapsed" : ""}`}>
+        <nav aria-label={t("navigation.main")} className={`jl-sidebar ${collapsed ? "collapsed" : ""}`}>
             {/* Logo Header */}
             <div className="jl-sidebar-header">
                 <div className="jl-logo">
@@ -77,10 +84,15 @@ export default function LeftNav({ items, activeId, onSelect }) {
 
             {/* Navigation Items - Flex Grow per occupare spazio */}
             <div className="jl-nav-container">
+                {groups.map(group => <div className="jl-nav-group" key={group.label}>
+                <h2 className="jl-nav-heading">{t(group.label)}</h2>
                 <ul className="jl-nav-list">
-                    {visibleItems.map((item) => (
+                    {group.items.map((item) => (
                         <li key={item.id} className="jl-nav-item">
                             <button
+                                data-nav-id={item.id}
+                                aria-label={item.label}
+                                aria-current={activeId === item.id ? "page" : undefined}
                                 className={`jl-nav-link ${activeId === item.id ? "active" : ""}`}
                                 onClick={() => onSelect(item.id)}
                                 title={collapsed ? item.label : undefined}
@@ -93,12 +105,15 @@ export default function LeftNav({ items, activeId, onSelect }) {
                         </li>
                     ))}
                 </ul>
+                </div>)}
             </div>
 
             {/* Footer / Collapse Toggle */}
             <div className="jl-sidebar-footer">
                 <button
                     className="jl-collapse-btn"
+                    aria-expanded={!collapsed}
+                    aria-label={t(collapsed ? "navigation.expand" : "navigation.collapse")}
                     onClick={() => setCollapsed(!collapsed)}
                     title={collapsed ? t("More") : t("Less")}
                 >
@@ -107,172 +122,11 @@ export default function LeftNav({ items, activeId, onSelect }) {
 
                 {!collapsed && (
                     <div className="jl-sidebar-branding">
-                        <small className="text-muted opacity-75">AssociaGo {appVersion ? `v${appVersion}` : ''}</small>
+                        <small >AssociaGo {appVersion ? `v${appVersion}` : ''}</small>
                     </div>
                 )}
             </div>
 
-            <style>{`
-                .jl-sidebar {
-                    display: flex;
-                    flex-direction: column;
-                    width: 260px;
-                    min-width: 260px;
-                    background: var(--bs-body-bg); /* Usa variabile Bootstrap */
-                    border-right: 1px solid var(--bs-border-color);
-                    color: var(--bs-body-color);
-                    transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
-                    height: 100vh;
-                    position: sticky;
-                    top: 0;
-                    z-index: 100;
-                }
-
-                .jl-sidebar.collapsed {
-                    width: 80px;
-                    min-width: 80px;
-                }
-
-                .jl-sidebar-header {
-                    padding: 1.5rem 1.25rem;
-                    height: 80px;
-                    display: flex;
-                    align-items: center;
-                }
-
-                .jl-logo {
-                    display: flex;
-                    align-items: center;
-                    gap: 1rem;
-                    width: 100%;
-                }
-
-                .jl-logo-icon-img {
-                    width: 50px;
-                    height: 50px;
-                    object-fit: contain;
-                    flex-shrink: 0;
-                }
-
-                .jl-logo-text {
-                    font-weight: 800;
-                    font-size: 1.75rem;
-                    letter-spacing: -0.5px;
-                    background: linear-gradient(45deg, #0d6efd, #6610f2);
-                    -webkit-background-clip: text;
-                    -webkit-text-fill-color: transparent;
-                    white-space: nowrap;
-                    overflow: hidden;
-                }
-
-                /* Container che occupa lo spazio rimanente */
-                .jl-nav-container {
-                    flex: 1;
-                    overflow-y: auto;
-                    padding: 1rem 0.75rem;
-                    display: flex;
-                    flex-direction: column;
-                }
-
-                .jl-nav-list {
-                    list-style: none;
-                    padding: 0;
-                    margin: 0;
-                    width: 100%;
-                }
-
-                .jl-nav-item {
-                    margin-bottom: 0.5rem;
-                }
-
-                .jl-nav-link {
-                    display: flex;
-                    align-items: center;
-                    gap: 1rem;
-                    width: 100%;
-                    padding: 0.85rem 1rem;
-                    border: none;
-                    border-radius: 12px;
-                    background: transparent;
-                    color: var(--bs-secondary-color);
-                    font-size: 0.95rem;
-                    font-weight: 500;
-                    cursor: pointer;
-                    transition: all 0.2s ease;
-                    text-align: left;
-                    white-space: nowrap;
-                    overflow: hidden;
-                }
-
-                .jl-nav-link:hover {
-                    background: var(--bs-tertiary-bg);
-                    color: var(--bs-primary);
-                    transform: translateX(4px);
-                }
-
-                .jl-nav-link.active {
-                    background: linear-gradient(90deg, rgba(13, 110, 253, 0.1) 0%, rgba(13, 110, 253, 0.05) 100%);
-                    color: var(--bs-primary);
-                    font-weight: 600;
-                    box-shadow: inset 3px 0 0 var(--bs-primary);
-                }
-
-                .jl-nav-icon-wrapper {
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    width: 24px;
-                    height: 24px;
-                    flex-shrink: 0;
-                }
-
-                .jl-sidebar-footer {
-                    padding: 1.5rem;
-                    border-top: 1px solid var(--bs-border-color);
-                }
-
-                .jl-collapse-btn {
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    width: 100%;
-                    padding: 0.75rem;
-                    border: 1px solid var(--bs-border-color);
-                    border-radius: 10px;
-                    background: var(--bs-tertiary-bg);
-                    color: var(--bs-secondary-color);
-                    cursor: pointer;
-                    transition: all 0.2s ease;
-                }
-
-                .jl-collapse-btn:hover {
-                    background: var(--bs-secondary-bg);
-                    color: var(--bs-primary);
-                    border-color: var(--bs-primary);
-                }
-
-                .jl-sidebar-branding {
-                    text-align: center;
-                    margin-top: 1rem;
-                    font-size: 0.75rem;
-                    white-space: nowrap;
-                    overflow: hidden;
-                }
-
-                .jl-sidebar.collapsed .jl-nav-link {
-                    justify-content: center;
-                    padding: 0.85rem;
-                }
-
-                .jl-sidebar.collapsed .jl-sidebar-header {
-                    justify-content: center;
-                    padding: 1.5rem 0;
-                }
-
-                .jl-sidebar.collapsed .jl-logo {
-                    justify-content: center;
-                }
-            `}</style>
         </nav>
     );
 }

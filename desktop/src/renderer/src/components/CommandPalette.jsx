@@ -16,13 +16,10 @@ export default function CommandPalette({ shell, isOpen, onClose }) {
 
     // Lista comandi base
     const commands = [
-        { id: 'dashboard', label: t('nav.dashboard'), icon: 'LayoutDashboard', action: () => shell.navigate('dashboard') },
-        { id: 'members', label: t('nav.members'), icon: 'Users', action: () => shell.navigate('members') },
-        { id: 'activities', label: t('nav.activities'), icon: 'Calendar', action: () => shell.navigate('activities') },
-        { id: 'events', label: t('nav.events'), icon: 'Calendar', action: () => shell.navigate('events') },
-        { id: 'fiscal', label: t('nav.fiscal'), icon: 'CreditCard', action: () => shell.navigate('fiscal') },
-        { id: 'settings', label: t('nav.settings'), icon: 'Settings', action: () => shell.navigate('settings') },
-        { id: 'new-member', label: t('New Member'), icon: 'UserPlus', action: () => { shell.navigate('members'); /* TODO: Open modal */ } },
+        ...shell.pages.map(page => ({ ...page, action: () => shell.navigate(page.id) })),
+        { id: 'new-member', label: t('New Member'), action: () => shell.openModal('member-form', {
+            associationId: shell.currentAssociationId, associationType: shell.currentAssociation?.tipo
+        }) }
     ];
 
     // Filtra comandi
@@ -38,12 +35,15 @@ export default function CommandPalette({ shell, isOpen, onClose }) {
     // Focus input all'apertura
     useEffect(() => {
         if (isOpen) {
+            setQuery('');
+            setSelectedIndex(0);
             setTimeout(() => inputRef.current?.focus(), 50);
         }
     }, [isOpen]);
 
     // Gestione tastiera
     const handleKeyDown = (e) => {
+        if (!filteredCommands.length) return;
         if (e.key === 'ArrowDown') {
             e.preventDefault();
             setSelectedIndex(prev => (prev + 1) % filteredCommands.length);
@@ -66,6 +66,7 @@ export default function CommandPalette({ shell, isOpen, onClose }) {
                     <Search size={20} className="text-muted me-3" />
                     <Form.Control
                         ref={inputRef}
+                        aria-label={t("navigation.search")}
                         type="text"
                         placeholder={t('Type a command or search...')}
                         value={query}
@@ -82,6 +83,7 @@ export default function CommandPalette({ shell, isOpen, onClose }) {
                         filteredCommands.map((cmd, index) => (
                             <ListGroup.Item
                                 key={cmd.id}
+                                data-command-id={cmd.id}
                                 action
                                 active={index === selectedIndex}
                                 onClick={() => { cmd.action(); onClose(); }}
@@ -116,9 +118,9 @@ export default function CommandPalette({ shell, isOpen, onClose }) {
                     max-height: 400px;
                     overflow-y: auto;
                 }
-                .list-group-item.active {
-                    background-color: #0d6efd;
-                    border-color: #0d6efd;
+                .command-list .list-group-item.active {
+                    background-color: var(--brand-primary);
+                    border-color: var(--brand-primary);
                 }
             `}</style>
         </Modal>

@@ -25,7 +25,6 @@
   "Theme": "Tema",
   "Light": "Claro",
   "Dark": "Oscuro",
-  "Remote Database (MariaDB)": "Base de Datos Remota (MariaDB)",
   "Host": "Host",
   "Port": "Puerto",
   "Database Name": "Nombre Base de Datos",
@@ -130,17 +129,7 @@
   "Search volunteers...": "Buscar voluntarios...",
   "Hours": "Horas",
   "No volunteers found.": "No se encontraron voluntarios.",
-  "Welcome to AssociaGo": "Bienvenido a AssociaGo",
-  "Let's set up your database connection": "Configuremos su conexión a la base de datos",
-  "Choose Database Type": "Elegir Tipo de Base de Datos",
-  "Local Database (SQLite)": "Base de Datos Local (SQLite)",
-  "Best for single-user or offline use": "Mejor para uso individual o sin conexión",
-  "Best for multi-user teams": "Mejor para equipos multiusuario",
-  "Finish Setup": "Finalizar Configuración",
-  "Next Step": "Siguiente Paso",
-  "Database Configuration": "Configuración de Base de Datos",
   "Back": "Atrás",
-  "Connect": "Conectar",
   "Login": "Iniciar Sesión",
   "Sign in to your account": "Inicia sesión en tu cuenta",
   "Invalid credentials": "Credenciales inválidas",
@@ -521,16 +510,6 @@
   "Report Bug": "Informar de un error",
   "User Manual": "Manual de Usuario",
   "Complete guide to AssociaGo features": "Guía completa de las funciones de AssociaGo",
-  "1. Introduzione e Dashboard": "1. Introducción y Tablero",
-  "2. Gestione Soci": "2. Gestión de Socios",
-  "3. Gestione Attività": "3. Gestión de Actividades",
-  "4. Gestione Eventi": "4. Gestión de Eventos",
-  "5. Finanze e Contabilità": "5. Finanzas y Contabilidad",
-  "6. Gestione Assemblee": "6. Gestión de Asambleas",
-  "7. Gestione Inventario": "7. Gestión de Inventario",
-  "8. Gestione Volontari": "8. Gestión de Voluntarios",
-  "9. Coupon e Sconti": "9. Cupones y Descuentos",
-  "10. Impostazioni": "10. Ajustes",
   "Save Preferences": "Guardar Preferencias",
   "Preferences saved successfully.": "Preferencias guardadas con éxito.",
   "A transaction will be automatically created": {
@@ -708,7 +687,7 @@
   "Registry": "Registro",
   "Regulation Path/Link": "Ruta/Enlace reglamento",
   "Remember to configure institutional signatures for president, secretary and treasurer before generating balances, certificates and official documents": {
-    "": "Recuerde configurar las firmas institucionales para presidente, secretario y tesorero."
+    "": "Indica Presidente, Secretario y Tesorero en el Organigrama: sus nombres aparecen en balances y certificados, y sin ellos el balance no se puede aprobar."
   },
   "Renew Membership": "Renovar membresía",
   "Rows": "Filas",
@@ -802,19 +781,142 @@
       "legal": "Sede legal",
       "operational": "Sede operativa",
       "project": "Sede proyecto"
+    },
+    "activityCategory": {
+      "course": "Curso",
+      "workshop": "Taller",
+      "seminar": "Seminario",
+      "other": "Otro"
+    },
+    "balanceStatus": {
+      "draft": "Borrador",
+      "computed": "Calculado",
+      "generated": "Generado",
+      "approved": "Aprobado",
+      "signed": "Firmado",
+      "archived": "Archivado"
+    },
+    "budgetSection": {
+      "income": "Ingresos",
+      "expense": "Gastos"
+    },
+    "budgetStatus": {
+      "draft": "Borrador",
+      "approved": "Aprobado",
+      "active": "Activo",
+      "closed": "Cerrado"
+    },
+    "certificateType": {
+      "participation": "Participación",
+      "attendance": "Asistencia",
+      "training": "Formación",
+      "membership": "Membresía",
+      "completion": "Finalización",
+      "volunteerHours": "Horas de voluntariado",
+      "custom": "Personalizado"
+    },
+    "compensationType": {
+      "hourly": "Por hora",
+      "flatRate": "Tarifa fija",
+      "percentage": "Porcentaje",
+      "volunteer": "Voluntario"
+    },
+    "costCategory": {
+      "equipment": "Equipamiento",
+      "venue": "Alquiler / Sede",
+      "instructor": "Instructor",
+      "marketing": "Marketing",
+      "materials": "Materiales",
+      "staff": "Personal",
+      "other": "Otro"
+    },
+    "deadlineStatus": {
+      "pending": "Pendiente",
+      "completed": "Completada",
+      "overdue": "Vencida"
+    },
+    "eventType": {
+      "workshop": "Taller",
+      "seminar": "Seminario",
+      "meeting": "Reunión / Asamblea",
+      "party": "Fiesta",
+      "fundraiser": "Recaudación de fondos",
+      "congress": "Congreso",
+      "conference": "Conferencia",
+      "other": "Otro"
+    },
+    "participantStatus": {
+      "registered": "Registrado",
+      "checkedIn": "Presente",
+      "cancelled": "Cancelado",
+      "waitlisted": "En lista de espera"
+    },
+    "paymentStatus": {
+      "paid": "Pagado",
+      "pending": "Pendiente",
+      "refunded": "Reembolsado",
+      "waived": "Exento"
+    },
+    "memberStatus": {
+      "active": "Activo",
+      "expired": "Caducado",
+      "suspended": "Suspendido",
+      "resigned": "Dado de baja"
+    },
+    "orientation": {
+      "landscape": "Horizontal",
+      "portrait": "Vertical"
     }
   },
   "notifications": {
     "empty": "Sin notificaciones",
     "markAllRead": "Marcar todo como leído",
     "newAlerts": "Nuevas alertas",
-    "title": "Notificaciones"
+    "title": "Notificaciones",
+    "timeAgo": {
+      "seconds_one": "hace {{count}} segundo",
+      "seconds_other": "hace {{count}} segundos",
+      "minutes_one": "hace {{count}} minuto",
+      "minutes_other": "hace {{count}} minutos",
+      "hours_one": "hace {{count}} hora",
+      "hours_other": "hace {{count}} horas"
+    },
+    "unreadCount_one": "{{count}} notificación sin leer",
+    "unreadCount_other": "{{count}} notificaciones sin leer",
+    "unread": "Sin leer",
+    "loadError": "No se pudieron cargar las notificaciones.",
+    "someone": "Un participante",
+    "reason": "Motivo: {{reason}}",
+    "messages": {
+      "eventRegistration": {
+        "title": "Nueva inscripción a un evento",
+        "message": "{{name}} se ha inscrito en «{{event}}»."
+      },
+      "eventCancelled": {
+        "title": "Evento cancelado",
+        "message_one": "«{{event}}» se ha cancelado: avisa a {{count}} participante.",
+        "message_other": "«{{event}}» se ha cancelado: avisa a los {{count}} participantes."
+      },
+      "membershipRenewed": {
+        "title": "Membresía renovada",
+        "message": "La membresía de {{name}} es válida hasta el {{date}}."
+      },
+      "membershipExpiring": {
+        "title": "Membresía a punto de vencer",
+        "message": "La membresía de {{name}} vence el {{date}}."
+      },
+      "membershipExpired": {
+        "title": "Membresía vencida",
+        "message": "La membresía de {{name}} venció el {{date}}."
+      }
+    }
   },
   "registry": {
     "complete": "Registro completo",
     "deadlines": "Vencimientos",
     "dueDate": "Fecha de vencimiento",
-    "locations": "Sedes"
+    "locations": "Sedes",
+    "markComplete": "Marcar como completada"
   },
   "Signatures": "Firmas",
   "No signature image": "Sin imagen de firma",
@@ -907,5 +1009,388 @@
   "Password must be at least 6 characters": "La contraseña debe tener al menos 6 caracteres",
   "Passwords do not match": "Las contraseñas no coinciden",
   "Recovery data does not match": "Los datos de recuperación no coinciden",
-  "No associations found in this database": "No se encontraron asociaciones en esta base de datos"
+  "No associations found in this database": "No se encontraron asociaciones en esta base de datos",
+  "navigation": {
+    "overview": "Resumen",
+    "people": "Personas",
+    "activities": "Actividades",
+    "administration": "Administración",
+    "governance": "Gobernanza",
+    "support": "Ayuda",
+    "main": "Navegación principal",
+    "expand": "Expandir navegación",
+    "collapse": "Contraer navegación",
+    "skip": "Ir al contenido",
+    "search": "Buscar función",
+    "profile": "Menú asociación"
+  },
+  "support": {
+    "title": "Apoya AssociaGo",
+    "description": "Contribuye al desarrollo y mantenimiento con una donación voluntaria a través de PayPal."
+  },
+  "dashboard": {
+    "loadError": "No se pudo cargar el resumen. Inténtalo de nuevo."
+  },
+  "Retry": "Reintentar",
+  "Open": "Abrir",
+  "attendanceUi": {
+    "description": "Sesiones y asistencia por actividad.",
+    "newSession": "Nueva sesión",
+    "start": "Hora de inicio",
+    "end": "Hora de fin",
+    "manage": "Gestionar asistencia",
+    "empty": "Sin sesiones.",
+    "confirmDelete": "¿Eliminar sesión y asistencias?",
+    "invalidTime": "El fin debe ser posterior al inicio.",
+    "saved": "Guardado.",
+    "unrecorded": "Sin registrar",
+    "PRESENT": "Presente",
+    "ABSENT": "Ausente",
+    "LATE": "Con retraso",
+    "EXCUSED": "Justificado",
+    "noParticipants": "Añade participantes en los detalles de la actividad.",
+    "legacyRecords": "Asistencias históricas conservadas"
+  },
+  "connection": {
+    "unavailable": "Servidor no disponible. Reconecta y comprueba los datos antes de guardar otra vez."
+  },
+  "Interface zoom": "Zoom de interfaz",
+  "Donate to support": "Apoyar con una donación",
+  "dataTransfer": {
+    "title": "Importar/exportar socios",
+    "description": "Descarga un ejemplo CSV o JSON, edita los datos y genera una vista previa. Las filas inválidas bloquean la importación; las inscripciones existentes se omiten sin sobrescribir datos. Máximo 5000 filas, 5 MB.",
+    "template": "Ejemplo {{format}}",
+    "export": "Exportar {{format}}",
+    "file": "Archivo CSV o JSON",
+    "counts": "Filas: {{total}} · Válidas: {{valid}} · Duplicadas: {{skipped}} · Errores: {{errors}}",
+    "exampleFileName": "associago-socios-ejemplo",
+    "exportFileName": "associago-socios-exportacion"
+  },
+  "databaseUi": {
+    "saved": "Configuración guardada. Cierra y vuelve a abrir AssociaGo para activarla.",
+    "restartNotice": "La nueva conexión se activa al volver a abrir la app. Los datos locales permanecen en la base local: cambiar la conexión no los transfiere. Usa una base MariaDB dedicada y crea una copia antes del cambio.",
+    "activeRemote": "Activo: MariaDB",
+    "activeLocal": "Activo: SQLite local",
+    "connected": "Conexión verificada: lectura y escritura correctas.",
+    "test": "Probar conexión",
+    "dbHost": "Host de base de datos",
+    "dbPort": "Puerto de base de datos",
+    "dbName": "Nombre de base de datos",
+    "dbUser": "Usuario de base de datos",
+    "dbPassword": "Contraseña de base de datos"
+  },
+  "backupScope": "Copia solo de la base de datos: archivo SQLite o instantánea JSON para MariaDB. No incluye archivos adjuntos externos.",
+  "Are you sure you want to delete this volunteer?": "¿Quieres eliminar este voluntario?",
+  "Loading...": "Cargando…",
+  "View Details": "Ver detalles",
+  "Association details": "Datos de la asociación",
+  "Administrator access": "Acceso de administrador",
+  "Remove association": "Eliminar asociación",
+  "manual": {
+    "chapters": {
+      "c01": "1. Introducción, acceso e interfaz",
+      "c02": "2. Gestión de Socios",
+      "c03": "3. Gestión de Actividades",
+      "c04": "4. Gestión de Eventos",
+      "c05": "5. Finanzas y Contabilidad",
+      "c06": "6. Gestión de Asambleas",
+      "c07": "7. Gestión de Inventario",
+      "c08": "8. Gestión de Voluntarios",
+      "c09": "9. Cupones y Descuentos",
+      "c10": "10. Ajustes y base de datos",
+      "c11": "11. Certificados y Diplomas",
+      "c12": "12. Presupuesto",
+      "c13": "13. Balance Anual",
+      "c14": "14. Registro de Asistencia",
+      "c15": "15. Comunicaciones",
+      "c16": "16. Firmas Institucionales",
+      "c17": "17. Notificaciones",
+      "c18": "18. Conformidad y Auditoría"
+    }
+  },
+  "Failed": "Fallidos",
+  "Recipients": "Destinatarios",
+  "Body (HTML)": "Cuerpo (HTML)",
+  "Renew membership for 1 year?": "¿Renovar la membresía por 1 año?",
+  "Membership renewed successfully!": "Membresía renovada.",
+  "Error renewing membership": "Error al renovar la membresía",
+  "balance": {
+    "titleWithYear": "Balance {{year}}"
+  },
+  "errors": {
+    "pageUnavailableTitle": "Página no disponible",
+    "pageUnavailableBody": "El módulo encontró un error. La aplicación sigue activa: puedes pasar a otra sección.",
+    "unknown": "Error desconocido",
+    "backendUnreachable": "Backend no disponible. Comprueba la conexión e inténtalo de nuevo. Antes de repetir un guardado, comprueba si se completó.",
+    "http": "Error del servidor (HTTP {{status}})"
+  },
+  "PENDING": "Pendiente",
+  "AVAILABLE": "Disponible",
+  "IN_USE": "En uso",
+  "LOANED": "Prestado",
+  "LOST": "Perdido",
+  "DISPOSED": "Dado de baja",
+  "ACTIVE": "Activo",
+  "INACTIVE": "Inactivo",
+  "RETURNED": "Devuelto",
+  "APPROVED": "Aprobado",
+  "REJECTED": "Rechazado",
+  "PAID": "Pagado",
+  "CALLED": "Convocada",
+  "IN_PROGRESS": "En curso",
+  "CLOSED": "Cerrada",
+  "CANCELLED": "Cancelada",
+  "SCHEDULED": "Programado",
+  "COMPLETED": "Completado",
+  "MISSED": "No realizado",
+  "ORDINARY": "Ordinaria",
+  "EXTRAORDINARY": "Extraordinaria",
+  "eventCheckIn": {
+    "checkIn": "Registrar entrada",
+    "checkedIn": "Presente",
+    "checkInLabel": "Registrar la entrada de {{name}}",
+    "undoLabel": "Deshacer la entrada de {{name}}",
+    "checkedInAt": "Entrada a las {{time}}",
+    "cancelledHint": "Inscripción cancelada",
+    "search": "Buscar participante por nombre o email",
+    "shown": "{{shown}} de {{total}}",
+    "noMatch": "Ningún participante coincide con la búsqueda",
+    "paymentLabel": "Estado del pago de {{name}}",
+    "checkInColumn": "Asistencia",
+    "error": "No se pudo actualizar el participante. Inténtalo de nuevo.",
+    "deleteLabel": "Eliminar a {{name}}"
+  },
+  "assemblyVoting": {
+    "recordVote": "Registrar votación",
+    "save": "Guardar votación",
+    "clear": "Anular votación",
+    "favor": "A favor",
+    "against": "En contra",
+    "abstain": "Abstenciones",
+    "voters_one": "{{count}} votante con derecho (presentes + delegaciones)",
+    "voters_other": "{{count}} votantes con derecho (presentes + delegaciones)",
+    "cast": "Votos emitidos: {{total}} de {{voters}}",
+    "preview": "Resultado calculado",
+    "tally": "{{favor}} a favor · {{against}} en contra · {{abstain}} abst.",
+    "votesColumn": "Votos",
+    "outcomeColumn": "Resultado",
+    "unknownMember": "Socio #{{id}}",
+    "outcome": {
+      "APPROVED": "Aprobada",
+      "REJECTED": "Rechazada",
+      "NOTED": "Tomada en cuenta",
+      "PENDING": "Pendiente"
+    },
+    "rule": {
+      "SIMPLE": "Aprobada si los votos a favor superan a los votos en contra",
+      "QUALIFIED": "Aprobada con al menos 2/3 a favor de los votos emitidos (abstenciones incluidas)",
+      "UNANIMITY": "Aprobada si nadie vota en contra y al menos uno vota a favor",
+      "CONSULTATIVE": "Votación consultiva: el resultado no es vinculante"
+    },
+    "errors": {
+      "generic": "La operación ha fallado",
+      "MOTION_VOTES_REQUIRED": "Indica votos a favor, en contra y abstenciones",
+      "MOTION_VOTES_NEGATIVE": "Los votos deben ser números enteros no negativos",
+      "MOTION_VOTES_EXCEED_VOTERS": "El total de votos supera a presentes más delegaciones",
+      "MOTION_NO_VOTERS": "Registra primero presentes o delegaciones en la pestaña Participantes",
+      "MOTION_TITLE_REQUIRED": "El título es obligatorio",
+      "MOTION_NOT_FOUND": "Moción no encontrada",
+      "PARTICIPANT_NOT_FOUND": "Participante no encontrado",
+      "PARTICIPANT_INVALID_TYPE": "Tipo de participación no válido"
+    }
+  },
+  "couponApply": {
+    "label": "Código de cupón (opcional)",
+    "placeholder": "p. ej. VERANO2026",
+    "apply": "Aplicar",
+    "checking": "Verificando…",
+    "remove": "Quitar cupón",
+    "hint": "Pulsa Aplicar para ver el descuento. El código se vuelve a verificar al guardar.",
+    "applied": "Cupón {{code}} aplicable",
+    "price": "Precio",
+    "discount": "Descuento",
+    "amountDue": "Importe a pagar",
+    "badgeTitle": "Cupón {{code}}: descuento de {{discount}}",
+    "scopeHint": "Si seleccionas actividades o eventos, el cupón solo vale para ellos. Deja ambas listas vacías para que valga en todas partes.",
+    "errors": {
+      "COUPON_NOT_FOUND": "Cupón no encontrado.",
+      "COUPON_INACTIVE": "El cupón no está activo.",
+      "COUPON_NOT_STARTED": "El cupón todavía no es válido.",
+      "COUPON_EXPIRED": "El cupón ha caducado.",
+      "COUPON_USAGE_LIMIT": "El cupón ha alcanzado el límite de usos.",
+      "COUPON_MIN_AMOUNT": "El importe no alcanza el mínimo del cupón.",
+      "COUPON_NOT_APPLICABLE": "El cupón no es válido para esta actividad o evento.",
+      "generic": "No se pudo verificar el cupón."
+    }
+  },
+  "auditLog": {
+    "tab": "Registro de actividad",
+    "title": "Registro de actividad",
+    "intro": "Registros creados, modificados y eliminados en esta asociación. Nunca se guardan contraseñas, credenciales ni imágenes.",
+    "filters": "Filtros del registro",
+    "all": "Todas",
+    "from": "Desde",
+    "to": "Hasta",
+    "reset": "Borrar filtros",
+    "col": {
+      "date": "Fecha y hora",
+      "area": "Área",
+      "action": "Acción",
+      "record": "Registro",
+      "summary": "Detalle"
+    },
+    "changedFields": "Campos modificados: {{fields}}",
+    "empty": "Aún no hay actividad registrada.",
+    "emptyFiltered": "Ninguna entrada coincide con los filtros seleccionados.",
+    "error": "No se pudo cargar el registro de actividad.",
+    "retry": "Reintentar",
+    "loading": "Cargando…",
+    "pagination": "Paginación del registro",
+    "prev": "Página anterior",
+    "next": "Página siguiente",
+    "page": "Página {{page}} de {{total}}",
+    "total": "{{count}} entradas",
+    "action": {
+      "CREATE": "Creación",
+      "UPDATE": "Modificación",
+      "DELETE": "Eliminación"
+    },
+    "area": {
+      "MEMBERS": "Socios",
+      "FINANCE": "Finanzas",
+      "ACTIVITIES": "Actividades",
+      "EVENTS": "Eventos",
+      "ASSEMBLIES": "Asambleas",
+      "INVENTORY": "Inventario",
+      "VOLUNTEERS": "Voluntarios",
+      "COUPONS": "Cupones",
+      "BUDGET": "Presupuesto",
+      "BALANCE": "Balance anual",
+      "CERTIFICATES": "Certificados",
+      "COMMUNICATIONS": "Comunicaciones",
+      "ASSOCIATION": "Asociación",
+      "SETTINGS": "Ajustes",
+      "SIGNATURES": "Firmas"
+    },
+    "entity": {
+      "User": "Socio",
+      "Member": "Ficha de socio",
+      "UserAssociation": "Afiliación",
+      "MedicalCertificate": "Certificado médico",
+      "MemberConsent": "Consentimiento",
+      "Transaction": "Movimiento",
+      "Invoice": "Factura",
+      "PaymentMethod": "Método de pago",
+      "Account": "Cuenta",
+      "JournalEntry": "Asiento contable",
+      "CashRegister": "Caja",
+      "Activity": "Actividad",
+      "ActivityParticipant": "Participante en actividad",
+      "ActivitySchedule": "Horario de actividad",
+      "ActivityCost": "Coste de actividad",
+      "ActivityInstructor": "Instructor",
+      "Event": "Evento",
+      "EventParticipant": "Participante en evento",
+      "Assembly": "Asamblea",
+      "AssemblyMotion": "Moción",
+      "AssemblyParticipant": "Participante en asamblea",
+      "AssemblyDocument": "Documento de asamblea",
+      "AssemblyVote": "Voto",
+      "InventoryItem": "Bien",
+      "InventoryLoan": "Préstamo",
+      "Volunteer": "Voluntario",
+      "VolunteerShift": "Turno",
+      "VolunteerExpense": "Reembolso de gastos",
+      "Coupon": "Cupón",
+      "Budget": "Presupuesto",
+      "BudgetLine": "Partida presupuestaria",
+      "AnnualBalance": "Balance anual",
+      "AnnualBalanceLine": "Partida del balance",
+      "CertificateTemplate": "Plantilla de certificado",
+      "IssuedCertificate": "Certificado emitido",
+      "Communication": "Comunicación",
+      "CommunicationTemplate": "Plantilla de comunicación",
+      "Association": "Perfil de la asociación",
+      "AssociationLocation": "Sede",
+      "AssociationDocument": "Documento de la asociación",
+      "AssociationDeadline": "Vencimiento",
+      "DatabaseConfig": "Configuración de base de datos",
+      "InstitutionalSignature": "Firma institucional"
+    }
+  },
+  "memberForm": {
+    "feeDescription": "Cuota de socio - {{name}}",
+    "paymentFailed": "Socio creado, pero no se pudo registrar el pago.",
+    "saveFailed": "No se pudo guardar el socio: {{error}}",
+    "notLoaded": "Datos del socio aún no cargados",
+    "taxCodeMissingData": "Para calcular el código fiscal se necesitan: nombre, apellido, fecha de nacimiento, sexo y código catastral (p. ej. H501).",
+    "taxCodeFailed": "Error al calcular el código fiscal: {{error}}",
+    "birthDate": "Fecha de nacimiento",
+    "gender": "Sexo",
+    "male": "Hombre",
+    "female": "Mujer",
+    "birthPlaceCode": "Código catastral (p. ej. H501)",
+    "birthPlaceCodePlaceholder": "p. ej. H501",
+    "calculate": "Calcular",
+    "addressPlaceholder": "Calle Mayor 1",
+    "cardNumber": "Número de carné",
+    "registrationDate": "Fecha de registro",
+    "registrationDateHint": "(recepción del pago)",
+    "roles": {
+      "title": "Tipo / Cargos",
+      "hint": "(selecciona una o más)",
+      "MEMBER": "Socio ordinario",
+      "FOUNDER": "Socio fundador",
+      "HONORARY": "Socio honorario",
+      "PRESIDENT": "Presidente",
+      "VICE_PRESIDENT": "Vicepresidente",
+      "SECRETARY": "Secretario",
+      "TREASURER": "Tesorero",
+      "COUNCILLOR": "Consejero"
+    },
+    "registerPayment": "Registrar pago de la cuota de socio",
+    "amountEur": "Importe (€)",
+    "posCard": "TPV / Tarjeta",
+    "save": "Guardar socio"
+  },
+  "certificatePreview": {
+    "associationName": "Asociación de Ejemplo",
+    "activityName": "Curso Básico",
+    "activityCategory": "Formación",
+    "eventName": "Asamblea Anual",
+    "letter": "Carta (US)"
+  },
+  "receiptMail": {
+    "subject": "Recibo de pago {{reference}}",
+    "body": "Estimado socio:\n\nadjuntamos el recibo del pago de {{amount}} € realizado el {{date}}.\n\nUn cordial saludo,\nLa Presidencia"
+  },
+  "inventoryLoan": {
+    "expectedSuffix": "(prevista)"
+  },
+  "activityList": {
+    "maxParticipants": "{{count}} máx."
+  },
+  "couponList": {
+    "minAmount": "Mín.: {{amount}} €"
+  },
+  "activityForm": {
+    "saveFailed": "No se pudo guardar la actividad: {{error}}"
+  },
+  "volunteerExpense": {
+    "updateUnsupported": "La edición de gastos aún no está disponible. Elimina el gasto y registra uno nuevo."
+  },
+  "paymentMethodForm": {
+    "namePlaceholder": "p. ej. PayPal, Stripe, Transferencia"
+  },
+  "bugReport": {
+    "subject": "[INFORME DE ERROR] AssociaGo",
+    "body": "Versión de la app: {{version}}\n\nDescripción del problema:\n"
+  },
+  "settingsUi": {
+    "statutePlaceholder": "/ruta/estatutos.pdf",
+    "regulationPlaceholder": "/ruta/reglamento.pdf"
+  },
+  "eventList": {
+    "locationTbd": "Por definir"
+  }
 }

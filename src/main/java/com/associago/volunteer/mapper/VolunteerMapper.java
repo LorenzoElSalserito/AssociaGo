@@ -1,5 +1,7 @@
 package com.associago.volunteer.mapper;
 
+import java.math.BigDecimal;
+
 import com.associago.volunteer.Volunteer;
 import com.associago.volunteer.dto.VolunteerCreateDTO;
 import com.associago.volunteer.dto.VolunteerDTO;
@@ -9,6 +11,10 @@ public final class VolunteerMapper {
     private VolunteerMapper() {}
 
     public static VolunteerDTO toDTO(Volunteer volunteer) {
+        return toDTO(volunteer, null);
+    }
+
+    public static VolunteerDTO toDTO(Volunteer volunteer, BigDecimal hours) {
         return new VolunteerDTO(
                 volunteer.getId(),
                 volunteer.getMemberId(),
@@ -17,7 +23,8 @@ public final class VolunteerMapper {
                 volunteer.getStatus(),
                 volunteer.getNotes(),
                 volunteer.getCreatedAt(),
-                volunteer.getUpdatedAt()
+                volunteer.getUpdatedAt(),
+                hours
         );
     }
 

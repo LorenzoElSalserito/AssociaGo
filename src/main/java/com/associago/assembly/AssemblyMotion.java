@@ -59,6 +59,34 @@ public class AssemblyMotion {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt = LocalDateTime.now();
 
+    public static final String OUTCOME_APPROVED = "APPROVED";
+    public static final String OUTCOME_REJECTED = "REJECTED";
+    public static final String OUTCOME_NOTED = "NOTED";
+    public static final String OUTCOME_PENDING = "PENDING";
+
+    /** Outcome of a vote: QUALIFIED needs two thirds of the votes cast (abstentions included). */
+    public static String computeOutcome(String votingType, int favor, int against, int abstain) {
+        String type = votingType == null ? "SIMPLE" : votingType;
+        return switch (type) {
+            case "CONSULTATIVE" -> OUTCOME_NOTED;
+            case "UNANIMITY" -> against == 0 && favor > 0 ? OUTCOME_APPROVED : OUTCOME_REJECTED;
+            case "QUALIFIED" -> {
+                int cast = favor + against + abstain;
+                yield cast > 0 && favor * 3 >= cast * 2 ? OUTCOME_APPROVED : OUTCOME_REJECTED;
+            }
+            default -> favor > against ? OUTCOME_APPROVED : OUTCOME_REJECTED;
+        };
+    }
+
+    /** APPROVED, REJECTED or NOTED once votes are recorded, PENDING before. */
+    public String getOutcome() {
+        return decisionTaken == null || decisionTaken.isBlank() ? OUTCOME_PENDING : decisionTaken;
+    }
+
+    public boolean isVoteRecorded() {
+        return !OUTCOME_PENDING.equals(getOutcome());
+    }
+
     // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }

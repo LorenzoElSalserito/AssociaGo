@@ -1,88 +1,77 @@
 # 11. Certificados y Diplomas
 
-La sección **Certificados** permite crear plantillas personalizables y emitir certificados para socios, participantes en actividades y participantes en eventos.
+La página **Certificados** tiene dos pestañas: **Plantillas** y **Emitidos**. Arriba encuentras los botones **Nueva plantilla** y **Emitir certificado**.
 
-## 11.1 Descripción general
+## 11.1 Plantillas
 
-La página está dividida en dos pestañas principales:
-- **Plantillas**: Las plantillas a partir de las cuales se generan los certificados.
-- **Emitidos**: La lista de todos los certificados ya generados, con la posibilidad de descargarlos en PDF.
+La tabla muestra para cada plantilla el nombre, el tipo, la maquetación (orientación / tamaño) y el estado **Activo** o **Inactivo**. Las acciones son el icono del **lápiz** (editar) y el icono de la **papelera** (eliminar, tras la confirmación **¿Estás seguro?**).
 
-## 11.2 Gestión de Plantillas
+> Si la plantilla ya se ha usado para emitir certificados, la eliminación falla y aparece un mensaje de error de la base de datos. No hay un aviso específico.
 
-### Crear una Nueva Plantilla
-Haz clic en **"Nueva Plantilla"** para abrir el cuadro de diálogo de creación. El cuadro está organizado en cuatro secciones:
+## 11.2 Crear una plantilla
 
-#### General
-- **Nombre**: El nombre identificativo de la plantilla (ej. "Certificado de Participación Curso Básico").
-- **Tipo**: Selecciona la tipología entre:
-  - *Participación* — para quienes han participado en una actividad o evento.
-  - *Asistencia* — para quienes han completado un itinerario con asistencia mínima.
-  - *Formación* — para cursos formativos con certificación.
-  - *Inscripción* — certificado de pertenencia a la asociación.
-  - *Personalizado* — formato libre para necesidades específicas.
-- **Activo**: Interruptor para habilitar/deshabilitar la plantilla. Solo las plantillas activas pueden usarse para la emisión.
+Pulsa **Nueva plantilla**. A la izquierda hay cuatro pestañas y a la derecha la **Vista previa**.
 
-#### Cuerpo
-Aquí se redacta el texto del certificado. Una fila de **botones de campos dinámicos** permite insertar marcadores de posición que se sustituirán automáticamente con los datos reales:
+### General
+- **Nombre** (obligatorio: sin nombre, **Crear** sigue desactivado). También se convierte en el título del certificado.
+- **Tipo**: Participación, Asistencia, Formación, Membresía o Personalizado.
+- **Activo**: interruptor.
 
-| Campo | Descripción |
-|-------|-------------|
-| `{{firstName}}` | Nombre del socio |
-| `{{lastName}}` | Apellido del socio |
-| `{{fiscalCode}}` | Código fiscal |
-| `{{associationName}}` | Nombre de la asociación |
-| `{{date}}` | Fecha de emisión |
-| `{{activityName}}` | Nombre de la actividad asociada |
-| `{{activityCategory}}` | Categoría de la actividad |
-| `{{eventName}}` | Nombre del evento asociado |
-| `{{eventType}}` | Tipología del evento |
+> El estado **Activo** es solo informativo: las plantillas inactivas también aparecen en la emisión y se pueden usar.
 
-Haz clic en un botón para insertar el campo en la posición actual del cursor en el texto.
+### Cuerpo
+Escribe el texto en **Cuerpo de la plantilla**. Los botones situados encima del campo insertan un campo dinámico en la posición del cursor:
 
-#### Maquetación
-- **Orientación**: Horizontal (landscape) o Vertical (portrait).
-- **Formato de Papel**: A4, A3 o Letter.
+| Campo | Se sustituye por |
+|-------|----------------------|
+| `{{firstName}}`, `{{lastName}}` | nombre y apellido del destinatario |
+| `{{fiscalCode}}` | código fiscal del destinatario |
+| `{{associationName}}` | nombre de la asociación |
+| `{{date}}` | fecha de emisión |
+| `{{activityName}}`, `{{activityCategory}}` | nombre y categoría de la actividad (solo emisión por actividad) |
+| `{{eventName}}`, `{{eventType}}` | nombre y tipo del evento, como código interno (solo emisión por evento) |
 
-#### Firmantes
-Selecciona qué cargos institucionales deben firmar el certificado:
-- Presidente
-- Secretario
-- Tesorero
+Los campos de actividad y evento se quedan como texto literal si el certificado no se emite desde una actividad o un evento. En el PDF el cuerpo se convierte en texto simple: las etiquetas HTML que haya se eliminan.
 
-Las firmas se colocarán al pie del certificado PDF generado, tomando automáticamente las imágenes de las firmas configuradas en la sección Ajustes > Firmas.
+### Maquetación
+- **Orientación**: **Horizontal** o **Vertical**.
+- **Tamaño de papel**: A4, A3 o Letter.
 
-### Vista Previa en Tiempo Real
-En el lado derecho del cuadro de diálogo, un **panel de vista previa** muestra cómo se verá el certificado. Los campos dinámicos se sustituyen con datos de ejemplo (ej. "Mario Rossi") para dar una idea del resultado final. La vista previa también refleja la orientación y el estado activo/inactivo.
+> El tamaño de papel se guarda pero no se usa: el PDF siempre es A4, en la orientación elegida.
 
-### Modificar una Plantilla
-Haz clic en el icono de **lápiz** en la fila de la plantilla para abrir el cuadro de diálogo con todos los datos precargados.
+### Firmantes
+Marca los **Roles de firmantes**: Presidente (preseleccionado), Secretario, Tesorero. En el PDF cada rol tiene un bloque de firma con la imagen, el nombre y el cargo tomados de **Ajustes › Firmas** (capítulo 16); si un rol no tiene una firma guardada, aparece el nombre del **Organigrama** (**Ajustes › Perfil de la Asociación**) sobre una línea vacía.
 
-### Eliminar una Plantilla
-Haz clic en el icono de **papelera**. Se pedirá confirmación antes de la eliminación. Las plantillas con certificados ya emitidos no pueden eliminarse.
+### Vista previa
+Muestra el título, el cuerpo con datos de ejemplo (p. ej. "Mario Rossi") y una línea de firma para cada rol marcado. Sigue la orientación elegida.
 
-## 11.3 Emisión de Certificados
+Pulsa **Crear** (o **Guardar** al editar).
 
-### Emisión Individual
-1. Haz clic en **"Emitir Certificado"**.
-2. Selecciona la **plantilla** del menú desplegable.
-3. Introduce el **ID del socio** destinatario.
-4. Haz clic en **"Emitir"**.
+## 11.3 Emitir certificados
 
-El sistema genera un certificado con número único (formato: CERT-AÑO-NNNN) y lo asocia al socio.
+Pulsa **Emitir certificado** y elige la **Plantilla**.
 
-### Emisión Masiva (Batch)
-Para emitir certificados a todos los participantes de una actividad o evento:
-1. Selecciona la plantilla.
-2. En la sección inferior, elige una **actividad** o un **evento** del menú desplegable.
-3. Haz clic en **"Emisión masiva por Actividad"** o **"Emisión masiva por Evento"**.
+### A un socio
+1. En **Socio** elige un nombre de la lista de socios de la asociación.
+2. Pulsa **Emitir**.
 
-Todos los participantes activos recibirán un certificado.
+### A todos los participantes
+Bajo **O emitir en lote para todos los participantes:**
+- elige una **Actividad** y pulsa **Emisión masiva por actividad**: reciben el certificado los participantes activos inscritos como socios;
+- o bien elige un **Evento** y pulsa **Emisión masiva por evento**: reciben el certificado los participantes registrados como socios; los invitados se omiten.
 
-## 11.4 Descarga PDF
-En la pestaña **Emitidos**, cada certificado tiene un botón de **descarga**. El PDF generado incluye:
-- Título y cuerpo del certificado con los datos completados.
-- Número único del certificado.
-- Fecha de emisión.
-- Firmas institucionales.
-- Checksum SHA-256 para la verificación de autenticidad.
+Los botones solo aparecen después de elegir la plantilla y la actividad o el evento. También puedes emitir en bloque desde la pestaña **Certificados** de una actividad (capítulo 3).
+
+> No hay control de duplicados: si repites la emisión, cada destinatario recibe un certificado nuevo.
+
+Cada certificado recibe un número correlativo con el formato **CERT-AÑO-NNNN**. El texto y el título se congelan en el momento de la emisión: modificar la plantilla después no cambia los certificados ya emitidos. Las firmas, en cambio, se leen en cada descarga, según los roles de la plantilla.
+
+## 11.4 Certificados emitidos y PDF
+
+La pestaña **Emitidos** (con el contador) lista **Certificado** (número), **Destinatario** (nombre del socio) y **Emitido el**. El icono de **descarga** descarga el PDF (A4, con número y fecha en el idioma de la interfaz), que contiene:
+- título (nombre de la plantilla), número y fecha de emisión;
+- cuerpo con los datos rellenados;
+- un bloque de firma para cada rol firmante (imagen, nombre y cargo);
+- un código QR abajo a la derecha con número, asociación y fecha.
+
+> En cada descarga se calcula y se guarda una suma de comprobación SHA-256 del PDF, pero no se imprime en el documento ni se muestra en la interfaz.

@@ -1,6 +1,5 @@
 package com.associago.association;
 
-import com.associago.app.SetupController;
 import com.associago.association.repository.AssociationRepository;
 import java.io.File;
 import java.util.UUID;
@@ -36,9 +35,6 @@ class AssociationPasswordEncodingTests {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private SetupController setupController;
-
     @BeforeEach
     void cleanAssociations() {
         associationRepository.deleteAll();
@@ -61,24 +57,6 @@ class AssociationPasswordEncodingTests {
 
         assertThat(updated.getPassword()).isEqualTo(encodedPassword);
         assertThat(passwordEncoder.matches("secret-password", updated.getPassword())).isTrue();
-    }
-
-    @Test
-    void legacySetupEndpointEncodesPasswordOnlyOnce() {
-        SetupController.SetupRequest request = new SetupController.SetupRequest();
-        request.name = "Setup Association";
-        request.slug = "setup-association";
-        request.email = "setup@example.org";
-        request.password = "setup-password";
-        request.type = "APS";
-        request.fiscalCode = "12345678901";
-
-        Long id = setupController.initSetup(request).getBody().id();
-
-        Association saved = associationRepository.findById(id).orElseThrow();
-
-        assertThat(saved.getPassword()).isNotEqualTo("setup-password");
-        assertThat(passwordEncoder.matches("setup-password", saved.getPassword())).isTrue();
     }
 
     @Test

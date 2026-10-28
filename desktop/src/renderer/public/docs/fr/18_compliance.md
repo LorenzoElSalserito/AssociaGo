@@ -1,54 +1,55 @@
-# 18. Conformite et Audit
+# 18. Conformité et audit
 
-La section **Audit** enregistre automatiquement toutes les operations sensibles effectuees sur la plateforme, garantissant la tracabilite complete exigee par la reglementation du secteur associatif.
+Les outils de conformité disponibles aujourd'hui se trouvent dans l'onglet **Paramètres › Registre** : sites, documents institutionnels et échéances de l'association.
 
-## 18.1 Qu'est-ce que le Journal d'Audit
-Le journal d'audit est un registre immuable qui documente :
-- **Qui** a effectue l'operation (utilisateur).
-- **Quoi** a ete fait (type d'action).
-- **Quand** cela s'est produit (horodatage precis).
-- **Sur quelle entite** l'action a ete effectuee (membre, transaction, evenement, etc.).
-- **Quelles valeurs** ont change (avant/apres, lorsque disponible).
+**Journal d'activité.** AssociaGo enregistre automatiquement chaque **création**, **modification** et **suppression** des données principales : membres et adhésions, mouvements et factures, activités, événements et participants, assemblées et motions, inventaire et prêts, bénévoles, créneaux et remboursements, coupons, budgets prévisionnels, bilans, attestations, communications, profil de l'association, signatures et paramètres de la base de données.
 
-## 18.2 Operations Tracees
-Le systeme enregistre automatiquement les operations les plus pertinentes, parmi lesquelles :
-- Creation, modification et suppression de membres.
-- Enregistrement et modification de transactions financieres.
-- Creation et envoi de communications.
-- Approbation de bilans.
-- Emission d'attestations.
-- Modifications des parametres de l'association.
-- Gestion des presences.
+Pour le consulter, ouvrez **Paramètres › Journal d'activité**. Le tableau, de l'entrée la plus récente à la plus ancienne, affiche :
+- **Date et heure** de l'opération ;
+- **Domaine** (par exemple Membres, Finances, Événements) ;
+- **Action** : Création, Modification ou Suppression ;
+- **Enregistrement** : le type de donnée et son numéro d'identification ;
+- **Détail** : pour les modifications, les noms des champs modifiés.
 
-## 18.3 Consultation du Journal
+Vous pouvez filtrer par **Domaine**, **Action** et intervalle de dates (**Du**, **Au**) ; **Effacer les filtres** revient à la liste complète. Les entrées sont réparties en pages de 25.
 
-### Acces
-Le journal d'audit est consultable via les API du systeme. Les informations disponibles comprennent :
+Ce qui n'est **pas** enregistré :
+- les valeurs des champs, ni avant ni après la modification : seulement leurs noms ;
+- les mots de passe, codes d'accès, identifiants de la base de données, images des logos et des signatures ;
+- l'auteur de l'opération : l'accès se fait par association, pas par utilisateur.
 
-### Filtres Disponibles
-- **Par association** : Affiche uniquement les operations d'une association specifique.
-- **Par entite** : Filtre par type d'entite (ex. "MEMBER", "TRANSACTION") et ID specifique.
-- **Par date** : Selectionne un intervalle temporel avec dates de debut et de fin.
-- **Par utilisateur** : Filtre les actions d'un utilisateur specifique.
+> Chaque association ne voit que son propre journal. Le journal ne se modifie pas depuis l'application et il est supprimé avec l'association.
 
-### Pagination
-Les resultats sont pagines pour gerer de grands volumes de donnees. Il est possible de specifier :
-- **Page** : Numero de la page courante.
-- **Taille** : Nombre d'enregistrements par page (par defaut 50).
+## 18.1 Sites
 
-## 18.4 Comptage des Operations
-Un endpoint est disponible pour obtenir le nombre total d'operations enregistrees pour une association, utile pour les tableaux de bord et les statistiques.
+Remplissez la ligne du haut et appuyez sur **Ajouter** :
+- type : **Siège social**, **Siège opérationnel** ou **Siège projet** ;
+- **Nom**, **Adresse**, **Ville** et province (**Prov.**).
 
-## 18.5 Caracteristiques Techniques
-- **Transaction independante** : Chaque entree d'audit est ecrite dans une transaction separee. Meme si l'operation principale echoue, la tentative est tout de meme enregistree dans le journal.
-- **Immuabilite** : Les entrees d'audit ne peuvent etre ni modifiees ni supprimees.
-- **Indexation** : Le journal est indexe par association, entite, utilisateur et date pour garantir des recherches rapides.
+Le tableau affiche **Type**, **Nom**, **Adresse** et **Contacts**. La corbeille supprime le site.
 
-## 18.6 Importance pour le Secteur Associatif
-La tracabilite des operations est une exigence fondamentale pour :
-- **Revision legale** : Les organismes dont les recettes depassent certains seuils sont soumis a une revision.
-- **Controles fiscaux** : L'administration fiscale peut demander une documentation detaillee.
-- **Transparence** : Les membres ont le droit d'acceder aux documents de l'association.
-- **Conformite GDPR** : Le journal documente qui a effectue des operations sur les donnees personnelles.
+> La colonne **Contacts** reste vide : le formulaire n'a pas de champs pour le téléphone et l'email du site.
 
-> **Note** : Le journal d'audit est une fonctionnalite interne de securite. L'acces au journal devrait etre limite aux administrateurs de l'association et aux commissaires aux comptes.
+## 18.2 Documents
+
+Pour archiver les statuts, les règlements et les autres actes :
+1. choisissez le type : **Statut**, **Règlement** ou **Pièce jointe** ;
+2. saisissez un **Titre** ;
+3. sélectionnez le fichier et appuyez sur **Télécharger**.
+
+Le fichier est copié dans le dossier de données d'AssociaGo. Le tableau affiche **Type**, **Titre** et, dans la colonne **Fichier**, le chemin où il est enregistré. La corbeille supprime à la fois la ligne et le fichier copié.
+
+> Le document ne peut être ni ouvert ni téléchargé depuis l'application : pour le consulter, ouvrez le fichier à partir du chemin indiqué.
+
+## 18.3 Échéances
+
+Pour noter des obligations comme les renouvellements d'assurance, les déclarations ou les assemblées obligatoires :
+- **Titre** et date d'échéance ;
+- catégorie : **Fiscal**, **Juridique**, **Gouvernance**, **Assurances** ou **Autre** ;
+- un champ numérique, prérempli à 30 : les jours de préavis.
+
+Appuyez sur **Ajouter**. Le tableau affiche **Titre**, **Date d'échéance**, **Catégorie** et **Statut**. Une fois l'obligation remplie, appuyez sur **Marquer comme terminée** : l'échéance passe à terminée et le bouton disparaît. La corbeille la supprime.
+
+> Les échéances sont un aide-mémoire à consulter manuellement. Les jours de préavis sont enregistrés, mais l'application n'envoie ni avertissements ni notifications, ne signale pas les échéances dépassées et ne recrée pas celles qui sont récurrentes.
+
+> Les suppressions dans cet onglet (sites, documents, échéances) sont immédiates et ne demandent pas de confirmation.

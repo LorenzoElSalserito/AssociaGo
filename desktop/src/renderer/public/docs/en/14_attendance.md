@@ -1,47 +1,34 @@
 # 14. Attendance Register
 
-The **Attendance** section allows you to record and monitor member participation in the association's activities.
+The **Attendance** page records attendance by session: for each activity you create the sessions (the individual lessons or meetings) and in each one you mark every participant's status.
 
-## 14.1 Overview
-The attendance register is essential for:
-- Documenting actual participation in activities.
-- Generating attendance certificates based on real presence records.
-- Complying with traceability requirements for Third Sector (Terzo Settore) entities.
-- Monitoring member engagement.
+## 14.1 Sessions of an activity
 
-## 14.2 Attendance List
-The main table shows all attendance records with:
-- **Member**: First and last name of the participant.
-- **Activity**: The activity or event the attendance refers to.
-- **Date**: Date and time of the record.
-- **Status**: Present, Absent, Excused.
+1. Choose the **Activity** from the menu at the top (the first one is preselected).
+2. The table shows the sessions with **Date**, **Start time**, **End time** and **Notes**.
 
-### Filters
-Use the available filters to:
-- Filter by specific **activity**.
-- Filter by **date** or date range.
-- Filter by **member**.
+The actions on each row are **Manage attendance** and the **trash** icon, which deletes the session and its attendance records after confirmation.
 
-## 14.3 Recording Attendance
-### Single Registration
-1. Click **"Record Attendance"**.
-2. Select the **member**.
-3. Select the **activity**.
-4. Choose the **date**.
-5. Set the **status** (Present/Absent/Excused).
-6. Add any **notes**.
-7. Click **"Save"**.
+## 14.2 Creating a session
 
-### Quick Check-in
-For ongoing activities, you can perform a quick check-in:
-1. Select the current activity.
-2. Check off the present members from the participant list.
-3. Confirm the check-in.
+1. Press **New session** (disabled if there are no activities).
+2. Fill in **Date** (required), **Start time**, **End time** and **Notes**. The end time must be after the start time.
+3. Press **Save**. The message **Saved successfully.** appears.
 
-## 14.4 Attendance Reports
-The system generates attendance statistics:
-- **Participation rate** per activity.
-- **Attendance history** per individual member.
-- **Most attended activities**.
+After saving, the participant list appears on the same page. **Back** returns to the session list.
 
-> **Note**: The attendance register is particularly important for Amateur Sports Associations (Associazioni Sportive Dilettantistiche - ASD), where attendance documentation is a requirement for insurance coverage and for the validity of training certificates.
+## 14.3 Marking attendance
+
+Open a session with **Manage attendance**. You can correct date, times and notes and press **Save**.
+
+In the **Attendance** table there is one row for each participant in the activity enrolled as a member. For each one choose the **Status**:
+- **Present**
+- **Absent**
+- **Late**
+- **Excused**
+
+Until you choose something the status is **Not recorded**. Each choice is saved immediately, without pressing **Save**.
+
+If the table is empty, first add the participants in the activity's detail page (chapter 3). Any attendance from previous versions appears in a **Preserved legacy attendance** box.
+
+> There are no filters by member or period, and no attendance reports or statistics. Certificates do not take recorded attendance into account.

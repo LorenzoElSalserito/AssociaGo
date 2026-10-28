@@ -13,6 +13,7 @@ const http = require("http");
 const os = require("os");
 const { spawn, spawnSync } = require("child_process");
 const { electronApp, optimizer, is } = require('@electron-toolkit/utils');
+import { createTranslator, normalizeLanguage } from "./i18n.mjs";
 
 const APP_SYSTEM_NAME = "associago-desktop";
 const APP_DISPLAY_NAME = "AssociaGo";
@@ -26,7 +27,7 @@ const isDev = process.env.NODE_ENV === "development" || !app.isPackaged;
 // quando l'app è lanciata da shortcut. Senza file log non
 // possiamo diagnosticare nulla.
 // =========================================================
-const LOG_DIR = path.join(os.homedir(), ".associago", "logs");
+const LOG_DIR = path.join(getAssociaGoHome(), "logs");
 let LOG_FILE_PATH = null;
 
 (function setupFileLogging() {
@@ -77,13 +78,25 @@ if (process.env.ASSOCIAGO_DISABLE_GPU === "1") {
 // Disable hardware acceleration to prevent libva errors on Linux (default for now)
 app.disableHardwareAcceleration();
 
+// UI language for dialogs/splash: the renderer's last choice (persisted here),
+// otherwise the OS locale once the app is ready.
+const UI_LANGUAGE_FILE = path.join(getAssociaGoHome(), "config", "ui-language.json");
+function readSavedLanguage() {
+    try { return normalizeLanguage(JSON.parse(fs.readFileSync(UI_LANGUAGE_FILE, "utf-8")).language); }
+    catch (_) { return null; }
+}
+const savedLanguage = readSavedLanguage();
+const tr = createTranslator(savedLanguage);
+
 const BACKEND_DEFAULT_PORT = 8080;
 
 let mainWindow = null;
 let splashWindow = null;
+let lastSplashStatus = null;
 let backendPort = BACKEND_DEFAULT_PORT;
 let backendInfo = null;
 let backendProcess = null;
+let backendManaged = false;
 
 // =========================================================
 // Focus Broker v2.1 (Conservativo + webContents key focus)
@@ -174,7 +187,7 @@ function nowStamp() {
 // ----------------------------
 
 function getAssociaGoHome() {
-    return path.join(os.homedir(), ".associago");
+    return process.env.ASSOCIAGO_DATA_PATH ? path.resolve(process.env.ASSOCIAGO_DATA_PATH) : path.join(os.homedir(), ".associago");
 }
 
 function ensureDir(dirPath) {
@@ -184,7 +197,7 @@ function ensureDir(dirPath) {
 }
 
 function getUserDataPath() {
-    return path.join(app.getPath("appData"), APP_SYSTEM_NAME);
+    return process.env.ASSOCIAGO_DATA_PATH ? path.join(getAssociaGoHome(), "electron") : path.join(app.getPath("appData"), APP_SYSTEM_NAME);
 }
 
 function getRuntimeAssetPath(...segments) {
@@ -297,6 +310,7 @@ function tryParseBackendPort(content) {
 }
 
 function sendSplashStatus(message) {
+    lastSplashStatus = message;
     if (splashWindow && !splashWindow.isDestroyed()) {
         splashWindow.webContents.executeJavaScript(
             `document.getElementById('status').textContent = ${JSON.stringify(message)};`
@@ -314,10 +328,10 @@ function waitForBackendInfo(retries = 1800, delay = 1000) {
         const check = () => {
             attempts++;
             const elapsed = attempts;
-            sendSplashStatus(`Avvio backend... (${elapsed}s, può richiedere alcuni minuti)`);
+            sendSplashStatus(tr('splash.startingBackendElapsed', { seconds: elapsed }));
 
             // Early-abort: se il processo Java è già morto, inutile aspettare.
-            if (!isDev && backendProcess === null) {
+            if (backendManaged && backendProcess === null) {
                 console.error("[Main] Backend process exited before writing port file. Aborting wait.");
                 resolve(null);
                 return;
@@ -362,10 +376,10 @@ function waitForBackendReady(infoOrPort, retries = 1800, delay = 1000) {
 
         const check = () => {
             attempts++;
-            sendSplashStatus(`Health check backend... (${attempts}s)`);
+            sendSplashStatus(tr('splash.healthCheck', { seconds: attempts }));
 
             // Early-abort: se il processo Java è già morto, inutile aspettare.
-            if (!isDev && backendProcess === null) {
+            if (backendManaged && backendProcess === null) {
                 console.error("[Main] Backend process exited before health check passed. Aborting wait.");
                 resolve(false);
                 return;
@@ -377,7 +391,7 @@ function waitForBackendReady(infoOrPort, retries = 1800, delay = 1000) {
                 res.on('end', () => {
                     if (res.statusCode === 200) {
                         console.log(`[Main] Backend health OK at ${healthUrl} (attempt ${attempts})`);
-                        sendSplashStatus('Backend pronto. Caricamento UI...');
+                        sendSplashStatus(tr('splash.ready'));
                         resolve(true);
                     } else {
                         retry();
@@ -386,7 +400,7 @@ function waitForBackendReady(infoOrPort, retries = 1800, delay = 1000) {
             });
 
             req.on('error', () => retry());
-            req.on('timeout', () => { req.destroy(); retry(); });
+            req.on('timeout', () => req.destroy(new Error('Backend health timeout')));
 
             function retry() {
                 if (attempts >= retries) {
@@ -492,7 +506,13 @@ function getJavaExecutable() {
 }
 
 function getBackendJar() {
-    if (isDev) return null;
+    if (isDev) {
+        const dir = path.resolve(__dirname, '../../../build/libs');
+        if (!fs.existsSync(dir)) return null;
+        const jars = fs.readdirSync(dir).filter(file => file.endsWith('.jar') && !file.endsWith('-plain.jar'));
+        jars.sort((a, b) => fs.statSync(path.join(dir, b)).mtimeMs - fs.statSync(path.join(dir, a)).mtimeMs);
+        return jars[0] ? path.join(dir, jars[0]) : null;
+    }
 
     // In production, look for the bundled backend in the known resource locations.
     const fixedJarPath = path.join(process.resourcesPath, "backend", "backend.jar");
@@ -524,38 +544,35 @@ function getBackendJar() {
 }
 
 async function startBackend() {
-    if (isDev) {
-        console.log("[Main] Dev mode: Skipping backend spawn (assume running externally)");
-        backendInfo = await waitForBackendInfo(5, 500) || buildBackendInfo({ port: BACKEND_DEFAULT_PORT });
+    if (isDev && process.env.ASSOCIAGO_MANAGED_BACKEND !== '1') {
+        // Reuse an external development backend only after a successful health check.
+        backendInfo = readBackendInfoFromDisk() || buildBackendInfo({ port: BACKEND_DEFAULT_PORT });
         backendPort = backendInfo.port;
-        const ready = await waitForBackendReady(backendInfo, 10, 500);
-        if (!ready) console.warn("[Main] Dev backend health check failed, proceeding anyway.");
-        return;
+        if (await waitForBackendReady(backendInfo, 2, 250)) {
+            console.log('[Main] Using healthy external development backend');
+            return;
+        }
+        console.log('[Main] Development backend unavailable; starting local JAR.');
     }
 
     const javaExec = getJavaExecutable();
     const jarPath = getBackendJar();
 
     if (!javaExec) {
-        const message =
-            "AssociaGo non riesce a trovare una runtime Java.\n\n" +
-            "Il pacchetto avrebbe dovuto includere una JRE integrata. " +
-            "Come fallback prova a installare Java 21 (https://adoptium.net) " +
-            "e a riavviare l'applicazione.\n\nLog: " + (LOG_FILE_PATH || LOG_DIR);
+        const message = tr('javaMissing.message', { log: LOG_FILE_PATH || LOG_DIR });
         console.error("[Main] " + message);
-        dialog.showErrorBox("AssociaGo - Java non trovato", message);
-        app.quit();
-        return;
+        dialog.showErrorBox(tr('javaMissing.title'), message);
+        throw new Error(message);
     }
 
     if (!jarPath) {
-        const message =
-            "AssociaGo non riesce a trovare il backend (file .jar) all'interno del pacchetto.\n\n" +
-            "Il pacchetto risulta incompleto. Reinstalla l'applicazione.\n\nLog: " + (LOG_FILE_PATH || LOG_DIR);
+        const message = tr('backendMissing.message', {
+            hint: tr(isDev ? 'backendMissing.devHint' : 'backendMissing.packageHint'),
+            log: LOG_FILE_PATH || LOG_DIR
+        });
         console.error("[Main] Cannot start backend: JAR not found.");
-        dialog.showErrorBox("AssociaGo - Backend mancante", message);
-        app.quit();
-        return;
+        dialog.showErrorBox(tr('backendMissing.title'), message);
+        throw new Error(message);
     }
 
     // Diagnostic: capture java -version output (Java prints version on stderr)
@@ -569,7 +586,7 @@ async function startBackend() {
     }
 
     console.log(`[Main] Spawning backend: ${javaExec} -jar ${jarPath}`);
-    sendSplashStatus('Starting Java backend...');
+    sendSplashStatus(tr('splash.startingJava'));
 
     // Ensure data directory exists
     const dataPath = getAssociaGoHome();
@@ -586,6 +603,7 @@ async function startBackend() {
     }
 
     try {
+        backendManaged = true;
         backendProcess = spawn(javaExec, [
             `-Dassociago.data.path=${dataPath}`,
             "-Dspring.profiles.active=desktop",
@@ -601,11 +619,10 @@ async function startBackend() {
     } catch (e) {
         console.error(`[Main] spawn() threw: ${e.code || ""} ${e.message}`);
         dialog.showErrorBox(
-            "AssociaGo - Avvio backend fallito",
-            `Impossibile avviare il processo Java.\n\nDettaglio: ${e.message}\n\nLog: ${LOG_FILE_PATH || LOG_DIR}`
+            tr('spawnFailed.title'),
+            tr('spawnFailed.message', { error: e.message, log: LOG_FILE_PATH || LOG_DIR })
         );
-        app.quit();
-        return;
+        throw e;
     }
 
     backendProcess.on('error', (err) => {
@@ -626,14 +643,14 @@ async function startBackend() {
     });
 
     // Step 1: Wait for port file
-    sendSplashStatus('Avvio backend...');
+    sendSplashStatus(tr('splash.startingBackend'));
     const info = await waitForBackendInfo();
     if (!info) {
         console.error("[Main] Failed to retrieve backend port after spawn — backend never wrote connection.json.");
         if (backendProcess) { try { backendProcess.kill(); } catch (_) {} }
         dialog.showErrorBox(
-            "AssociaGo - Backend non risponde",
-            `Il backend Java non si è avviato entro il timeout.\n\nVerifica i log dettagliati:\n${LOG_FILE_PATH || LOG_DIR}\n\nIncolla il contenuto del file più recente per ottenere supporto.`
+            tr('backendTimeout.title'),
+            tr('backendTimeout.message', { log: LOG_FILE_PATH || LOG_DIR })
         );
         // app.exit() è sincrono e termina subito: evita che createWindow venga
         // comunque chiamato dopo il return.
@@ -644,16 +661,12 @@ async function startBackend() {
     backendPort = info.port;
 
     // Step 2: Health check — wait for Spring Boot to be fully ready
-    sendSplashStatus('Verifica backend...');
+    sendSplashStatus(tr('splash.checkingBackend'));
     const ready = await waitForBackendReady(backendInfo);
     if (!ready) {
         console.error("[Main] Backend never became healthy.");
         if (backendProcess) { try { backendProcess.kill(); } catch (_) {} }
-        dialog.showMessageBox(
-            "AssociaGo - Backend non sano",
-            `Il backend è partito ma potrebbe avere qualche problema.\n\nVerifica i log:\n${LOG_FILE_PATH || LOG_DIR}`
-        );
-        //app.exit(1);
+        throw new Error(tr('backendUnhealthy.message', { log: LOG_FILE_PATH || LOG_DIR }));
     }
 }
 
@@ -688,6 +701,7 @@ function createSplashWindow() {
     if (splashEntry.startsWith("http")) splashWindow.loadURL(splashEntry);
     else splashWindow.loadFile(splashEntry);
 
+    splashWindow.webContents.once('did-finish-load', () => sendSplashStatus(lastSplashStatus || tr('splash.loading')));
     splashWindow.center();
 
     splashWindow.on('closed', () => {
@@ -792,6 +806,7 @@ app.whenReady().then(async () => {
     app.setPath("userData", getUserDataPath());
     electronApp.setAppUserModelId(APP_USER_MODEL_ID);
     Menu.setApplicationMenu(null);
+    if (!savedLanguage) tr.setLanguage(app.getLocale());
 
     app.on('browser-window-created', (_, window) => {
         optimizer.watchWindowShortcuts(window);
@@ -817,7 +832,7 @@ app.whenReady().then(async () => {
             createWindow();
         } catch (e) {
             console.error("[Main] Failed to start backend:", e);
-            dialog.showErrorBox("Startup Error", "Failed to start AssociaGo backend service.\n" + e.message);
+            dialog.showErrorBox(tr('startupError.title'), tr('startupError.message', { error: e.message }));
             app.quit();
         }
     }, 500);
@@ -923,6 +938,27 @@ ipcMain.handle("get-backend-info", () => {
     return buildBackendInfo({ port: backendPort });
 });
 
+ipcMain.handle('ui:set-zoom', (event, percent) => {
+    if (!Number.isInteger(percent) || percent < 50 || percent > 200 || percent % 25 !== 0) {
+        throw new Error('Zoom must be between 50 and 200 in steps of 25');
+    }
+    event.sender.setZoomFactor(percent / 100);
+    return percent;
+});
+
+ipcMain.handle('ui:set-language', (_event, language) => {
+    const next = normalizeLanguage(language);
+    if (!next) return tr.getLanguage();
+    tr.setLanguage(next);
+    try {
+        fs.mkdirSync(path.dirname(UI_LANGUAGE_FILE), { recursive: true });
+        fs.writeFileSync(UI_LANGUAGE_FILE, JSON.stringify({ language: next }), "utf-8");
+    } catch (e) {
+        console.warn("[Main] Cannot persist UI language:", e.message);
+    }
+    return next;
+});
+
 ipcMain.handle("backend:refreshPort", () => {
     // In standalone mode, we rely on the port we found at startup
     // But we can re-check the file if needed
@@ -1025,9 +1061,9 @@ ipcMain.handle("data:exportJsonDialog", async () => {
     );
 
     const res = await dialog.showSaveDialog({
-        title: "AssociaGo - Esporta dati (JSON)",
+        title: tr('dialog.exportJson'),
         defaultPath,
-        buttonLabel: "Esporta",
+        buttonLabel: tr('dialog.export'),
         filters: [{ name: "JSON", extensions: ["json"] }],
     });
 
@@ -1053,8 +1089,8 @@ ipcMain.handle("data:exportJsonDialog", async () => {
 
 ipcMain.handle("data:importJsonDialog", async () => {
     const res = await dialog.showOpenDialog({
-        title: "AssociaGo - Importa dati (JSON)",
-        buttonLabel: "Importa",
+        title: tr('dialog.importJson'),
+        buttonLabel: tr('dialog.import'),
         filters: [{ name: "JSON", extensions: ["json"] }],
         properties: ["openFile"],
     });
@@ -1081,10 +1117,10 @@ ipcMain.handle("data:exportDbDialog", async () => {
     );
 
     const res = await dialog.showSaveDialog({
-        title: "AssociaGo - Esporta Database",
+        title: tr('dialog.exportDb'),
         defaultPath,
-        buttonLabel: "Esporta",
-        filters: [{ name: "SQLite Database", extensions: ["db"] }],
+        buttonLabel: tr('dialog.export'),
+        filters: [{ name: tr('dialog.sqliteFilter'), extensions: ["db"] }],
     });
 
     if (res.canceled || !res.filePath) {
@@ -1096,7 +1132,7 @@ ipcMain.handle("data:exportDbDialog", async () => {
         const dbPath = path.join(getAssociaGoHome(), "associago.db");
 
         if (!fs.existsSync(dbPath)) {
-            return { ok: false, error: "Database non trovato in " + dbPath };
+            return { ok: false, error: tr('dialog.dbNotFound', { path: dbPath }) };
         }
 
         fs.copyFileSync(dbPath, res.filePath);
@@ -1108,9 +1144,9 @@ ipcMain.handle("data:exportDbDialog", async () => {
 
 ipcMain.handle("data:importDbDialog", async () => {
     const res = await dialog.showOpenDialog({
-        title: "AssociaGo - Importa Database",
-        buttonLabel: "Importa",
-        filters: [{ name: "SQLite Database", extensions: ["db"] }],
+        title: tr('dialog.importDb'),
+        buttonLabel: tr('dialog.import'),
+        filters: [{ name: tr('dialog.sqliteFilter'), extensions: ["db"] }],
         properties: ["openFile"],
     });
 
@@ -1136,7 +1172,7 @@ ipcMain.handle("data:importDbDialog", async () => {
             ok: true,
             importPath,
             destPath: destDb,
-            message: "Database importato. Riavvia l'applicazione per applicare le modifiche."
+            message: tr('dialog.dbImported')
         };
     } catch (e) {
         return { ok: false, error: e.message };

@@ -1,51 +1,60 @@
-# 2. Mitgliederverwaltung (Members)
+# 2. Mitgliederverwaltung
 
-Der Bereich **Mitglieder** ist das Herzstück von AssociaGo. Hier können Sie das vollständige Register aller Mitglieder verwalten.
+Der Bereich **Mitglieder** enthält die Stammdaten der im Verein eingeschriebenen Personen und ihre Mitgliedschaften.
 
 ## 2.1 Mitgliederliste
-Die Haupttabelle zeigt:
-- **Vor- und Nachname**
-- **E-Mail**
-- **Status**: (Aktiv, Abgelaufen, Suspendiert)
-- **Mitgliedschaftsablauf**: Datum des Ablaufs der Anmeldung.
-- **Rolle**: (Mitglied, Präsident, Sekretär, etc.)
 
-### Filter und Suche
-Verwenden Sie die Suchleiste oben, um ein Mitglied schnell zu finden, indem Sie Name, Nachname oder Mitgliedsnummer eingeben.
+Die Tabelle zeigt Name, E-Mail, Rolle, Ablaufdatum und Status jedes Mitglieds.
+- **Mitglieder suchen...** filtert nach Vorname, Nachname oder E-Mail.
+- Die Aktionen jeder Zeile sind **Bearbeiten**, **Mitgliedschaft erneuern** und **Löschen**.
+- Bei Vereinen des Typs **ASD** wird auch der Status des sportärztlichen Attests angezeigt. Oben in der Liste weist ein Hinweis auf abgelaufene und innerhalb von 30 Tagen ablaufende Atteste hin.
 
-## 2.2 Neues Mitglied hinzufügen
-Durch Klicken auf **"Mitglied hinzufügen"** öffnet sich ein detailliertes Formular, das in Abschnitte unterteilt ist:
+## 2.2 Neues Mitglied und Bearbeiten
 
-### Persönliche Daten
-- **Vor- und Nachname**: Obligatorisch.
-- **Geburtsdatum**: Grundlegend für die Berechnung der Steuernummer (in Italien).
-- **Geschlecht**: Männlich/Weiblich.
-- **Geburtsort**: Gemeinde oder Ausland.
-- **Katastercode**: (z.B. H501 für Rom). Notwendig für die automatische Berechnung der Steuernummer.
+Klicken Sie auf **Mitglied hinzufügen** oder verwenden Sie *Neues Mitglied registrieren* im Dashboard bzw. „Neues Mitglied“ in der Funktionssuche (<kbd>Ctrl</kbd>+<kbd>K</kbd>).
 
-### Steuernummer
-Das System enthält einen **automatischen Rechner**. Durch Eingabe der persönlichen Daten und Klicken auf "Berechnen" wird das Feld automatisch ausgefüllt. Es ist immer möglich, es manuell zu ändern.
+### Stammdaten
+- **Vorname**, **Nachname**, **Geburtsdatum** und **Geschlecht** sind Pflichtfelder.
+- **Katastercode (z. B. H501)** ist der Code der Geburtsgemeinde (H501 steht für Rom).
+- **Steuernummer** ist Pflicht. Die Schaltfläche **Berechnen** ermittelt sie aus Vorname, Nachname, Geburtsdatum, Geschlecht und Katastercode.
+- Kontakt: **E-Mail**, **Telefon**, **Adresse**, **Stadt**, **PLZ**.
 
-### Kontakte und Adresse
-- **E-Mail und Telefon**: Für die Kommunikation.
-- **Vollständige Adresse**: Straße, Stadt, PLZ.
+### Mitgliedschaft
+- **Ausweisnummer**: freies Feld.
+- **Registrierungsdatum (Zahlungseingang)**: Pflicht, darf nicht in der Zukunft liegen. Gilt auch als Zahlungsdatum.
+- **Art / Ämter**: Sie können mehrere ankreuzen (Ordentliches Mitglied, Gründungsmitglied, Ehrenmitglied, Vorsitzende/r, Stellv. Vorsitzende/r, Schriftführer/in, Kassenwart/in, Vorstandsmitglied).
 
-### Vereinsdaten
-- **Mitgliedsnummer**: Manuell oder automatisch zugewiesen, wenn konfiguriert.
-- **Rolle**: Definiert Berechtigungen und das soziale Amt.
-- **Beitrittsdatum**: Datum des Eintritts in den Verein.
+### Mitgliedsbeitrag
+Nur bei einem neuen Mitglied legt **Zahlung des Mitgliedsbeitrags erfassen** auch die Einnahme in Finanzen an:
+- vorgeschlagener Betrag 20,00 €, änderbar;
+- Zahlungsmethode wählbar zwischen Bargeld, Banküberweisung, Kartenterminal / Karte und PayPal.
 
-### Kontextuelle Zahlungsregistrierung
-Unten im Formular befindet sich die Option **"Mitgliedsbeitrag registrieren"**.
-Wenn ausgewählt:
-1.  Werden die Felder für den Betrag (konfigurierbarer Standard) und die Zahlungsmethode aktiviert.
-2.  Beim Speichern erstellt das System **automatisch** eine eingehende Transaktion in der Buchhaltung, die mit dem neuen Mitglied verknüpft ist.
+Beim Bearbeiten ist das Kästchen nicht verfügbar: Spätere Zahlungen werden in Finanzen erfasst. Das Format der Mitgliedsnummer und der Grundmitgliedsbeitrag aus den Einstellungen werden in diesem Formular noch nicht automatisch angewendet.
 
-## 2.3 Aktionen für das Mitglied
-Für jede Zeile in der Tabelle stehen drei Schnellaktionen zur Verfügung:
-1.  **Erneuern (Neu laden-Symbol)**: Verlängert die Gültigkeit der Karte um ein Jahr (oder den konfigurierten Zeitraum) und aktualisiert den Status auf "Aktiv".
-2.  **Bearbeiten (Stift-Symbol)**: Öffnet das Formular zum Aktualisieren der Daten.
-3.  **Löschen (Papierkorb-Symbol)**: Entfernt das Mitglied (irreversible Aktion, wird aber in den Protokollen aufbewahrt).
+### Sportärztliches Attest (nur ASD)
+Der Abschnitt **Sportärztliches Attest** erfasst:
+- Art (Wettkampfmäßig oder Nicht-wettkampfmäßig);
+- Ausstellungs- und Ablaufdatum;
+- ausstellenden Arzt, Einrichtung und Notizen.
 
-## 2.4 Drucken der Mitgliedskarte
-Aus der Liste oder der Detailansicht können Sie das **PDF der Mitgliedskarte** herunterladen, bereit zum Drucken, komplett mit dem Vereinslogo und den Mitgliedsdaten.
+## 2.3 Erneuerung und Löschen
+
+- **Mitgliedschaft erneuern** fragt nach einer Bestätigung und verschiebt das Ablaufdatum auf **ein Jahr ab heute**. Die Erneuerung erfasst keine Zahlung: Der Beitrag muss in Finanzen erfasst werden.
+- **Löschen** fragt nach einer Bestätigung und entfernt die Mitgliedschaft des Mitglieds in diesem Verein.
+
+## 2.4 CSV/JSON-Import und -Export
+
+Klicken Sie auf **CSV importieren**, um den Bereich **Mitglieder importieren/exportieren** zu öffnen. Zum Schließen verwenden Sie **CSV-Import ausblenden**.
+
+1. **CSV-Beispiel** / **JSON-Beispiel** laden eine Beispieldatei mit den vorgesehenen Spalten herunter.
+2. **CSV exportieren** / **JSON exportieren** laden alle aktuellen Mitglieder herunter.
+3. Wählen Sie eine CSV- oder JSON-Datei und klicken Sie auf **Vorschau erstellen**. Die Übersicht nennt Zeilen gesamt, gültige, doppelte und fehlerhafte Zeilen.
+4. **Import bestätigen** importiert alle gültigen Zeilen in einem einzigen Vorgang.
+
+Regeln:
+- ist eine Zeile ungültig, wird der Import blockiert und es werden keine Daten geschrieben;
+- bereits vorhandene Mitglieder werden übersprungen, ohne Daten zu überschreiben;
+- Grenze von 5000 Zeilen und 5 MB pro Datei;
+- beim CSV-Export werden Zellen, die mit `=`, `+`, `-` oder `@` beginnen, geschützt, damit Tabellenkalkulationen sie nicht als Formeln ausführen.
+
+> Der druckbare Mitgliedsausweis ist über die Oberfläche noch nicht verfügbar.

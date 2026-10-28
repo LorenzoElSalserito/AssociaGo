@@ -59,7 +59,7 @@ public class Association {
     private String treasurer;
 
     // --- Files & Assets ---
-    @Column(name = "logo")
+    @Column(name = "logo", length = 16777216)
     @JdbcTypeCode(SqlTypes.VARBINARY)
     private byte[] logo;
 

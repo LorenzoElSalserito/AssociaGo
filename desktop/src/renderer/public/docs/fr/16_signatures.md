@@ -1,47 +1,32 @@
-# 16. Signatures Institutionnelles
+# 16. Signatures institutionnelles
 
-La section **Signatures** (accessible depuis Parametres > Signatures) permet de configurer les signatures visuelles des representants institutionnels de l'association.
+Les signatures se gèrent dans **Paramètres › Signatures**. Il y a trois onglets, un par rôle : **Président**, **Secrétaire** et **Trésorier**.
 
-## 16.1 A Quoi Servent-elles
-Les signatures institutionnelles sont apposees automatiquement sur :
-- **Bilans financiers** (PDF)
-- **Attestations et certificats** (PDF)
-- **Proces-verbaux d'assemblee** (lorsqu'ils sont generes)
-- Tout document officiel produit par la plateforme.
+## 16.1 Nom et titre
 
-## 16.2 Roles Disponibles
-AssociaGo gere trois roles de signataires :
-- **President** : La signature principale de l'organisme.
-- **Secretaire** : La signature du secretaire de seance.
-- **Tresorier** : La signature du responsable financier.
+Dans chaque onglet :
+- **Nom** : prénom et nom de la personne qui occupe la fonction ;
+- **Titre** : déjà rempli avec le nom du rôle, vous pouvez le modifier (ex. « Président du Conseil d'administration »).
 
-## 16.3 Configuration
+Dès que vous modifiez un champ, le bouton **Enregistrer** apparaît. Appuyez dessus : la confirmation est « Signature enregistrée avec succès. ».
 
-### Pour Chaque Role
-Dans l'onglet Signatures des Parametres, vous trouverez une fiche pour chaque role avec :
+## 16.2 Image de la signature
 
-1. **Nom du Signataire** : Le nom complet de la personne occupant la fonction (ex. "Jean Dupont").
-2. **Titre/Qualite** : La denomination officielle (ex. "President du Conseil d'Administration").
-3. **Image de la Signature** : Chargement d'un fichier PNG ou JPG contenant le scan de la signature manuscrite.
+Le champ **Télécharger l'image de signature** n'apparaît qu'après avoir enregistré le nom au moins une fois (jusque-là, l'onglet rappelle : « Enregistrez d'abord le nom, puis téléchargez l'image. »).
+1. Appuyez sur le champ et choisissez un fichier PNG ou JPG (fond transparent recommandé).
+2. L'image est chargée immédiatement, sans autre bouton, et apparaît en aperçu.
 
-### Charger une Signature
-1. Cliquez sur **"Charger une Image"** dans la fiche du role souhaite.
-2. Selectionnez un fichier image (PNG, JPG) contenant la signature.
-3. L'image est chargee et affichee en apercu.
-4. Cliquez sur **"Enregistrer"** pour confirmer.
+Pour la retirer, appuyez sur **Supprimer** sous l'aperçu. S'il n'y a pas d'image, l'onglet affiche **Aucune image de signature**.
 
-### Supprimer une Signature
-Cliquez sur l'icone **corbeille** a cote de l'apercu pour supprimer l'image de la signature.
+Il n'existe pas de statut actif/inactif : une signature existe ou n'existe pas.
 
-## 16.4 Etat des Signatures
-Les signatures ont deux etats :
-- **Active** : La signature est disponible pour etre apposee sur les documents.
-- **Inactive** : La signature est archivee et n'est pas utilisee.
+## 16.3 Où elles sont utilisées
 
-## 16.5 Bonnes Pratiques
-- Utiliser des images avec un **fond transparent** (PNG) pour un meilleur rendu sur les documents.
-- La resolution recommandee est d'au moins **300x100 pixels**.
-- Maintenir a jour les noms et titres en cas de renouvellement des fonctions dirigeantes.
-- Configurer les signatures **avant** de generer des bilans, attestations ou proces-verbaux officiels.
+Les signatures enregistrées ici sont imprimées dans les PDF : l'image, redimensionnée sans être déformée, au-dessus d'une ligne avec le nom et, en dessous, la fonction (le **Titre** s'il est rempli, sinon le nom du rôle dans la langue de l'interface).
+- **Bilan financier annuel** : Président, Secrétaire et Trésorier.
+- **Attestations** : les rôles choisis dans l'onglet **Signataires** du modèle.
+- **Procès-verbaux d'assemblée** : Président et Secrétaire. L'image n'apparaît que si le nom indiqué dans l'assemblée coïncide avec celui de la signature ; sinon, la ligne reste vide pour une signature à la main.
 
-> **Important** : Les signatures configurees dans cette section sont des signatures visuelles (images). Elles n'ont pas valeur de signature electronique qualifiee au sens du Reglement eIDAS. Pour les documents necessitant une signature electronique, utilisez des outils de signature electronique certifiee.
+Si aucune signature n'est enregistrée pour un rôle, le PDF utilise le nom indiqué dans l'**Organigramme** (Paramètres › Profil de l'Association) et laisse la ligne vide. Une image illisible est elle aussi ignorée, sans bloquer le document.
+
+> Les signatures sont des images : elles n'ont pas la valeur d'une signature électronique qualifiée (eIDAS). Pour les documents qui l'exigent, utilisez un outil de signature électronique certifiée.

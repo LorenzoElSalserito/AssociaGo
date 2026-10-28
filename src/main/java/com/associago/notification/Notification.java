@@ -10,7 +10,10 @@ public class Notification {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "user_id", nullable = false)
+    @Column(name = "association_id")
+    private Long associationId;
+
+    @Column(name = "user_id")
     private Long userId;
 
     @Column(nullable = false)
@@ -18,6 +21,13 @@ public class Notification {
 
     @Column(nullable = false)
     private String message;
+
+    // i18n key rendered by the client; legacy rows only carry literal title/message.
+    @Column(name = "message_key")
+    private String messageKey;
+
+    @Column(name = "message_params", columnDefinition = "TEXT")
+    private String messageParams;
 
     @Column(nullable = false)
     private String type; // INFO, WARNING, ALERT, REMINDER
@@ -37,6 +47,12 @@ public class Notification {
     // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
+    public Long getAssociationId() { return associationId; }
+    public void setAssociationId(Long associationId) { this.associationId = associationId; }
+    public String getMessageKey() { return messageKey; }
+    public void setMessageKey(String messageKey) { this.messageKey = messageKey; }
+    public String getMessageParams() { return messageParams; }
+    public void setMessageParams(String messageParams) { this.messageParams = messageParams; }
     public Long getUserId() { return userId; }
     public void setUserId(Long userId) { this.userId = userId; }
     public String getTitle() { return title; }

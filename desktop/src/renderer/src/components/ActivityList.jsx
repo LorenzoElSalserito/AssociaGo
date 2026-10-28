@@ -159,7 +159,7 @@ const ActivityList = ({ associationId, shell }) => {
                                             <td>
                                                 <div className="d-flex align-items-center text-muted small">
                                                     <Users size={14} className="me-1" />
-                                                    {activity.maxParticipants ? `${activity.maxParticipants} max` : 'Unlimited'}
+                                                    {activity.maxParticipants ? t('activityList.maxParticipants', { count: activity.maxParticipants }) : t('Unlimited')}
                                                 </div>
                                             </td>
                                             <td>

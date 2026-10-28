@@ -1,47 +1,32 @@
 # 16. Firmas Institucionales
 
-La sección **Firmas** (accesible desde Ajustes > Firmas) permite configurar las firmas visuales de los representantes institucionales de la asociación.
+Las firmas se gestionan en **Ajustes › Firmas**. Hay tres pestañas, una por rol: **Presidente**, **Secretario** y **Tesorero**.
 
-## 16.1 Para Qué Sirven
-Las firmas institucionales se aplican automáticamente en:
-- **Balances anuales** (PDF)
-- **Certificados y diplomas** (PDF)
-- **Actas de asamblea** (cuando se generan)
-- Cualquier documento oficial producido por la plataforma.
+## 16.1 Nombre y título
 
-## 16.2 Roles Disponibles
-AssociaGo gestiona tres roles de firmantes:
-- **Presidente**: La firma principal de la entidad.
-- **Secretario**: La firma del secretario encargado de las actas.
-- **Tesorero**: La firma del responsable financiero.
+En cada pestaña:
+- **Nombre**: nombre y apellido de quien ocupa el cargo;
+- **Título**: ya rellenado con el nombre del rol; puedes cambiarlo (p. ej. "Presidente de la Junta Directiva").
 
-## 16.3 Configuración
+En cuanto modificas un campo aparece el botón **Guardar**. Púlsalo: la confirmación es "Firma guardada con éxito.".
 
-### Para Cada Rol
-En la pestaña Firmas de los Ajustes, encontrarás una tarjeta para cada rol con:
+## 16.2 Imagen de la firma
 
-1. **Nombre del Firmante**: El nombre completo de la persona que ocupa el cargo (ej. "Mario Rossi").
-2. **Título/Cargo**: La denominación oficial (ej. "Presidente de la Junta Directiva").
-3. **Imagen de la Firma**: Carga de un archivo PNG o JPG que contenga el escaneo de la firma manuscrita.
+El campo **Subir imagen de firma** solo aparece después de haber guardado el nombre al menos una vez (hasta entonces la pestaña recuerda: "Guarde primero el nombre, luego suba la imagen.").
+1. Pulsa el campo y elige un archivo PNG o JPG (se recomienda fondo transparente).
+2. La imagen se sube de inmediato, sin más botones, y aparece en la vista previa.
 
-### Cargar una Firma
-1. Haz clic en **"Cargar Imagen"** en la tarjeta del rol deseado.
-2. Selecciona un archivo de imagen (PNG, JPG) que contenga la firma.
-3. La imagen se carga y se muestra en vista previa.
-4. Haz clic en **"Guardar"** para confirmar.
+Para quitarla pulsa **Eliminar** debajo de la vista previa. Si no hay imagen, la pestaña muestra **Sin imagen de firma**.
 
-### Eliminar una Firma
-Haz clic en el icono de **papelera** junto a la vista previa para eliminar la imagen de la firma.
+No existe un estado activa/inactiva: una firma existe o no.
 
-## 16.4 Estado de las Firmas
-Las firmas tienen dos estados:
-- **Activa**: La firma está disponible para su inserción en los documentos.
-- **Inactiva**: La firma está archivada y no se utiliza.
+## 16.3 Dónde se usan
 
-## 16.5 Buenas Prácticas
-- Utilizar imágenes con **fondo transparente** (PNG) para un mejor resultado en los documentos.
-- La resolución recomendada es de al menos **300x100 píxeles**.
-- Mantener actualizados los nombres y títulos en caso de renovación de los cargos directivos.
-- Configurar las firmas **antes** de generar balances, certificados o actas oficiales.
+Las firmas guardadas aquí se imprimen en los PDF: la imagen, redimensionada sin deformarla, sobre una línea con el nombre y, debajo, el cargo (el **Título** si está rellenado; si no, el nombre del rol en el idioma de la interfaz).
+- **Balance anual**: Presidente, Secretario y Tesorero.
+- **Certificados**: los roles elegidos en la pestaña **Firmantes** de la plantilla.
+- **Actas de asamblea**: Presidente y Secretario. La imagen solo aparece si el nombre indicado en la asamblea coincide con el de la firma; si no, queda la línea vacía para firmar a mano.
 
-> **Importante**: Las firmas configuradas en esta sección son firmas visuales (imágenes). No tienen valor de firma digital cualificada en los términos del Reglamento eIDAS. Para documentos que requieran firma digital, utilice herramientas de firma electrónica certificada.
+Si un rol no tiene una firma guardada, el PDF usa el nombre indicado en el **Organigrama** (Ajustes › Perfil de la Asociación) y deja la línea vacía. Una imagen ilegible también se ignora, sin bloquear el documento.
+
+> Las firmas son imágenes: no tienen valor de firma digital cualificada (eIDAS). Para los documentos que la requieren, usa una herramienta de firma electrónica certificada.

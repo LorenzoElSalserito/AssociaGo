@@ -1,49 +1,53 @@
-# 4. Gestione Eventi (Events)
+# 4. Gestione Eventi
 
-La sezione **Eventi** è dedicata alla gestione di iniziative singole, come feste, raccolte fondi, congressi o riunioni.
+La pagina **Eventi e Coupon** contiene due schede: **Eventi** (feste, riunioni, raccolte fondi, conferenze) e **Coupon** (vedi capitolo 9).
 
-## 4.1 Lista Eventi
-La tabella mostra:
-- **Titolo**
-- **Data**: Giorno dell'evento.
-- **Luogo**
-- **Stato**: (Pianificato, Confermato, In Corso, Completato, Annullato).
+## 4.1 Elenco eventi
 
-## 4.2 Creare un Nuovo Evento
-Il modulo permette di inserire:
+La tabella mostra per ogni evento:
+- titolo;
+- data;
+- luogo;
+- stato.
 
-### Dati Generali
-- **Nome e Descrizione**.
-- **Tipo**: (Riunione, Festa, Raccolta Fondi, Congresso, Conferenza).
-- **Stato**: Per tracciare l'avanzamento dell'organizzazione.
+**Cerca eventi...** filtra l'elenco. In ogni riga ci sono le azioni **Visualizza dettagli**, **Modifica** ed **Elimina**.
 
-### Date e Orari
-- **Inizio e Fine**: Data e ora precise.
+## 4.2 Creare un evento
 
-### Luogo
-- **Nome Luogo e Indirizzo**.
+Premi **Aggiungi Evento** e compila:
+- **Nome Evento** e **Tipo**, entrambi obbligatori. I tipi sono Riunione / Assemblea, Festa, Raccolta Fondi, Congresso, Conferenza, Altro.
+- **Stato**: Pianificato, Confermato, In Corso, Completato oppure Annullata. Gli eventi annullati non compaiono tra i prossimi eventi della Dashboard.
+- **Data Inizio** (obbligatoria), **Ora Inizio**, **Data Fine**, **Ora Fine**.
+- **Luogo**, **Indirizzo** e **Descrizione**.
+- **Costo Soci** e **Costo Non Soci**.
+- **Max Partecipanti**. Se lo lasci vuoto, i posti sono illimitati.
+- Le opzioni **Evento Pubblico**, **Richiede Registrazione** e **Genera Fattura**.
 
-### Partecipazione e Costi
-- **Max Partecipanti**: Numero massimo di posti.
-- **Costo Soci**: Prezzo agevolato per i membri.
-- **Costo Non Soci**: Prezzo intero per esterni.
+## 4.3 Scheda dettaglio
 
-### Opzioni
-- **Evento Pubblico**: Se visibile anche ai non iscritti.
-- **Richiede Registrazione**: Obbligatoria per partecipare.
-- **Genera Fattura**: Per la contabilità.
-
-## 4.3 Dettaglio Evento
-Cliccando su un evento si accede alla sua scheda di dettaglio.
+### Indicatori
+- **Registrato**: numero di iscritti, esclusi annullati e lista d'attesa.
+- **Presente**: numero di partecipanti che hanno fatto il check-in.
+- **Tasso di Presenza**: presenti diviso iscritti.
+- **Entrate**: somma dei pagamenti registrati; per chi è segnato come Pagato senza importo registrato conta la quota dovuta, già scontata.
 
 ### Partecipanti
-- **Elenco**: Lista degli iscritti.
-- **Aggiungi**: Iscrizione manuale di un socio.
-- **Check-in**: Funzionalità per segnare la presenza effettiva all'evento.
+**Aggiungi Partecipante** propone due **tipi di partecipante**:
+- **Socio**: si sceglie dall'elenco dei soci.
+- **Ospite (Esterno)**: si indicano nome ed email.
 
-### Statistiche
-- **Tasso di Partecipazione**: Percentuale di iscritti rispetto al massimo.
-- **Entrate**: Totale incassato dalle iscrizioni.
+La quota dovuta è il **costo soci** per i soci e il **costo non soci** per gli ospiti. Il campo facoltativo **Codice coupon** applica uno sconto (vedi 9.3); la tabella mostra la quota dovuta e, se usato, il coupon con lo sconto.
 
-## 4.4 Reportistica
-È possibile generare un report PDF con la lista dei partecipanti e il riepilogo finanziario dell'evento.
+Per ogni partecipante la tabella mostra stato, presenza e pagamento, con l'azione di rimozione. Il campo **Cerca partecipante per nome o email** filtra le righe: utile all'ingresso con elenchi lunghi.
+
+In ogni riga:
+- **Check-in**: segna il partecipante come presente e registra l'ora di arrivo, mostrata sotto il pulsante. Il pulsante diventa **Presente**; premilo di nuovo per annullare il check-in. Chi ha l'iscrizione annullata non può fare il check-in.
+- **Stato pagamento**: dal menu nella riga scegli In attesa, Pagato, Esente o Rimborsato. La modifica è salvata subito.
+
+Dopo ogni azione gli indicatori in alto si aggiornano.
+
+### Attestati
+Scegli un modello e premi **Emetti in Blocco**: ogni partecipante iscritto come socio riceve un attestato. Gli ospiti esterni non ricevono attestati nominativi.
+
+### Importazione CSV
+Qui importi i partecipanti da un file CSV. Il flusso (anteprima, poi conferma) è lo stesso delle attività: vedi il capitolo 3.

@@ -3,7 +3,7 @@ import { Card, Button, Table, Badge, Spinner, Row, Col, Modal, Form, Nav, Tab } 
 import { Plus, Trash2, Download, Award, FileText, Edit, Eye, Type, Layout, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { associago } from '../api';
-import { translateCertificateType } from '../utils/enumTranslations';
+import { translateCertificateType, translateOrientation } from '../utils/enumTranslations';
 
 const MERGE_FIELDS = [
     '{{firstName}}', '{{lastName}}', '{{fiscalCode}}',
@@ -21,20 +21,20 @@ const DEFAULT_TEMPLATE_FORM = {
     active: true
 };
 
-const SAMPLE_DATA = {
+const sampleData = (t, language) => ({
     '{{firstName}}': 'Mario',
     '{{lastName}}': 'Rossi',
     '{{fiscalCode}}': 'RSSMRA80A01H501U',
-    '{{associationName}}': 'Associazione Esempio',
-    '{{date}}': new Date().toLocaleDateString('it-IT'),
-    '{{activityName}}': 'Corso Base',
-    '{{activityCategory}}': 'Formazione',
-    '{{eventName}}': 'Assemblea Annuale',
+    '{{associationName}}': t('certificatePreview.associationName'),
+    '{{date}}': new Date().toLocaleDateString(language),
+    '{{activityName}}': t('certificatePreview.activityName'),
+    '{{activityCategory}}': t('certificatePreview.activityCategory'),
+    '{{eventName}}': t('certificatePreview.eventName'),
     '{{eventType}}': 'ASSEMBLY'
-};
+});
 
 const CertificateList = ({ associationId }) => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const bodyRef = useRef(null);
     const [tab, setTab] = useState('templates');
     const [templates, setTemplates] = useState([]);
@@ -47,10 +47,11 @@ const CertificateList = ({ associationId }) => {
     const [issueForm, setIssueForm] = useState({ templateId: '', memberId: '', activityId: '', eventId: '' });
     const [activities, setActivities] = useState([]);
     const [events, setEvents] = useState([]);
+    const [members, setMembers] = useState([]);
     const [formTab, setFormTab] = useState('general');
 
     useEffect(() => {
-        if (associationId) fetchData();
+        if (associationId) { fetchData(); fetchActivitiesAndEvents(); }
     }, [associationId]);
 
     const fetchData = async () => {
@@ -68,13 +69,21 @@ const CertificateList = ({ associationId }) => {
 
     const fetchActivitiesAndEvents = async () => {
         try {
-            const [acts, evts] = await Promise.all([
+            const [acts, evts, mems] = await Promise.all([
                 associago.activities.getAll(associationId),
-                associago.events.getAll()
+                associago.events.getAll(),
+                associago.memberships.getByAssociation(associationId)
             ]);
             setActivities(acts || []);
             setEvents(evts || []);
+            setMembers((mems || []).filter(m => m.user));
         } catch (e) { console.error(e); }
+    };
+
+    // Issued certificates reference the user behind each membership.
+    const recipientName = (userId) => {
+        const user = members.find(m => m.user.id === userId)?.user;
+        return user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() : `#${userId}`;
     };
 
     const handleSaveTemplate = async () => {
@@ -171,7 +180,7 @@ const CertificateList = ({ associationId }) => {
 
     const getPreviewHtml = () => {
         let html = templateForm.bodyHtml || '';
-        for (const [key, val] of Object.entries(SAMPLE_DATA)) {
+        for (const [key, val] of Object.entries(sampleData(t, i18n.language))) {
             html = html.replaceAll(key, `<strong style="color:#0d6efd">${val}</strong>`);
         }
         return html;
@@ -249,7 +258,7 @@ const CertificateList = ({ associationId }) => {
                                             </div>
                                         </td>
                                         <td><Badge bg="info" className="fw-normal">{translateCertificateType(tpl.type, t)}</Badge></td>
-                                        <td><span className="text-muted small">{tpl.orientation || 'LANDSCAPE'} / {tpl.paperSize || 'A4'}</span></td>
+                                        <td><span className="text-muted small">{translateOrientation(tpl.orientation || 'LANDSCAPE', t)} / {tpl.paperSize || 'A4'}</span></td>
                                         <td><Badge bg={tpl.active !== false ? 'success' : 'secondary'}>{tpl.active !== false ? t('Active') : t('Inactive')}</Badge></td>
                                         <td className="text-end pe-4">
                                             <Button variant="light" size="sm" className="me-1" onClick={() => openEditTemplate(tpl)}>
@@ -287,8 +296,8 @@ const CertificateList = ({ associationId }) => {
                                                 <span className="fw-bold">{cert.certificateNumber || `#${cert.id}`}</span>
                                             </div>
                                         </td>
-                                        <td>{t('certificates.recipientFallback', { id: cert.userId })}</td>
-                                        <td>{cert.issueDate ? new Date(cert.issueDate).toLocaleDateString('it-IT') : '-'}</td>
+                                        <td>{recipientName(cert.userId)}</td>
+                                        <td>{cert.issueDate ? new Date(cert.issueDate).toLocaleDateString(i18n.language) : '-'}</td>
                                         <td className="text-end pe-4">
                                             <Button variant="light" size="sm" onClick={() => handleDownloadPdf(cert.id)}>
                                                 <Download size={14} />
@@ -428,7 +437,7 @@ const CertificateList = ({ associationId }) => {
                                         <Form.Select value={templateForm.paperSize} onChange={e => setTemplateForm({ ...templateForm, paperSize: e.target.value })} style={{ maxWidth: 200 }}>
                                             <option value="A4">A4</option>
                                             <option value="A3">A3</option>
-                                            <option value="LETTER">Letter</option>
+                                            <option value="LETTER">{t('certificatePreview.letter')}</option>
                                         </Form.Select>
                                     </Form.Group>
                                 </div>
@@ -519,8 +528,11 @@ const CertificateList = ({ associationId }) => {
                         </Form.Select>
                     </Form.Group>
                     <Form.Group className="mb-3">
-                        <Form.Label>{t('Member ID')}</Form.Label>
-                        <Form.Control type="number" value={issueForm.memberId} onChange={e => setIssueForm({ ...issueForm, memberId: e.target.value })} />
+                        <Form.Label htmlFor="certificate-recipient">{t('Member')}</Form.Label>
+                        <Form.Select id="certificate-recipient" value={issueForm.memberId} onChange={e => setIssueForm({ ...issueForm, memberId: e.target.value })}>
+                            <option value="">{t('Select a member...')}</option>
+                            {members.map(m => <option key={m.user.id} value={m.user.id}>{`${m.user.lastName || ''} ${m.user.firstName || ''}`.trim()}</option>)}
+                        </Form.Select>
                     </Form.Group>
                     <hr />
                     <p className="text-muted small">{t('Or issue in batch for all participants:')}</p>

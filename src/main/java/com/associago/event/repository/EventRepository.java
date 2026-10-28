@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 
 @Repository
 public interface EventRepository extends JpaRepository<Event, Long> {
+    java.util.List<Event> findByAssociationId(Long associationId);
     long countByStartDatetimeAfter(LocalDateTime now);
     Event findFirstByStartDatetimeAfterOrderByStartDatetimeAsc(LocalDateTime now);
 }

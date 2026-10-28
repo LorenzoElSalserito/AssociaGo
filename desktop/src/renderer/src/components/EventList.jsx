@@ -8,7 +8,7 @@ import CouponList from './CouponList';
 import RowActions from './common/RowActions';
 
 const EventList = ({ associationId, shell }) => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const [events, setEvents] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
@@ -20,6 +20,15 @@ const EventList = ({ associationId, shell }) => {
             fetchEvents();
         }
     }, [associationId, activeTab]);
+
+    useEffect(() => {
+        const target = shell?.navTarget;
+        if (target?.page === 'events' && target.eventId) {
+            setActiveTab('events');
+            setSelectedEventId(target.eventId);
+            shell.clearNavTarget();
+        }
+    }, [shell?.navTarget]);
 
     const fetchEvents = async () => {
         setLoading(true);
@@ -153,13 +162,13 @@ const EventList = ({ associationId, shell }) => {
                                             </td>
                                             <td>
                                                 <div className="text-muted small">
-                                                    {new Date(event.startDatetime).toLocaleDateString()} {new Date(event.startDatetime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                                                    {new Date(event.startDatetime).toLocaleDateString(i18n.language)} {new Date(event.startDatetime).toLocaleTimeString(i18n.language, {hour: '2-digit', minute:'2-digit'})}
                                                 </div>
                                             </td>
                                             <td>
                                                 <div className="d-flex align-items-center text-muted small">
                                                     <MapPin size={14} className="me-1" />
-                                                    {event.location || 'TBD'}
+                                                    {event.location || t('eventList.locationTbd')}
                                                 </div>
                                             </td>
                                             <td>

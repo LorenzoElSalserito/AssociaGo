@@ -1,88 +1,77 @@
 # 11. Attestations et Certificats
 
-La section **Attestations** permet de creer des modeles personnalisables et d'emettre des certificats pour les membres, les participants aux activites et les participants aux evenements.
+La page **Attestations** comporte deux onglets : **Modèles** et **Émis**. En haut se trouvent les boutons **Nouveau modèle** et **Émettre un certificat**.
 
-## 11.1 Vue d'ensemble
+## 11.1 Modèles
 
-La page est divisee en deux onglets principaux :
-- **Modeles** : Les templates a partir desquels les attestations sont generees.
-- **Emis** : La liste de toutes les attestations deja generees, avec la possibilite de les telecharger en PDF.
+Pour chaque modèle, le tableau affiche le nom, le type, la mise en page (orientation / format) et le statut **Actif** ou **Inactif**. Les actions sont l'icône **crayon** (modifier) et l'icône **corbeille** (supprimer, après la confirmation **Êtes-vous sûr ?**).
 
-## 11.2 Gestion des Modeles
+> Si le modèle a déjà servi à émettre des attestations, la suppression échoue et un message d'erreur de la base de données apparaît. Il n'y a pas d'avertissement dédié.
 
-### Creer un Nouveau Modele
-Cliquez sur **"Nouveau Modele"** pour ouvrir la fenetre de creation. La fenetre est organisee en quatre sections :
+## 11.2 Créer un modèle
 
-#### General
-- **Nom** : Le nom identifiant du modele (ex. "Attestation de Participation Cours de Base").
-- **Type** : Selectionnez la typologie parmi :
-  - *Participation* — pour ceux qui ont participe a une activite ou un evenement.
-  - *Assiduite* — pour ceux qui ont complete un parcours avec une presence minimale.
-  - *Formation* — pour les cours de formation avec certification.
-  - *Inscription* — attestation d'appartenance a l'association.
-  - *Personnalise* — format libre pour des besoins specifiques.
-- **Actif** : Interrupteur pour activer/desactiver le modele. Seuls les modeles actifs peuvent etre utilises pour l'emission.
+Appuyez sur **Nouveau modèle**. À gauche se trouvent quatre onglets, à droite l'**Aperçu**.
 
-#### Corps
-C'est ici que l'on redige le texte de l'attestation. Une ligne de **boutons pour les champs dynamiques** permet d'inserer des espaces reservees qui seront automatiquement remplaces par les donnees reelles :
+### Général
+- **Nom** (obligatoire : sans nom, **Créer** reste désactivé). Il devient aussi le titre de l'attestation.
+- **Type** : Participation, Assiduité, Formation, Adhésion ou Personnalisé.
+- **Actif** : interrupteur.
 
-| Champ | Description |
-|-------|-------------|
-| `{{firstName}}` | Prenom du membre |
-| `{{lastName}}` | Nom de famille du membre |
-| `{{fiscalCode}}` | Code fiscal |
-| `{{associationName}}` | Nom de l'association |
-| `{{date}}` | Date d'emission |
-| `{{activityName}}` | Nom de l'activite associee |
-| `{{activityCategory}}` | Categorie de l'activite |
-| `{{eventName}}` | Nom de l'evenement associe |
-| `{{eventType}}` | Type de l'evenement |
+> Le statut **Actif** est purement informatif : les modèles inactifs apparaissent aussi lors de l'émission et peuvent être utilisés.
 
-Cliquez sur un bouton pour inserer le champ a la position actuelle du curseur dans le texte.
+### Corps
+Rédigez le texte dans **Corps du modèle**. Les boutons au-dessus du champ insèrent un champ dynamique à la position du curseur :
 
-#### Mise en page
-- **Orientation** : Horizontale (paysage) ou Verticale (portrait).
+| Champ | Est remplacé par |
+|-------|----------------------|
+| `{{firstName}}`, `{{lastName}}` | prénom et nom du destinataire |
+| `{{fiscalCode}}` | code fiscal du destinataire |
+| `{{associationName}}` | nom de l'association |
+| `{{date}}` | date d'émission |
+| `{{activityName}}`, `{{activityCategory}}` | nom et catégorie de l'activité (émission par activité uniquement) |
+| `{{eventName}}`, `{{eventType}}` | nom et type de l'événement, sous forme de code interne (émission par événement uniquement) |
+
+Les champs d'activité et d'événement restent en texte littéral si l'attestation n'est pas émise depuis une activité ou un événement. Dans le PDF, le corps devient du texte brut : les éventuelles balises HTML sont supprimées.
+
+### Mise en page
+- **Orientation** : **Paysage** ou **Portrait**.
 - **Format de papier** : A4, A3 ou Letter.
 
-#### Signataires
-Selectionnez les fonctions institutionnelles qui doivent signer l'attestation :
-- President
-- Secretaire
-- Tresorier
+> Le format de papier est enregistré mais pas utilisé : le PDF est toujours en A4, dans l'orientation choisie.
 
-Les signatures seront positionnees en bas du certificat PDF genere, en recuperant automatiquement les images des signatures configurees dans la section Parametres > Signatures.
+### Signataires
+Cochez les **Rôles des signataires** : Président (présélectionné), Secrétaire, Trésorier. Dans le PDF, chaque rôle a un bloc de signature avec l'image, le nom et la fonction repris de **Paramètres › Signatures** (chapitre 16) ; si aucune signature n'est enregistrée pour un rôle, le nom de l'**Organigramme** (**Paramètres › Profil de l'Association**) apparaît au-dessus d'une ligne vide.
 
-### Apercu en Temps Reel
-Sur le cote droit de la fenetre, un **panneau d'apercu** montre a quoi ressemblera l'attestation. Les champs dynamiques sont remplaces par des donnees d'exemple (ex. "Jean Dupont") pour donner une idee du resultat final. L'apercu reflete egalement l'orientation et l'etat actif/inactif.
+### Aperçu
+Affiche le titre, le corps avec des données d'exemple (ex. « Mario Rossi ») et une ligne de signature pour chaque rôle coché. Il suit l'orientation choisie.
 
-### Modifier un Modele
-Cliquez sur l'icone **crayon** dans la ligne du modele pour ouvrir la fenetre avec toutes les donnees pre-remplies.
+Appuyez sur **Créer** (ou **Enregistrer** en modification).
 
-### Supprimer un Modele
-Cliquez sur l'icone **corbeille**. Une confirmation sera demandee avant la suppression. Les modeles ayant des attestations deja emises ne peuvent pas etre supprimes.
+## 11.3 Émettre des attestations
 
-## 11.3 Emission des Attestations
+Appuyez sur **Émettre un certificat** et choisissez le **Modèle**.
 
-### Emission Individuelle
-1. Cliquez sur **"Emettre Certificat"**.
-2. Selectionnez le **modele** dans le menu deroulant.
-3. Saisissez l'**ID du membre** destinataire.
-4. Cliquez sur **"Emettre"**.
+### À un membre
+1. Dans **Membre**, choisissez un nom dans la liste des membres de l'association.
+2. Appuyez sur **Émettre**.
 
-Le systeme genere une attestation avec un numero unique (format : CERT-ANNEE-NNNN) et l'associe au membre.
+### À tous les participants
+Sous **Ou émettre en lot pour tous les participants :**
+- choisissez une **Activité** et appuyez sur **Émission groupée par activité** : les participants actifs inscrits en tant que membres reçoivent l'attestation ;
+- ou choisissez un **Événement** et appuyez sur **Émission groupée par événement** : les participants enregistrés en tant que membres reçoivent l'attestation ; les invités sont ignorés.
 
-### Emission en Lot (Batch)
-Pour emettre des attestations a tous les participants d'une activite ou d'un evenement :
-1. Selectionnez le modele.
-2. Dans la section inferieure, choisissez une **activite** ou un **evenement** dans le menu deroulant.
-3. Cliquez sur **"Emission batch par Activite"** ou **"Emission batch par Evenement"**.
+Les boutons n'apparaissent qu'après avoir choisi le modèle et l'activité ou l'événement. Vous pouvez aussi émettre en lot depuis l'onglet **Certificats** d'une activité (chapitre 3).
 
-Tous les participants actifs recevront une attestation.
+> Il n'y a aucun contrôle des doublons : si vous répétez l'émission, chaque destinataire reçoit une nouvelle attestation.
 
-## 11.4 Telechargement PDF
-Dans l'onglet **Emis**, chaque attestation dispose d'un bouton de **telechargement**. Le PDF genere comprend :
-- Titre et corps de l'attestation avec les donnees renseignees.
-- Numero unique du certificat.
-- Date d'emission.
-- Signatures institutionnelles.
-- Somme de controle SHA-256 pour la verification d'authenticite.
+Chaque attestation reçoit un numéro progressif au format **CERT-ANNÉE-NNNN**. Le texte et le titre sont figés au moment de l'émission : modifier le modèle ensuite ne change pas les attestations déjà émises. Les signatures, en revanche, sont lues à chaque téléchargement, selon les rôles du modèle.
+
+## 11.4 Attestations émises et PDF
+
+L'onglet **Émis** (avec le compteur) liste **Certificat** (numéro), **Destinataire** (nom du membre) et **Émis le**. L'icône de **téléchargement** télécharge le PDF (A4, avec le numéro et la date dans la langue de l'interface), qui contient :
+- le titre (nom du modèle), le numéro et la date d'émission ;
+- le corps avec les données remplies ;
+- un bloc de signature pour chaque rôle signataire (image, nom et fonction) ;
+- un code QR en bas à droite avec le numéro, l'association et la date.
+
+> À chaque téléchargement, une somme de contrôle SHA-256 du PDF est calculée et enregistrée, mais elle n'est ni imprimée sur le document ni affichée dans l'interface.

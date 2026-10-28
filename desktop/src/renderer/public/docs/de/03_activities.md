@@ -1,70 +1,70 @@
-# 3. Aktivitätenverwaltung (Activities)
+# 3. Aktivitätenverwaltung
 
-Der Bereich **Aktivitäten** ist für die Verwaltung von Kursen, Workshops, Seminaren und anderen fortlaufenden oder langfristigen Initiativen konzipiert.
+Die Seite **Aktivitäten und Gutscheine** hat zwei Registerkarten: **Aktivitäten** (Kurse, Workshops, Seminare) und **Gutscheine** (siehe Kapitel 9).
 
 ## 3.1 Aktivitätenliste
-Die Haupttabelle zeigt:
-- **Aktivitätsname**
-- **Zeitplan**: Eine Zusammenfassung der wöchentlichen Zeiten (z.B. "Mo/Mi 18-20").
-- **Teilnehmer**: Anzahl der eingeschriebenen Mitglieder.
-- **Status**: (Aktiv, Archiviert).
 
-## 3.2 Neue Aktivität erstellen
-Das Erstellungsformular ist umfassend und ermöglicht es Ihnen, jeden Aspekt zu definieren:
+Für jede Aktivität zeigt die Tabelle:
+- Name und Kategorie;
+- Zeitraum (Start- und Enddatum);
+- maximale Teilnehmerzahl oder „Unbegrenzt“, wenn es keine Grenze gibt;
+- Status.
 
-### Grundlegende Informationen
-- **Name und Beschreibung**: Zur Identifizierung der Aktivität.
-- **Kategorie**: (Kurs, Workshop, Seminar, Sonstiges).
-- **Abonnementtyp**:
-    - **Einmalig**: Einmalige Zahlung.
-    - **Monatlich**: Wiederkehrende Zahlung.
-    - **Jährlich**: Jährliche Zahlung.
-- **Kosten**: Der Grundbetrag für die Anmeldung.
+**Aktivitäten suchen...** filtert nach Name. Die Aktionen jeder Zeile sind **Details anzeigen**, **Bearbeiten** und **Löschen**.
 
-### Operative Details
-- **Daten**: Start und Ende (optional).
-- **Zeitplan**: Ein Textfeld zur Beschreibung der Zeiten.
-- **Ort**: Wo die Aktivität stattfindet.
-- **Max. Teilnehmer**: Maximale Anzahl der Eingeschriebenen.
+## 3.2 Aktivität anlegen
 
-### Erweiterte Optionen
-- **Anmeldung erforderlich**: Wenn nicht angekreuzt, ist die Aktivität nur informativ.
-- **Rechnung erstellen**: Wenn ausgewählt, kann das System Steuerdokumente erstellen.
-- **Bild-/Dokumentpfade**: Zum Anhängen von visuellem oder informativem Material.
+Klicken Sie auf **Aktivität hinzufügen**.
 
-## 3.3 Aktivitätsdetail
-Durch Klicken auf eine Aktivität gelangen Sie zu einem dedizierten Dashboard mit 4 Registerkarten:
+### Hauptdaten
+- **Aktivitätsname** und **Kategorie** sind Pflichtfelder. Die Kategorien sind Kurs, Workshop, Seminar und Andere.
+- **Beschreibung** und **Ort**.
+- **Startdatum** (Pflicht), **Enddatum**, **Startzeit** und **Endzeit**.
+- **Zeitplandetails**: freie Notiz, zum Beispiel „Mo/Mi 18–20“.
 
-### 1. Teilnehmer
-- **Liste**: Liste aller eingeschriebenen Mitglieder.
-- **Hinzufügen**: Ermöglicht die Anmeldung eines Mitglieds für die Aktivität.
-- **Zahlungsstatus**: Zeigt an, ob der Teilnehmer die Gebühr bezahlt hat.
+### Anmeldung und Kosten
+- **Kosten** und **Abonnementart**: Einmalig, Monatlich oder Jährlich.
+- **Max. Teilnehmer**: Leer lassen, wenn es keine Grenze gibt.
+- **Anmeldung erforderlich** und **Rechnung erstellen**.
+- **Dokumentpfad/URL** und **Bildpfad/URL**, um Material anzuhängen.
 
-### 2. Zeitplan (Schedule)
-- **Liste**: Liste der wöchentlichen Zeiten.
-- **Hinzufügen**: Ermöglicht die Definition eines neuen Zeitfensters mit:
-    - Wochentag.
-    - Start- und Endzeit.
-    - Ort (falls abweichend vom Hauptort).
+Klicken Sie zur Bestätigung auf **Aktivität speichern**.
 
-### 3. Kursleiter
-- **Liste**: Liste der zugeordneten Kursleiter.
-- **Hinzufügen**: Ermöglicht das Hinzufügen eines Kursleiters mit:
-    - Persönlichen Daten.
-    - Spezialisierung.
-    - **Vergütungstyp**: (Stündlich, Pauschal, Freiwillig).
-    - **Vergütungswert**: Der stündliche oder pauschale Betrag.
+## 3.3 Detailansicht
 
-### 4. Kosten
-- **Liste**: Liste der für die Aktivität angefallenen Kosten (Miete, Materialien, etc.).
-- **Hinzufügen**: Ermöglicht die Registrierung neuer Kosten mit:
-    - Beschreibung und Betrag.
-    - Kategorie (Ausrüstung, Veranstaltungsort, Marketing, etc.).
-    - **Wiederkehrende Kosten**: Wenn sich die Kosten wiederholen (z.B. monatliche Miete).
+Oben stehen vier Kennzahlen: **Teilnehmer**, **Einnahmen**, **Kosten** und **Nettogewinn**. Darunter gibt es sechs Registerkarten.
 
-## 3.4 Aktivitätsbericht
-Von der Detailseite aus können Sie einen vollständigen **PDF-Bericht** herunterladen, der Folgendes zusammenfasst:
-- Aktivitätsdaten.
-- Teilnehmerliste.
-- Finanzielle Zusammenfassung (Einnahmen vs. Kosten).
-- Zeitplan und Kursleiter.
+### Teilnehmer
+**Teilnehmer hinzufügen** öffnet die Mitgliederliste (**Mitglied auswählen**) und ein optionales Feld **Gutscheincode** (siehe 9.3). Der zu zahlende Betrag sind die Kosten der Aktivität, abzüglich eines eventuellen Rabatts. Die Tabelle zeigt Status und Zahlung jedes Teilnehmers (Bezahlt, Ausstehend) mit dem zu zahlenden Betrag und, falls verwendet, dem Gutschein mit dem Rabatt; sie ermöglicht auch das Entfernen.
+
+In den **Einnahmen** zählen noch nicht bezahlte Beiträge mit dem bereits rabattierten zu zahlenden Betrag.
+
+### Zeitplan
+**Zeitplan hinzufügen** erfasst die wiederkehrenden Termine: Wochentag, Start- und Endzeit, Ort (optional).
+
+### Kursleiter
+**Kursleiter hinzufügen** erfasst:
+- Vor- und Nachname (Pflicht), E-Mail, Telefon;
+- **Spezialisierung** und **Zertifizierungen** (z. B. CONI, FIGC);
+- **Vergütungsart** (Stündlich, Festpreis oder Prozentsatz) und Betrag.
+
+### Kosten
+**Kosten hinzufügen** erfasst die Ausgaben der Aktivität:
+- Beschreibung, Betrag und Datum (Pflicht);
+- Kategorie: Materialien, Ausrüstung, Personal, Miete / Veranstaltungsort, Marketing, Andere;
+- Lieferant, **Wiederkehrende Kosten** und Notizen.
+
+Die Kosten fließen in den Nettogewinn ein.
+
+### Zertifikate
+Wählen Sie eine Vorlage und klicken Sie auf **Sammelausstellung**, um jedem aktiven, als Mitglied eingeschriebenen Teilnehmer ein Zertifikat auszustellen. Die Vorlagen werden im Bereich Zertifikate angelegt (Kapitel 11).
+
+### CSV-Import
+Importiert die Teilnehmer aus einer CSV-Datei:
+1. Laden Sie das Beispielformat herunter;
+2. klicken Sie auf **Vorschau erstellen**, das gültige, übersprungene und fehlerhafte Zeilen anzeigt;
+3. klicken Sie auf **Import bestätigen**.
+
+## 3.4 Bericht
+
+Die Schaltfläche **Bericht** lädt ein zusammenfassendes PDF der Aktivität herunter: Hauptdaten und Teilnehmerzahl.

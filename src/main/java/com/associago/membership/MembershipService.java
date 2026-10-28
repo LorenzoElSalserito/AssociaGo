@@ -2,6 +2,7 @@ package com.associago.membership;
 
 import com.associago.membership.repository.UserAssociationRepository;
 import com.associago.notification.NotificationService;
+import com.associago.user.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -9,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -48,15 +50,7 @@ public class MembershipService {
             membership.setLastRenewalDate(LocalDate.now());
             membership.setStatus("ACTIVE");
             
-            // Notify user
-            notificationService.createNotification(
-                membership.getUser().getId(),
-                "Rinnovo Tessera",
-                "La tua tessera è stata rinnovata fino al " + newExpirationDate,
-                "INFO",
-                "MEMBERSHIP",
-                membership.getId()
-            );
+            notifyMembership(membership, "notifications.messages.membershipRenewed", newExpirationDate, "INFO");
             
             return userAssociationRepository.save(membership);
         }).orElseThrow(() -> new RuntimeException("Membership not found"));
@@ -74,31 +68,31 @@ public class MembershipService {
                 ua.setStatus("EXPIRED");
                 userAssociationRepository.save(ua);
                 
-                // Notify user of expiration
-                notificationService.createNotification(
-                    ua.getUser().getId(),
-                    "Tessera Scaduta",
-                    "La tua tessera associativa è scaduta il " + ua.getExpirationDate(),
-                    "WARNING",
-                    "MEMBERSHIP",
-                    ua.getId()
-                );
+                notifyMembership(ua, "notifications.messages.membershipExpired", ua.getExpirationDate(), "WARNING");
             }
             
             // Check for upcoming expiration (e.g., in 7 days)
             if (ua.getExpirationDate() != null && "ACTIVE".equals(ua.getStatus())) {
                 LocalDate warningDate = ua.getExpirationDate().minusDays(7);
                 if (now.equals(warningDate)) {
-                    notificationService.createNotification(
-                        ua.getUser().getId(),
-                        "Tessera in Scadenza",
-                        "La tua tessera scadrà tra 7 giorni (" + ua.getExpirationDate() + ")",
-                        "REMINDER",
-                        "MEMBERSHIP",
-                        ua.getId()
-                    );
+                    notifyMembership(ua, "notifications.messages.membershipExpiring", ua.getExpirationDate(), "REMINDER");
                 }
             }
         }
+    }
+
+    private void notifyMembership(UserAssociation membership, String key, LocalDate date, String type) {
+        User user = membership.getUser();
+        String name = user == null ? "" : ((user.getFirstName() == null ? "" : user.getFirstName()) + " "
+                + (user.getLastName() == null ? "" : user.getLastName())).trim();
+        notificationService.notifyAssociation(
+            membership.getAssociation() != null ? membership.getAssociation().getId() : null,
+            user != null ? user.getId() : null,
+            key,
+            Map.of("name", name, "date", date == null ? "" : date.toString()),
+            type,
+            "MEMBERSHIP",
+            membership.getId()
+        );
     }
 }

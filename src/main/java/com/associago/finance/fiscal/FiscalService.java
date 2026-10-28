@@ -7,6 +7,8 @@ import com.associago.finance.fiscal.repository.FiscalYearClosureRepository;
 import com.associago.finance.fiscal.repository.InvoiceCheckRepository;
 import com.associago.finance.repository.InvoiceRepository;
 import com.associago.finance.repository.TransactionRepository;
+import com.associago.shared.i18n.Messages;
+import com.associago.shared.pdf.PdfText;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,18 +28,21 @@ public class FiscalService {
     private final InvoiceCheckRepository invoiceCheckRepository;
     private final TransactionRepository transactionRepository;
     private final InvoiceRepository invoiceRepository;
+    private final Messages messages;
 
     @Autowired
     public FiscalService(FiscalYearClosureRepository closureRepository,
                          FiscalComparisonRepository comparisonRepository,
                          InvoiceCheckRepository invoiceCheckRepository,
                          TransactionRepository transactionRepository,
-                         InvoiceRepository invoiceRepository) {
+                         InvoiceRepository invoiceRepository,
+                         Messages messages) {
         this.closureRepository = closureRepository;
         this.comparisonRepository = comparisonRepository;
         this.invoiceCheckRepository = invoiceCheckRepository;
         this.transactionRepository = transactionRepository;
         this.invoiceRepository = invoiceRepository;
+        this.messages = messages;
     }
 
     @Transactional
@@ -108,7 +113,7 @@ public class FiscalService {
             } else if (inv.getDueDate() != null && inv.getDueDate().isBefore(LocalDate.now())) {
                 overdueCount++;
                 overdueAmount = overdueAmount.add(inv.getAmount() != null ? inv.getAmount() : BigDecimal.ZERO);
-                paymentIssues.add("Fattura " + inv.getNumber() + " scaduta il " + inv.getDueDate());
+                paymentIssues.add(messages.get("fiscal.invoiceOverdue", inv.getNumber(), PdfText.date(inv.getDueDate(), messages.current())));
             }
 
             // Numbering sequence check
@@ -120,7 +125,7 @@ public class FiscalService {
                         int current = Integer.parseInt(numPart);
                         int last = Integer.parseInt(lastNumPart);
                         if (current != last + 1 && current != last) {
-                            numberingIssues.add("Gap numerazione tra " + lastNumber + " e " + inv.getNumber());
+                            numberingIssues.add(messages.get("fiscal.numberingGap", lastNumber, inv.getNumber()));
                         }
                     }
                 } catch (NumberFormatException e) {

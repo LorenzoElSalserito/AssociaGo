@@ -39,6 +39,7 @@ public class MembershipController {
         return membershipService.findById(id)
                 .map(existing -> {
                     existing.setRole(details.getRole());
+                    existing.setJoinDate(details.getJoinDate());
                     existing.setStatus(details.getStatus());
                     existing.setMembershipCardNumber(details.getMembershipCardNumber());
                     existing.setExpirationDate(details.getExpirationDate());
@@ -48,6 +49,14 @@ public class MembershipController {
                     return ResponseEntity.ok(membershipService.save(existing));
                 })
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/{id}/renew")
+    public ResponseEntity<UserAssociation> renewMembership(@PathVariable Long id,
+            @RequestParam java.time.LocalDate newExpirationDate) {
+        if (membershipService.findById(id).isEmpty()) return ResponseEntity.notFound().build();
+        if (newExpirationDate.isBefore(java.time.LocalDate.now())) return ResponseEntity.badRequest().build();
+        return ResponseEntity.ok(membershipService.renewMembership(id, newExpirationDate));
     }
 
     @DeleteMapping("/{id}")

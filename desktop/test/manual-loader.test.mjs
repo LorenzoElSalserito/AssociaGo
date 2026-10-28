@@ -52,3 +52,24 @@ test('ogni lingua contiene tutti i 18 capitoli', async () => {
         assert.equal(files.length, 18, `capitoli mancanti per lingua ${language}`);
     }
 });
+
+test('indice del manuale coerente con file, titoli tradotti e struttura uguale in ogni lingua', async () => {
+    const { readFile } = await import('node:fs/promises');
+    const docsRoot = new URL('../src/renderer/public/docs/', import.meta.url);
+    const source = await readFile(new URL('../src/renderer/src/components/ManualDashboard.jsx', import.meta.url), 'utf8');
+    const chapters = [...source.matchAll(/id: '(\d\d_[a-z]+\.md)', title: '(manual\.chapters\.c\d\d)'/g)];
+    assert.equal(chapters.length, 18);
+    const outline = (markdown) => markdown.split('\n').filter((line) => /^#{1,3} /.test(line)).map((line) => line.match(/^#+/)[0].length).join('');
+    const reference = {};
+    for (const language of ['it', 'en', 'de', 'es', 'fr']) {
+        const locale = JSON.parse(await readFile(new URL(`../src/renderer/src/locales/${language}.json`, import.meta.url), 'utf8'));
+        for (const [, file, key] of chapters) {
+            const title = key.split('.').reduce((value, part) => value?.[part], locale);
+            assert.equal(typeof title, 'string', `${language}: titolo ${key}`);
+            const markdown = await readFile(new URL(`${language}/${file}`, docsRoot), 'utf8');
+            assert.match(markdown, /^# \S/, `${language}/${file}: H1 mancante`);
+            reference[file] ??= outline(markdown);
+            assert.equal(outline(markdown), reference[file], `${language}/${file}: struttura sezioni diversa dall'italiano`);
+        }
+    }
+});

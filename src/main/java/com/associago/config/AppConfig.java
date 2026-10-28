@@ -8,6 +8,9 @@ public class AppConfig {
     private String dbUser;
     private String dbPassword;
     private boolean isConfigured;
+    private boolean dbSsl;
+    public boolean isDbSsl() { return dbSsl; }
+    public void setDbSsl(boolean dbSsl) { this.dbSsl = dbSsl; }
 
     // Defaults
     public AppConfig() {

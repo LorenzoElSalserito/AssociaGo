@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 @RestController
@@ -98,8 +99,8 @@ public class CertificateController {
     }
 
     @GetMapping("/{id}/pdf")
-    public ResponseEntity<byte[]> downloadPdf(@PathVariable Long id) throws IOException {
-        byte[] pdf = certificateService.generatePdf(id);
+    public ResponseEntity<byte[]> downloadPdf(@PathVariable Long id, Locale locale) throws IOException {
+        byte[] pdf = certificateService.generatePdf(id, locale);
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=attestato_" + id + ".pdf")
                 .contentType(MediaType.APPLICATION_PDF)

@@ -1,39 +1,49 @@
 # 13. Annual Financial Statement
 
-The **Financial Statement** section generates the association's annual financial report, in compliance with the Third Sector Code (Codice del Terzo Settore) guidelines.
+The **Annual Balance** page calculates a year's financial statement from the transactions recorded in the accounts.
 
-## 13.1 Overview
-The financial statement is the document that summarizes all actual income and expenses for a fiscal year. In AssociaGo, it is calculated automatically from the recorded transactions.
+## 13.1 Statement list
 
-## 13.2 Calculating the Financial Statement
-1. Select the **reference year**.
-2. Click **"Calculate Statement"**.
-3. The system analyzes all transactions for the year and generates the report with:
-   - **Income** broken down by category.
-   - **Expenses** broken down by category.
-   - **Operating surplus/deficit**.
-   - **Year-over-year comparison** (percentage change compared to the previous year).
+The table shows **Year**, **Title**, **Status** and **Net Result** (green if positive, red if negative). Click a row to open the statement. The **trash** icon deletes it, after the **Are you sure?** confirmation.
 
-## 13.3 Signatory Verification
-Before approving, the system verifies that the **institutional signatories** are correctly configured. Click **"Verify Signatories"** to check:
-- President (mandatory)
-- Secretary
-- Treasurer
+## 13.2 Calculating a statement
 
-If institutional signatures are missing, a warning will be displayed with a direct link to Settings > Signatures.
+1. Press **Compute Balance**.
+2. In the **Compute Annual Balance** window enter the **Year**.
+3. Press **Compute**.
 
-## 13.4 Approval
-1. Click **"Approve Statement"**.
-2. The status changes to **Approved**.
-3. The approved statement becomes immutable and can be exported as PDF.
+The system takes the transactions from 1 January to 31 December, groups them by category (those without a category go into "Other income" or "Other expenses") and creates the statement "Annual financial statement YEAR". The title and generic items are written in the interface language at the time of the calculation.
 
-## 13.5 PDF Export
-Click **"Download PDF"** to generate the official document. The PDF includes:
-- Header with association logo and details.
-- Income/expense breakdown by category.
-- Totals and balance.
-- Comparison with the previous year (if available).
-- Institutional signatures with the uploaded signature images.
-- Approval date.
+> If a statement already exists for that year, it is recalculated and overwritten, even if it was approved, and goes back to a non-approved status.
 
-> **Note**: The annual financial statement is a mandatory requirement for Third Sector (Terzo Settore) entities. Its preparation and approval by the general assembly must comply with the legal deadlines (generally by April 30 of the following year).
+## 13.3 Detail
+
+At the top, three boxes: **Total Income**, **Total Expenses** and **Net Result**. Below, two tables, **Income** and **Expenses**, with one row per category and the total in bold (TOTAL INCOME, TOTAL EXPENSES).
+
+> The comparison with the previous year is calculated but shown neither on the page nor in the PDF.
+
+## 13.4 Signatories
+
+On opening, the system automatically checks that **President**, **Secretary** and **Treasurer** have a name in **Settings › Signatures** or in the **Organization Chart** (**Settings › Association Profile**). If one is missing, the **Missing signers** warning appears followed by the roles as English codes (president, secretary, treasurer).
+
+## 13.5 Approval
+
+**Approve** moves the statement to the approved status. It stays disabled while even one of the three signatories is missing; after approval it disappears.
+
+> Approval does not make the statement immutable: it can still be deleted or recalculated.
+
+## 13.6 PDF
+
+**Download PDF** is available in every status, even before approval, and saves the file `bilancio_YEAR.pdf` in A4 format, in the interface language (labels, dates and amounts). It contains:
+- the association's name, address, city and fiscal code;
+- the title "ANNUAL FINANCIAL STATEMENT YEAR" and the period;
+- income and expenses by category with totals;
+- "OPERATING SURPLUS" or "OPERATING DEFICIT", opening and closing fund;
+- a "Signatures" section for President, Secretary and Treasurer: signature image from **Settings › Signatures** (chapter 16), name and office; without a saved signature, the name from the Organization Chart and a blank line;
+- generation date and time and page number.
+
+> The PDF contains no logo or approval date.
+
+On each download a SHA-256 checksum of the PDF is calculated. Its first 16 digits appear next to the status after you leave and reopen the page.
+
+> **Note**: the annual financial statement is mandatory for Third Sector entities and must be approved by the assembly within the legal deadlines (usually by 30 April of the following year).

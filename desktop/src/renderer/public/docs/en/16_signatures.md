@@ -1,47 +1,32 @@
 # 16. Institutional Signatures
 
-The **Signatures** section (accessible from Settings > Signatures) allows you to configure the visual signatures of the association's institutional representatives.
+You manage signatures in **Settings › Signatures**. There are three tabs, one per role: **President**, **Secretary** and **Treasurer**.
 
-## 16.1 Purpose
-Institutional signatures are automatically applied to:
-- **Annual financial statements** (PDF)
-- **Certificates and attestations** (PDF)
-- **Assembly minutes** (when generated)
-- Any official document produced by the platform.
+## 16.1 Name and title
 
-## 16.2 Available Roles
-AssociaGo manages three signatory roles:
-- **President**: The main signature of the organization.
-- **Secretary**: The signature of the recording secretary.
-- **Treasurer**: The signature of the financial officer.
+In each tab:
+- **Name**: first and last name of the person holding the office;
+- **Title**: already filled in with the role name; you can change it (e.g. "Chair of the Board of Directors").
 
-## 16.3 Configuration
+As soon as you change a field the **Save** button appears. Press it: the confirmation is "Signature saved successfully.".
 
-### For Each Role
-In the Signatures tab of Settings, you will find a card for each role with:
+## 16.2 Signature image
 
-1. **Signatory Name**: The full name of the person holding the position (e.g., "Mario Rossi").
-2. **Title/Qualification**: The official designation (e.g., "President of the Board of Directors").
-3. **Signature Image**: Upload of a PNG or JPG file containing the scan of the handwritten signature.
+The **Upload signature image** field appears only after you have saved the name at least once (until then the tab reminds you: "Save the name first, then upload the signature image.").
+1. Press the field and choose a PNG or JPG file (a transparent background is recommended).
+2. The image is uploaded immediately, with no other buttons, and appears as a preview.
 
-### Uploading a Signature
-1. Click **"Upload Image"** on the card of the desired role.
-2. Select an image file (PNG, JPG) containing the signature.
-3. The image is uploaded and displayed as a preview.
-4. Click **"Save"** to confirm.
+To remove it press **Delete** below the preview. If there is no image the tab shows **No signature image**.
 
-### Removing a Signature
-Click the **trash** icon next to the preview to remove the signature image.
+There is no active/inactive status: a signature either exists or it does not.
 
-## 16.4 Signature Status
-Signatures have two statuses:
-- **Active**: The signature is available for placement on documents.
-- **Inactive**: The signature is archived and not in use.
+## 16.3 Where they are used
 
-## 16.5 Best Practices
-- Use images with a **transparent background** (PNG) for better results on documents.
-- The recommended resolution is at least **300x100 pixels**.
-- Keep names and titles updated when board positions are renewed.
-- Configure signatures **before** generating financial statements, certificates, or official minutes.
+The signatures saved here are printed in PDFs: the image, resized without distortion, above a line with the name and, below, the office (the **Title** if filled in, otherwise the role name in the interface language).
+- **Annual financial statement**: President, Secretary and Treasurer.
+- **Certificates**: the roles chosen in the template's **Signatories** tab.
+- **Assembly minutes**: President and Secretary. The image appears only if the name entered in the assembly matches that of the signature; otherwise the blank line remains for signing by hand.
 
-> **Important**: The signatures configured in this section are visual signatures (images). They do not have the legal value of a qualified digital signature under the eIDAS Regulation. For documents requiring a digital signature, use certified electronic signature tools.
+If there is no saved signature for a role, the PDF uses the name entered in the **Organization Chart** (Settings › Association Profile) and leaves the line blank. An unreadable image is also ignored without blocking the document.
+
+> Signatures are images: they have no value as a qualified digital signature (eIDAS). For documents that require one, use a certified electronic signature tool.

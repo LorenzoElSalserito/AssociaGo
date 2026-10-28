@@ -27,7 +27,7 @@ public class InstitutionalSignature {
     @Column(name = "signer_title")
     private String signerTitle;
 
-    @Column(name = "signature_image")
+    @Column(name = "signature_image", length = 16777216)
     @JdbcTypeCode(SqlTypes.VARBINARY)
     private byte[] signatureImage;
 

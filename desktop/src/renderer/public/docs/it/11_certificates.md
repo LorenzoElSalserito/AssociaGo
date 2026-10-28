@@ -1,88 +1,77 @@
 # 11. Attestati e Certificati
 
-La sezione **Attestati** consente di creare modelli personalizzabili e di emettere certificati per soci, partecipanti ad attività e partecipanti ad eventi.
+La pagina **Attestati** ha due schede: **Modelli** ed **Emessi**. In alto trovi i pulsanti **Nuovo Modello** ed **Emetti Certificato**.
 
-## 11.1 Panoramica
+## 11.1 Modelli
 
-La pagina è divisa in due schede principali:
-- **Modelli**: I template da cui vengono generati gli attestati.
-- **Emessi**: L'elenco di tutti gli attestati già generati, con la possibilità di scaricarli in PDF.
+La tabella mostra per ogni modello nome, tipo, impaginazione (orientamento / formato) e stato **Attivo** o **Inattivo**. Le azioni sono l'icona **matita** (modifica) e l'icona **cestino** (elimina, dopo la conferma **Sei sicuro?**).
 
-## 11.2 Gestione Modelli
+> Se il modello è già stato usato per emettere attestati, l'eliminazione non riesce e compare un messaggio di errore del database. Non c'è un avviso dedicato.
 
-### Creare un Nuovo Modello
-Clicca su **"Nuovo Modello"** per aprire la modale di creazione. La modale è organizzata in quattro sezioni:
+## 11.2 Creare un modello
 
-#### Generale
-- **Nome**: Il nome identificativo del modello (es. "Attestato di Partecipazione Corso Base").
-- **Tipo**: Seleziona la tipologia tra:
-  - *Partecipazione* — per chi ha partecipato a un'attività o evento.
-  - *Frequenza* — per chi ha completato un percorso con presenza minima.
-  - *Formazione* — per corsi formativi con certificazione.
-  - *Iscrizione* — attestato di appartenenza all'associazione.
-  - *Personalizzato* — formato libero per esigenze specifiche.
-- **Attivo**: Switch per abilitare/disabilitare il modello. Solo i modelli attivi possono essere usati per l'emissione.
+Premi **Nuovo Modello**. A sinistra ci sono quattro schede, a destra l'**Anteprima**.
 
-#### Corpo
-Qui si scrive il testo dell'attestato. Una riga di **pulsanti per i campi dinamici** permette di inserire segnaposto che verranno sostituiti automaticamente con i dati reali:
+### Generale
+- **Nome** (obbligatorio: senza nome **Crea** resta disattivato). Diventa anche il titolo dell'attestato.
+- **Tipo**: Partecipazione, Presenze, Formazione, Iscrizione o Personalizzato.
+- **Attivo**: interruttore.
 
-| Campo | Descrizione |
-|-------|-------------|
-| `{{firstName}}` | Nome del socio |
-| `{{lastName}}` | Cognome del socio |
-| `{{fiscalCode}}` | Codice fiscale |
-| `{{associationName}}` | Nome dell'associazione |
-| `{{date}}` | Data di emissione |
-| `{{activityName}}` | Nome dell'attività collegata |
-| `{{activityCategory}}` | Categoria dell'attività |
-| `{{eventName}}` | Nome dell'evento collegato |
-| `{{eventType}}` | Tipologia dell'evento |
+> Lo stato **Attivo** è solo informativo: anche i modelli inattivi compaiono nell'emissione e si possono usare.
 
-Clicca su un pulsante per inserire il campo nella posizione corrente del cursore nel testo.
+### Corpo
+Scrivi il testo in **Corpo del Modello**. I pulsanti sopra il campo inseriscono un campo dinamico nella posizione del cursore:
 
-#### Impaginazione
-- **Orientamento**: Orizzontale (landscape) o Verticale (portrait).
+| Campo | Viene sostituito con |
+|-------|----------------------|
+| `{{firstName}}`, `{{lastName}}` | nome e cognome del destinatario |
+| `{{fiscalCode}}` | codice fiscale del destinatario |
+| `{{associationName}}` | nome dell'associazione |
+| `{{date}}` | data di emissione |
+| `{{activityName}}`, `{{activityCategory}}` | nome e categoria dell'attività (solo emissione per attività) |
+| `{{eventName}}`, `{{eventType}}` | nome e tipo dell'evento, come codice interno (solo emissione per evento) |
+
+I campi di attività ed evento restano come testo letterale se l'attestato non è emesso da un'attività o da un evento. Nel PDF il corpo diventa testo semplice: eventuali tag HTML vengono rimossi.
+
+### Impaginazione
+- **Orientamento**: **Orizzontale** o **Verticale**.
 - **Formato Carta**: A4, A3 o Letter.
 
-#### Firmatari
-Seleziona quali cariche istituzionali devono firmare l'attestato:
-- Presidente
-- Segretario
-- Tesoriere
+> Il formato carta viene salvato ma non usato: il PDF è sempre A4, nell'orientamento scelto.
 
-Le firme verranno posizionate in fondo al certificato PDF generato, prelevando automaticamente le immagini delle firme configurate nella sezione Impostazioni > Firme.
+### Firmatari
+Spunta i **Ruoli Firmatari**: Presidente (preselezionato), Segretario, Tesoriere. Nel PDF ogni ruolo ha un blocco firma con l'immagine, il nome e la carica presi da **Impostazioni › Firme** (capitolo 16); se per un ruolo non c'è una firma salvata, compare il nome dell'**Organigramma** (**Impostazioni › Profilo Associazione**) sopra una riga vuota.
 
-### Anteprima in Tempo Reale
-Sul lato destro della modale, un **pannello di anteprima** mostra come apparirà l'attestato. I campi dinamici vengono sostituiti con dati di esempio (es. "Mario Rossi") per dare un'idea del risultato finale. L'anteprima riflette anche l'orientamento e lo stato attivo/inattivo.
+### Anteprima
+Mostra il titolo, il corpo con dati di esempio (es. "Mario Rossi") e una linea di firma per ogni ruolo spuntato. Segue l'orientamento scelto.
 
-### Modificare un Modello
-Clicca sull'icona **matita** nella riga del modello per aprire la modale con tutti i dati precompilati.
+Premi **Crea** (o **Salva** in modifica).
 
-### Eliminare un Modello
-Clicca sull'icona **cestino**. Verrà chiesta conferma prima della cancellazione. I modelli con attestati già emessi non possono essere eliminati.
+## 11.3 Emettere attestati
 
-## 11.3 Emissione Attestati
+Premi **Emetti Certificato** e scegli il **Modello**.
 
-### Emissione Singola
-1. Clicca **"Emetti Certificato"**.
-2. Seleziona il **modello** dal menu a tendina.
-3. Inserisci l'**ID del socio** destinatario.
-4. Clicca **"Emetti"**.
+### A un socio
+1. In **Socio** scegli un nominativo dall'elenco dei soci dell'associazione.
+2. Premi **Emetti**.
 
-Il sistema genera un attestato con numero univoco (formato: CERT-ANNO-NNNN) e lo associa al socio.
+### A tutti i partecipanti
+Sotto **O emetti in blocco per tutti i partecipanti:**
+- scegli un'**Attività** e premi **Emissione Multipla per Attività**: ricevono l'attestato i partecipanti attivi iscritti come soci;
+- oppure scegli un **Evento** e premi **Emissione Multipla per Evento**: ricevono l'attestato i partecipanti registrati come soci; gli ospiti vengono saltati.
 
-### Emissione in Blocco (Batch)
-Per emettere attestati a tutti i partecipanti di un'attività o evento:
-1. Seleziona il modello.
-2. Nella sezione inferiore, scegli un'**attività** o un **evento** dal menu a tendina.
-3. Clicca **"Emissione batch per Attività"** o **"Emissione batch per Evento"**.
+I pulsanti compaiono solo dopo aver scelto modello e attività o evento. Puoi emettere in blocco anche dalla scheda **Attestati** di un'attività (capitolo 3).
 
-Tutti i partecipanti attivi riceveranno un attestato.
+> Non c'è controllo sui doppioni: ripetendo l'emissione, ogni destinatario riceve un nuovo attestato.
 
-## 11.4 Download PDF
-Nella scheda **Emessi**, ogni attestato ha un pulsante di **download**. Il PDF generato include:
-- Titolo e corpo dell'attestato con i dati compilati.
-- Numero univoco del certificato.
-- Data di emissione.
-- Firme istituzionali.
-- Checksum SHA-256 per la verifica di autenticità.
+Ogni attestato riceve un numero progressivo nel formato **CERT-ANNO-NNNN**. Il testo e il titolo vengono congelati al momento dell'emissione: modificare il modello dopo non cambia gli attestati già emessi. Le firme invece vengono lette a ogni download, secondo i ruoli del modello.
+
+## 11.4 Attestati emessi e PDF
+
+La scheda **Emessi** (con il contatore) elenca **Certificato** (numero), **Destinatario** (nome del socio) ed **Emesso il**. L'icona di **download** scarica il PDF (A4, con numero e data nella lingua dell'interfaccia), che contiene:
+- titolo (nome del modello), numero e data di emissione;
+- corpo con i dati compilati;
+- un blocco firma per ogni ruolo firmatario (immagine, nome e carica);
+- un codice QR in basso a destra con numero, associazione e data.
+
+> A ogni download viene calcolato e salvato un checksum SHA-256 del PDF, ma non viene stampato sul documento né mostrato nell'interfaccia.

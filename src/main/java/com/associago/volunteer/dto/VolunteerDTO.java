@@ -1,5 +1,6 @@
 package com.associago.volunteer.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public record VolunteerDTO(
@@ -10,5 +11,6 @@ public record VolunteerDTO(
         String status,
         String notes,
         LocalDateTime createdAt,
-        LocalDateTime updatedAt
+        LocalDateTime updatedAt,
+        BigDecimal hours
 ) {}

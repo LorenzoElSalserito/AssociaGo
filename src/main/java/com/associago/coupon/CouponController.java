@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -65,28 +66,43 @@ public class CouponController {
         return ResponseEntity.notFound().build();
     }
     
+    /**
+     * Previews a coupon. With activityId/eventId the base amount comes from the activity cost or the
+     * event member/non-member cost ("member" flag); otherwise "amount" is used. Rejections return
+     * valid=false with a stable "reason" code.
+     */
     @PostMapping("/validate")
-    public ResponseEntity<Map<String, Object>> validateCoupon(@RequestBody Map<String, Object> payload) {
-        Long associationId = ((Number) payload.get("associationId")).longValue();
-        String code = (String) payload.get("code");
-        BigDecimal amount = payload.containsKey("amount") ? new BigDecimal(payload.get("amount").toString()) : null;
-        Long activityId = payload.containsKey("activityId") ? ((Number) payload.get("activityId")).longValue() : null;
-        Long eventId = payload.containsKey("eventId") ? ((Number) payload.get("eventId")).longValue() : null;
-
-        return couponService.findByCode(associationId, code)
-                .map(coupon -> {
-                    boolean isValid = couponService.isValid(coupon, amount, activityId, eventId);
-                    if (isValid) {
-                        BigDecimal discount = couponService.calculateDiscount(coupon, amount);
-                        return ResponseEntity.ok(Map.of(
-                            "valid", true,
-                            "discount", discount,
-                            "coupon", coupon
-                        ));
-                    } else {
-                        return ResponseEntity.ok(Map.<String, Object>of("valid", false, "reason", "Conditions not met"));
-                    }
-                })
-                .orElse(ResponseEntity.ok(Map.of("valid", false, "reason", "Coupon not found")));
+    public ResponseEntity<Map<String, Object>> validateCoupon(
+            @RequestBody Map<String, Object> payload,
+            @RequestHeader(value = "X-Association-Id", required = false) Long headerAssociationId) {
+        Long associationId = payload.get("associationId") instanceof Number n ? n.longValue() : headerAssociationId;
+        String code = payload.get("code") != null ? payload.get("code").toString() : null;
+        Long activityId = payload.get("activityId") instanceof Number n ? n.longValue() : null;
+        Long eventId = payload.get("eventId") instanceof Number n ? n.longValue() : null;
+        try {
+            CouponService.CouponQuote quote;
+            if (activityId != null) {
+                quote = couponService.quoteForActivity(activityId, code);
+            } else if (eventId != null) {
+                boolean member = !Boolean.FALSE.equals(payload.get("member"));
+                quote = couponService.quoteForEvent(eventId, code, member, associationId);
+            } else {
+                BigDecimal amount = payload.get("amount") != null ? new BigDecimal(payload.get("amount").toString()) : null;
+                quote = couponService.quote(associationId, code, amount, null, null);
+            }
+            Coupon coupon = quote.coupon();
+            Map<String, Object> body = new LinkedHashMap<>();
+            body.put("valid", true);
+            body.put("couponId", coupon.getId());
+            body.put("code", coupon.getCode());
+            body.put("discountType", coupon.getDiscountType());
+            body.put("discountValue", coupon.getDiscountValue());
+            body.put("originalAmount", quote.originalAmount());
+            body.put("discount", quote.discount());
+            body.put("finalAmount", quote.finalAmount());
+            return ResponseEntity.ok(body);
+        } catch (CouponValidationException e) {
+            return ResponseEntity.ok(Map.of("valid", false, "reason", e.getCode()));
+        }
     }
 }

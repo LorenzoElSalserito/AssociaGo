@@ -17,14 +17,16 @@ public class HibernateConfig {
     public HibernatePropertiesCustomizer hibernatePropertiesCustomizer() {
         return (properties) -> {
             AppConfig config = configManager.loadConfig();
-            
+            properties.put("hibernate.auto_quote_keyword", true);
+            properties.remove("jakarta.persistence.schema-generation.database.action");
+
             if (!config.isConfigured()) {
                 // Setup Mode: SQLite
                 properties.put("hibernate.dialect", "org.hibernate.community.dialect.SQLiteDialect");
-                properties.put("hibernate.hbm2ddl.auto", "update"); 
+                properties.put("hibernate.hbm2ddl.auto", "none");
             } else if ("SQLITE".equalsIgnoreCase(config.getDbType())) {
                 properties.put("hibernate.dialect", "org.hibernate.community.dialect.SQLiteDialect");
-                properties.put("hibernate.hbm2ddl.auto", "none"); 
+                properties.put("hibernate.hbm2ddl.auto", "none");
             } else {
                 // MariaDB
                 properties.put("hibernate.dialect", "org.hibernate.dialect.MariaDBDialect");

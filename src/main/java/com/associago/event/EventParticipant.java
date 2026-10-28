@@ -43,6 +43,21 @@ public class EventParticipant {
     @Column(name = "amount_paid")
     private BigDecimal amountPaid = BigDecimal.ZERO;
 
+    @Column(name = "coupon_id")
+    private Long couponId;
+
+    @Column(name = "coupon_code")
+    private String couponCode;
+
+    @Column(name = "original_amount")
+    private BigDecimal originalAmount;
+
+    @Column(name = "discount_amount")
+    private BigDecimal discountAmount = BigDecimal.ZERO;
+
+    @Column(name = "amount_due")
+    private BigDecimal amountDue;
+
     @Column(name = "invoice_id")
     private Long invoiceId;
 
@@ -75,6 +90,16 @@ public class EventParticipant {
     public void setPaymentStatus(String paymentStatus) { this.paymentStatus = paymentStatus; }
     public BigDecimal getAmountPaid() { return amountPaid; }
     public void setAmountPaid(BigDecimal amountPaid) { this.amountPaid = amountPaid; }
+    public Long getCouponId() { return couponId; }
+    public void setCouponId(Long couponId) { this.couponId = couponId; }
+    public String getCouponCode() { return couponCode; }
+    public void setCouponCode(String couponCode) { this.couponCode = couponCode; }
+    public BigDecimal getOriginalAmount() { return originalAmount; }
+    public void setOriginalAmount(BigDecimal originalAmount) { this.originalAmount = originalAmount; }
+    public BigDecimal getDiscountAmount() { return discountAmount; }
+    public void setDiscountAmount(BigDecimal discountAmount) { this.discountAmount = discountAmount; }
+    public BigDecimal getAmountDue() { return amountDue; }
+    public void setAmountDue(BigDecimal amountDue) { this.amountDue = amountDue; }
     public Long getInvoiceId() { return invoiceId; }
     public void setInvoiceId(Long invoiceId) { this.invoiceId = invoiceId; }
     public String getPaymentMethod() { return paymentMethod; }

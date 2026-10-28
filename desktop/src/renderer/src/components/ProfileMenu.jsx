@@ -71,6 +71,8 @@ export default function ProfileMenu({ initials = "U", title, subtitle, items = [
                 className="profile-avatar"
                 onClick={() => setIsOpen(!isOpen)}
                 title={title}
+                aria-label={t("navigation.profile")}
+                aria-expanded={isOpen}
             >
                 {initials}
             </button>
@@ -133,6 +135,9 @@ export default function ProfileMenu({ initials = "U", title, subtitle, items = [
                                     </a>
                                 </p>
 
+                                <a className="btn btn-primary mb-3" data-testid="donate-app-info" href="https://www.paypal.com/paypalme/lorenzodemarco92" target="_blank" rel="noopener noreferrer">
+                                    {t('Donate to support')}
+                                </a>
                                 <div className="alert alert-warning small text-start">
                                     <strong>{t('Disclaimer')}:</strong> {t('AssociaGo may make errors, always check the outputs provided before forwarding them.')}
                                 </div>
@@ -156,7 +161,7 @@ export default function ProfileMenu({ initials = "U", title, subtitle, items = [
                     width: 36px;
                     height: 36px;
                     border-radius: 50%;
-                    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+                    background: var(--brand-primary);
                     color: white;
                     border: none;
                     font-weight: 600;
@@ -169,7 +174,7 @@ export default function ProfileMenu({ initials = "U", title, subtitle, items = [
                 }
 
                 .profile-avatar:hover {
-                    transform: scale(1.05);
+                    outline: 2px solid var(--primary-color);
                     box-shadow: 0 2px 8px rgba(0,0,0,0.15);
                 }
 
@@ -204,7 +209,7 @@ export default function ProfileMenu({ initials = "U", title, subtitle, items = [
                     width: 40px;
                     height: 40px;
                     border-radius: 50%;
-                    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+                    background: var(--brand-primary);
                     color: white;
                     display: flex;
                     align-items: center;

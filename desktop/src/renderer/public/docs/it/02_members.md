@@ -1,51 +1,60 @@
-# 2. Gestione Soci (Members)
+# 2. Gestione Soci
 
-La sezione **Soci** è il cuore pulsante di AssociaGo. Qui puoi gestire l'anagrafica completa di tutti gli iscritti.
+La sezione **Soci** contiene l'anagrafica delle persone iscritte all'associazione e le loro iscrizioni.
 
-## 2.1 Lista Soci
-La tabella principale mostra:
-- **Nome e Cognome**
-- **Email**
-- **Stato**: (Attivo, Scaduto, Sospeso)
-- **Scadenza Tessera**: Data di fine validità dell'iscrizione.
-- **Ruolo**: (Socio, Presidente, Segretario, ecc.)
+## 2.1 Elenco soci
 
-### Filtri e Ricerca
-Utilizza la barra di ricerca in alto per trovare rapidamente un socio digitando nome, cognome o numero di tessera.
+La tabella mostra nome, email, ruolo, scadenza e stato di ciascun socio.
+- **Cerca soci...** filtra per nome, cognome o email.
+- Le azioni di ogni riga sono **Modifica**, **Rinnova Iscrizione** ed **Elimina**.
+- Nelle associazioni di tipo **ASD** compare anche lo stato del certificato medico sportivo. In cima all'elenco un avviso segnala i certificati scaduti e quelli che scadono entro 30 giorni.
 
-## 2.2 Aggiungere un Nuovo Socio
-Cliccando su **"Aggiungi Socio"**, si apre un modulo dettagliato diviso in sezioni:
+## 2.2 Nuovo socio e modifica
 
-### Dati Anagrafici
-- **Nome e Cognome**: Obbligatori.
-- **Data di Nascita**: Fondamentale per il calcolo del Codice Fiscale.
-- **Sesso**: Maschio/Femmina.
-- **Luogo di Nascita**: Comune o Stato estero.
-- **Codice Catastale**: (es. H501 per Roma). Necessario per il calcolo automatico del CF.
+Premi **Aggiungi Socio**, oppure usa *Registra Nuovo Socio* dalla Dashboard o "Nuovo Socio" dalla ricerca funzioni (<kbd>Ctrl</kbd>+<kbd>K</kbd>).
 
-### Codice Fiscale
-Il sistema include un **calcolatore automatico**. Inserendo i dati anagrafici e cliccando su "Calcola", il campo verrà compilato automaticamente. È sempre possibile modificarlo manualmente.
+### Dati anagrafici
+- **Nome**, **Cognome**, **Data di nascita** e **Sesso** sono obbligatori.
+- **Codice Catastale** è il codice del comune di nascita (es. H501 per Roma).
+- **Codice Fiscale** è obbligatorio. Il pulsante **Calcola** lo ricava da nome, cognome, data di nascita, sesso e codice catastale.
+- Contatti: **Email**, **Telefono**, **Indirizzo**, **Città**, **CAP**.
 
-### Contatti e Indirizzo
-- **Email e Telefono**: Per le comunicazioni.
-- **Indirizzo Completo**: Via, Città, CAP.
+### Iscrizione
+- **Numero Tessera**: campo libero.
+- **Data di Registrazione (arrivo del pagamento)**: obbligatoria, non può essere nel futuro. Vale anche come data del pagamento.
+- **Tipologia / Cariche**: puoi spuntarne più di una (Socio Ordinario, Socio Fondatore, Socio Onorario, Presidente, Vice Presidente, Segretario, Tesoriere, Consigliere).
 
-### Dati Associativi
-- **Numero Tessera**: Assegnato manualmente o automaticamente se configurato.
-- **Ruolo**: Definisce i permessi e la carica sociale.
-- **Data Iscrizione**: Data di ingresso nell'associazione.
+### Quota associativa
+Solo per un nuovo socio, **Registra Pagamento Quota Associativa** crea anche l'entrata in Finanze:
+- importo proposto 20,00 €, modificabile;
+- metodo a scelta tra Contanti, Bonifico, POS / Carta e PayPal.
 
-### Registrazione Pagamento Contestuale
-In fondo al modulo, è presente l'opzione **"Registra Pagamento Quota Associativa"**.
-Se selezionata:
-1.  Si attivano i campi per l'importo (default configurabile) e il metodo di pagamento.
-2.  Al salvataggio, il sistema crea **automatiquement** una transazione in entrata nella contabilità, collegata al nuovo socio.
+In modifica la casella non è disponibile: i pagamenti successivi si registrano in Finanze. Il formato tessera e la quota base delle Impostazioni non vengono ancora applicati automaticamente in questo modulo.
 
-## 2.3 Azioni sul Socio
-Per ogni riga della tabella, sono disponibili tre azioni rapide:
-1.  **Rinnova (Icona Ricarica)**: Estende la validità della tessera di un anno (o del periodo configurato) e aggiorna lo stato ad "Attivo".
-2.  **Modifica (Icona Matita)**: Apre il modulo per aggiornare i dati.
-3.  **Elimina (Icona Cestino)**: Rimuove il socio (azione irreversibile, ma mantenuta nei log).
+### Certificato medico sportivo (solo ASD)
+La sezione **Certificato Medico Sportivo** raccoglie:
+- tipo (Agonistico o Non agonistico);
+- data di rilascio e di scadenza;
+- medico certificatore, struttura e note.
 
-## 2.4 Stampa Tessera
-Dalla lista o dal dettaglio, è possibile scaricare il **PDF della Tessera Associativa**, pronto per la stampa, completo di logo dell'associazione e dati del socio.
+## 2.3 Rinnovo ed eliminazione
+
+- **Rinnova Iscrizione** chiede conferma e sposta la scadenza a **un anno da oggi**. Il rinnovo non registra pagamenti: la quota va registrata in Finanze.
+- **Elimina** chiede conferma e rimuove l'iscrizione del socio da questa associazione.
+
+## 2.4 Import ed export CSV/JSON
+
+Premi **Importa CSV** per aprire il pannello **Import/export soci**. Per chiuderlo usa **Nascondi Importazione CSV**.
+
+1. **Esempio CSV** / **Esempio JSON** scaricano un file di esempio con le colonne previste.
+2. **Esporta CSV** / **Esporta JSON** scaricano tutti i soci attuali.
+3. Scegli un file CSV o JSON e premi **Genera Anteprima**. Il riepilogo indica righe totali, valide, duplicate ed errori.
+4. **Conferma Importazione** importa tutte le righe valide in un'unica operazione.
+
+Regole:
+- se una riga non è valida, l'importazione viene bloccata e nessun dato viene scritto;
+- i soci già presenti vengono saltati, senza sovrascrivere dati;
+- limite di 5000 righe e 5 MB per file;
+- nell'export CSV le celle che iniziano con `=`, `+`, `-` o `@` sono protette, così i fogli di calcolo non le eseguono come formule.
+
+> La tessera stampabile non è ancora disponibile dall'interfaccia.

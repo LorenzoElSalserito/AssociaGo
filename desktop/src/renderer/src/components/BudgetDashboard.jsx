@@ -6,7 +6,7 @@ import { associago } from '../api';
 import { translateBudgetStatus, translateBudgetSection } from '../utils/enumTranslations';
 
 const BudgetDashboard = ({ associationId, shell }) => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const [budgets, setBudgets] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedBudget, setSelectedBudget] = useState(null);
@@ -134,25 +134,25 @@ const BudgetDashboard = ({ associationId, shell }) => {
                     <Col md={3}>
                         <Card className="border-0 shadow-sm text-center p-3">
                             <div className="text-muted small">{t('Budgeted Income')}</div>
-                            <div className="fw-bold text-success fs-5">&euro; {totalBudgetedIncome.toLocaleString('it-IT', { minimumFractionDigits: 2 })}</div>
+                            <div className="fw-bold text-success fs-5">&euro; {totalBudgetedIncome.toLocaleString(i18n.language, { minimumFractionDigits: 2 })}</div>
                         </Card>
                     </Col>
                     <Col md={3}>
                         <Card className="border-0 shadow-sm text-center p-3">
                             <div className="text-muted small">{t('Actual Income')}</div>
-                            <div className="fw-bold text-primary fs-5">&euro; {totalActualIncome.toLocaleString('it-IT', { minimumFractionDigits: 2 })}</div>
+                            <div className="fw-bold text-primary fs-5">&euro; {totalActualIncome.toLocaleString(i18n.language, { minimumFractionDigits: 2 })}</div>
                         </Card>
                     </Col>
                     <Col md={3}>
                         <Card className="border-0 shadow-sm text-center p-3">
                             <div className="text-muted small">{t('Budgeted Expenses')}</div>
-                            <div className="fw-bold text-danger fs-5">&euro; {totalBudgetedExpense.toLocaleString('it-IT', { minimumFractionDigits: 2 })}</div>
+                            <div className="fw-bold text-danger fs-5">&euro; {totalBudgetedExpense.toLocaleString(i18n.language, { minimumFractionDigits: 2 })}</div>
                         </Card>
                     </Col>
                     <Col md={3}>
                         <Card className="border-0 shadow-sm text-center p-3">
                             <div className="text-muted small">{t('Actual Expenses')}</div>
-                            <div className="fw-bold text-warning fs-5">&euro; {totalActualExpense.toLocaleString('it-IT', { minimumFractionDigits: 2 })}</div>
+                            <div className="fw-bold text-warning fs-5">&euro; {totalActualExpense.toLocaleString(i18n.language, { minimumFractionDigits: 2 })}</div>
                         </Card>
                     </Col>
                 </Row>
@@ -179,10 +179,10 @@ const BudgetDashboard = ({ associationId, shell }) => {
                                         <tr key={line.id}>
                                             <td className="ps-4 fw-bold">{line.category}</td>
                                             <td><Badge bg={line.section === 'INCOME' ? 'success' : 'danger'} className="fw-normal">{translateBudgetSection(line.section, t)}</Badge></td>
-                                            <td className="text-end">&euro; {(line.budgetedAmount || 0).toLocaleString('it-IT', { minimumFractionDigits: 2 })}</td>
-                                            <td className="text-end">&euro; {(line.actualAmount || 0).toLocaleString('it-IT', { minimumFractionDigits: 2 })}</td>
+                                            <td className="text-end">&euro; {(line.budgetedAmount || 0).toLocaleString(i18n.language, { minimumFractionDigits: 2 })}</td>
+                                            <td className="text-end">&euro; {(line.actualAmount || 0).toLocaleString(i18n.language, { minimumFractionDigits: 2 })}</td>
                                             <td className={`text-end ${variance >= 0 ? 'text-success' : 'text-danger'}`}>
-                                                {variance >= 0 ? '+' : ''}&euro; {variance.toLocaleString('it-IT', { minimumFractionDigits: 2 })}
+                                                {variance >= 0 ? '+' : ''}&euro; {variance.toLocaleString(i18n.language, { minimumFractionDigits: 2 })}
                                             </td>
                                             <td style={{ minWidth: 120 }}>
                                                 <ProgressBar now={pct} variant={pct > 100 ? 'danger' : pct > 80 ? 'warning' : 'primary'} style={{ height: 8 }} />

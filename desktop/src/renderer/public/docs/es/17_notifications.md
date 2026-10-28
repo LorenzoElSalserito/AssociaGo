@@ -1,39 +1,31 @@
 # 17. Notificaciones
 
-El sistema de **Notificaciones** de AssociaGo informa en tiempo real sobre los eventos importantes de la asociación.
+Las notificaciones se consultan desde la **campana** del encabezado, junto al menú del perfil. Recogen lo que ocurre en la asociación con la que has iniciado sesión: cada asociación solo ve las suyas.
 
-## 17.1 Campana de Notificaciones
-En el encabezado de la página, junto al perfil del usuario, se encuentra el icono de la **campana**:
-- Un **indicador rojo** con el número señala las notificaciones no leídas.
-- Al hacer clic en la campana se abre el panel de notificaciones.
+## 17.1 La campana
 
-## 17.2 Panel de Notificaciones
-El panel muestra la lista de notificaciones ordenadas de la más reciente a la más antigua:
+- El **contador** de la campana indica cuántas notificaciones están sin leer (si son más de 9 muestra **9+**).
+- Un clic, o **Intro** o **Espacio** cuando la campana tiene el foco, abre el panel **Notificaciones**; un clic fuera o la tecla **Esc** lo cierra.
+- El recuento se actualiza solo cada 30 segundos.
 
-Para cada notificación se muestran:
-- **Título**: Descripción breve del evento.
-- **Mensaje**: Detalle adicional.
-- **Fecha y Hora**: Cuándo se generó la notificación.
-- **Estado**: Leída (gris) o No leída (resaltada).
+## 17.2 El panel
 
-### Acciones Disponibles
-- **Marcar como leída**: Haz clic en la notificación individual para marcarla como leída.
-- **Marcar todas como leídas**: Botón en la parte superior del panel para marcar todas las notificaciones como leídas de una sola vez.
+Las últimas 50 notificaciones aparecen ordenadas de la más reciente a la más antigua. Cada una muestra título, mensaje y cuándo se creó ("hace 5 minutos", "hace 2 horas"; pasado un día, la fecha). Las no leídas tienen el fondo resaltado y un punto a la derecha.
 
-## 17.3 Tipos de Notificación
-El sistema genera notificaciones automáticas para diversos eventos:
+- Haz clic en una notificación (o selecciónala con **Tab** y pulsa **Intro**): se marca como leída y se abre el elemento vinculado. Un evento abre su ficha en la sección **Eventos**; un carné abre la ficha del socio en la sección **Socios**.
+- **Marcar todo como leído**, arriba, solo aparece si hay notificaciones sin leer.
+- Si no hay ninguna, el panel muestra **Sin notificaciones**.
 
-| Tipo | Descripción |
-|------|-------------|
-| **INFO** | Información general (ej. "Nuevo socio registrado"). |
-| **WARNING** | Avisos que requieren atención (ej. "Carnets a punto de caducar"). |
-| **ALERT** | Situaciones urgentes (ej. "Vencimiento fiscal inminente"). |
-| **REMINDER** | Recordatorios programados (ej. "Asamblea mañana"). |
+Los textos de las notificaciones siguen el idioma elegido en los ajustes. Las notificaciones creadas por versiones anteriores de AssociaGo conservan el texto original.
 
-## 17.4 Actualización Automática
-Las notificaciones se actualizan automáticamente cada **30 segundos** sin necesidad de recargar la página. El indicador en la campana se actualiza en tiempo real.
+## 17.3 Cuándo se crean
 
-## 17.5 Notificaciones Vinculadas
-Algunas notificaciones están vinculadas a entidades específicas (socio, evento, actividad). El sistema registra el tipo y el ID de la entidad relacionada para facilitar la navegación directa al contexto de la notificación.
+| Notificación | Cuándo |
+|---|---|
+| Nueva inscripción a un evento | se añade un socio o un invitado a los participantes de un evento |
+| Evento cancelado | se cancela un evento: una sola notificación con el número de participantes a los que avisar |
+| Membresía renovada | se renueva un carné |
+| Membresía vencida | control nocturno (a la 1:00): el carné está vencido |
+| Membresía a punto de vencer | control nocturno (a la 1:00): faltan exactamente 7 días para el vencimiento |
 
-> **Nota**: Las notificaciones son generadas automáticamente por el sistema en respuesta a acciones y vencimientos. Actualmente no es posible crear notificaciones manuales.
+Los controles nocturnos solo se realizan si AssociaGo está abierto a esa hora. Las notificaciones son para la asociación: no se envían a los socios. Para escribir a los socios usa las **Comunicaciones** (capítulo 15).

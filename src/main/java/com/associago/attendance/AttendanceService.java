@@ -49,7 +49,9 @@ public class AttendanceService {
         }).orElseThrow(() -> new RuntimeException("Session not found"));
     }
 
+    @Transactional
     public void deleteSession(Long id) {
+        recordRepository.deleteAll(recordRepository.findBySessionId(id));
         sessionRepository.deleteById(id);
     }
 
@@ -75,6 +77,7 @@ public class AttendanceService {
         return recordRepository.findById(id).map(record -> {
             record.setSessionId(recordDetails.getSessionId());
             record.setMemberId(recordDetails.getMemberId());
+            record.setUserId(recordDetails.getUserId());
             record.setStatus(recordDetails.getStatus());
             record.setCheckInTime(recordDetails.getCheckInTime());
             record.setNotes(recordDetails.getNotes());

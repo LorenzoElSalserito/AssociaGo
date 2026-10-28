@@ -14,6 +14,7 @@ import java.util.List;
 
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, Long>, JpaSpecificationExecutor<Transaction> {
+    List<Transaction> findByAssociationId(Long associationId);
     List<Transaction> findByDateBetween(LocalDate startDate, LocalDate endDate);
 
     List<Transaction> findByAssociationIdAndDateBetween(Long associationId, LocalDate startDate, LocalDate endDate);

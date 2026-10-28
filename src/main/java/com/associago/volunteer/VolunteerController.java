@@ -24,7 +24,7 @@ public class VolunteerController {
     @GetMapping
     public ResponseEntity<List<VolunteerDTO>> getAllVolunteers() {
         List<VolunteerDTO> volunteers = StreamSupport.stream(volunteerService.getAllVolunteers().spliterator(), false)
-                .map(VolunteerMapper::toDTO)
+                .map(v -> VolunteerMapper.toDTO(v, volunteerService.totalHours(v.getId())))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(volunteers);
     }
@@ -92,9 +92,12 @@ public class VolunteerController {
     }
 
     @PutMapping("/expenses/{id}/status")
-    public ResponseEntity<VolunteerExpense> updateExpenseStatus(@PathVariable Long id, @RequestParam String status) {
+    public ResponseEntity<VolunteerExpense> updateExpenseStatus(@PathVariable Long id, @RequestParam String status,
+                                                                @RequestHeader(value = "X-Association-Id", required = false) Long associationId) {
         try {
-            return ResponseEntity.ok(volunteerService.updateExpenseStatus(id, status));
+            return ResponseEntity.ok(volunteerService.updateExpenseStatus(id, status, associationId));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }

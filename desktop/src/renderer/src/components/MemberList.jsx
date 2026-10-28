@@ -3,27 +3,13 @@ import { Card, Button, Table, Form, InputGroup, Badge, Spinner, Alert } from 're
 import { Search, Plus, Edit, Trash2, RefreshCw, AlertTriangle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { associago } from '../api';
-import CsvImporter from './CsvImporter';
-import { MEMBER_ROLES } from './MemberForm';
+import MemberDataTransfer from './MemberDataTransfer';
+import { formatRoles } from '../utils/memberRoles';
+import { translateMemberStatus } from '../utils/enumTranslations';
 import RowActions from './common/RowActions';
 
-const ROLE_LABEL_BY_VALUE = MEMBER_ROLES.reduce((acc, r) => {
-    acc[r.value] = r.label;
-    return acc;
-}, {});
-
-function formatRoles(roleCsv) {
-    if (!roleCsv) return '-';
-    return String(roleCsv)
-        .split(',')
-        .map((r) => r.trim())
-        .filter(Boolean)
-        .map((code) => ROLE_LABEL_BY_VALUE[code] || code)
-        .join(', ');
-}
-
 const MemberList = ({ associationId, shell }) => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const [members, setMembers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
@@ -38,6 +24,14 @@ const MemberList = ({ associationId, shell }) => {
             if (isASD) fetchMedicalAlerts();
         }
     }, [associationId]);
+
+    useEffect(() => {
+        const target = shell?.navTarget;
+        if (target?.page === 'members' && target.membershipId) {
+            shell.clearNavTarget();
+            shell.openModal('member-form', { associationId, associationType: shell?.currentAssociation?.tipo, memberId: target.membershipId, onSuccess: fetchMembers });
+        }
+    }, [shell?.navTarget]);
 
     const fetchMembers = async () => {
         setLoading(true);
@@ -138,11 +132,7 @@ const MemberList = ({ associationId, shell }) => {
 
             {showImport && (
                 <div className="mb-4">
-                    <CsvImporter
-                        title={t('Member CSV Import')}
-                        onPreview={(file) => associago.csvImport.previewMembers(file, associationId)}
-                        onImport={(file) => associago.csvImport.importMembers(file, associationId)}
-                    />
+                    <MemberDataTransfer associationId={associationId} onImported={fetchMembers} />
                 </div>
             )}
 
@@ -204,15 +194,15 @@ const MemberList = ({ associationId, shell }) => {
                                             </td>
                                             <td>
                                                 <Badge bg={member.status === 'ACTIVE' ? 'success' : 'warning'} className="fw-normal px-2 py-1">
-                                                    {member.status || 'ACTIVE'}
+                                                    {translateMemberStatus(member.status || 'ACTIVE', t)}
                                                 </Badge>
                                             </td>
                                             <td>
                                                 <div className="text-muted small">
-                                                    {member.expirationDate ? new Date(member.expirationDate).toLocaleDateString() : '-'}
+                                                    {member.expirationDate ? new Date(member.expirationDate).toLocaleDateString(i18n.language) : '-'}
                                                 </div>
                                             </td>
-                                            <td>{formatRoles(member.role)}</td>
+                                            <td>{formatRoles(member.role, t)}</td>
                                             <td className="text-end pe-4">
                                                 <RowActions actions={[
                                                     {
@@ -226,7 +216,7 @@ const MemberList = ({ associationId, shell }) => {
                                                         key: 'edit',
                                                         icon: <Edit size={16} />,
                                                         label: t('Edit'),
-                                                        onClick: () => shell.openModal('member-form', { associationId, memberId: member.id, onSuccess: fetchMembers }),
+                                                        onClick: () => shell.openModal('member-form', { associationId, associationType: shell?.currentAssociation?.tipo, memberId: member.id, onSuccess: fetchMembers }),
                                                     },
                                                     {
                                                         key: 'delete',

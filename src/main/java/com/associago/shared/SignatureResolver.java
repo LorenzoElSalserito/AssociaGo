@@ -2,6 +2,10 @@ package com.associago.shared;
 
 import com.associago.association.Association;
 import com.associago.association.repository.AssociationRepository;
+import com.associago.shared.i18n.Messages;
+import com.associago.shared.pdf.PdfDocument;
+import com.associago.signature.InstitutionalSignature;
+import com.associago.signature.InstitutionalSignatureRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -10,49 +14,52 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Risolve i firmatari attivi per un'associazione.
- * Utilizzato da tutti i moduli che necessitano firme automatiche:
- * CertificateService, AnnualBalanceService, GovernanceMinutesService, DocumentService.
+ * Fonte primaria: Impostazioni › Firme (institutional_signatures: nome, carica, immagine).
+ * Fallback: nomi dell'Organigramma e immagini in assets/{id}/signatures/{role}.png|jpg.
+ * Utilizzato da AnnualBalanceService, CertificateService e dal verbale di assemblea.
  */
 @Component
 public class SignatureResolver {
 
     private final AssociationRepository associationRepository;
+    private final InstitutionalSignatureRepository signatureRepository;
     private final String assetsPath;
 
     public SignatureResolver(AssociationRepository associationRepository,
+                             InstitutionalSignatureRepository signatureRepository,
                              @Value("${associago.assets.storage-path}") String assetsPath) {
         this.associationRepository = associationRepository;
+        this.signatureRepository = signatureRepository;
         this.assetsPath = assetsPath;
     }
 
     /**
-     * Preleva i firmatari attivi per un'associazione.
+     * Preleva i firmatari per un'associazione.
      *
      * @param associationId ID associazione
-     * @param roles         Lista ruoli richiesti ("president", "secretary", "treasurer", "instructor")
-     * @return Lista di SignerInfo con nome, cognome, carica, path immagine firma
+     * @param roles         Ruoli richiesti ("president", "secretary", "treasurer", "vice_president"; maiuscole ammesse)
+     * @return un SignerInfo per ogni ruolo noto, anche senza nome configurato
      */
     public List<SignerInfo> resolveSigners(Long associationId, List<String> roles) {
         Association assoc = associationRepository.findById(associationId)
                 .orElseThrow(() -> new IllegalArgumentException("Association not found: " + associationId));
 
         List<SignerInfo> signers = new ArrayList<>();
-
         for (String role : roles) {
             SignerInfo info = resolveRole(assoc, role);
             if (info != null) {
                 signers.add(info);
             }
         }
-
         return signers;
     }
 
     /**
-     * Verifica che tutti i firmatari richiesti siano configurati.
+     * Ruoli richiesti senza un nome né in Impostazioni › Firme né nell'Organigramma.
      */
     public List<String> getMissingSigners(Long associationId, List<String> roles) {
         Association assoc = associationRepository.findById(associationId)
@@ -61,7 +68,7 @@ public class SignatureResolver {
         List<String> missing = new ArrayList<>();
         for (String role : roles) {
             SignerInfo info = resolveRole(assoc, role);
-            if (info == null || info.firstName() == null || info.firstName().isBlank()) {
+            if (info == null || !info.hasName()) {
                 missing.add(role);
             }
         }
@@ -69,38 +76,44 @@ public class SignatureResolver {
     }
 
     private SignerInfo resolveRole(Association assoc, String role) {
-        return switch (role.toLowerCase()) {
-            case "president" -> buildSignerInfo("president", assoc.getPresident(), "Presidente", assoc.getId());
-            case "secretary" -> buildSignerInfo("secretary", assoc.getSecretary(), "Segretario", assoc.getId());
-            case "treasurer" -> buildSignerInfo("treasurer", assoc.getTreasurer(), "Tesoriere", assoc.getId());
-            case "vice_president" -> buildSignerInfo("vice_president", assoc.getVicePresident(), "Vice-Presidente", assoc.getId());
+        String key = role.toLowerCase(Locale.ROOT);
+        String organigramName = switch (key) {
+            case "president" -> assoc.getPresident();
+            case "secretary" -> assoc.getSecretary();
+            case "treasurer" -> assoc.getTreasurer();
+            case "vice_president" -> assoc.getVicePresident();
             default -> null;
         };
+        InstitutionalSignature stored = findStored(assoc.getId(), key);
+        if (organigramName == null && stored == null && !List.of("president", "secretary", "treasurer", "vice_president").contains(key)) {
+            return null;
+        }
+
+        String fullName = stored != null && notBlank(stored.getSignerName()) ? stored.getSignerName() : organigramName;
+        String title = stored != null && notBlank(stored.getSignerTitle()) ? stored.getSignerTitle() : null;
+        byte[] image = stored != null ? stored.getSignatureImage() : null;
+        String imagePath = image == null || image.length == 0 ? findSignatureImage(assoc.getId(), key) : null;
+
+        if (!notBlank(fullName)) {
+            return new SignerInfo(key, null, null, title, imagePath, image);
+        }
+        String[] parts = fullName.trim().split("\\s+", 2);
+        return new SignerInfo(key, parts[0], parts.length == 2 ? parts[1] : "", title, imagePath, image);
     }
 
-    private SignerInfo buildSignerInfo(String role, String fullName, String title, Long associationId) {
-        if (fullName == null || fullName.isBlank()) {
-            return new SignerInfo(role, null, null, title, null);
+    private InstitutionalSignature findStored(Long associationId, String role) {
+        if (signatureRepository == null || associationId == null) return null;
+        try {
+            return signatureRepository.findByAssociationIdAndSignerRole(associationId, role.toUpperCase(Locale.ROOT))
+                    .filter(InstitutionalSignature::isActive)
+                    .orElse(null);
+        } catch (RuntimeException e) {
+            return null;
         }
-
-        String firstName;
-        String lastName;
-        String[] parts = fullName.trim().split("\\s+", 2);
-        if (parts.length == 2) {
-            firstName = parts[0];
-            lastName = parts[1];
-        } else {
-            firstName = fullName;
-            lastName = "";
-        }
-
-        // Cerca immagine firma nell'assets path
-        String signaturePath = findSignatureImage(associationId, role);
-
-        return new SignerInfo(role, firstName, lastName, title, signaturePath);
     }
 
     private String findSignatureImage(Long associationId, String role) {
+        if (assetsPath == null || associationId == null) return null;
         String basePath = assetsPath + "/" + associationId + "/signatures";
         for (String ext : new String[]{"png", "jpg", "jpeg"}) {
             Path path = Paths.get(basePath, role + "." + ext);
@@ -111,11 +124,51 @@ public class SignatureResolver {
         return null;
     }
 
+    private static boolean notBlank(String value) {
+        return value != null && !value.isBlank();
+    }
+
+    /**
+     * @param title             carica personalizzata da Impostazioni › Firme; null = etichetta localizzata del ruolo
+     * @param signatureImage    immagine salvata nel database (preferita)
+     * @param signatureImagePath immagine su disco, usata solo se manca quella nel database
+     */
     public record SignerInfo(
             String role,
             String firstName,
             String lastName,
             String title,
-            String signatureImagePath
-    ) {}
+            String signatureImagePath,
+            byte[] signatureImage
+    ) {
+        public SignerInfo(String role, String firstName, String lastName, String title, String signatureImagePath) {
+            this(role, firstName, lastName, title, signatureImagePath, null);
+        }
+
+        public boolean hasName() {
+            return firstName != null && !firstName.isBlank();
+        }
+
+        public String fullName() {
+            if (!hasName()) return "";
+            return (firstName + " " + (lastName == null ? "" : lastName)).trim();
+        }
+
+        /** Image bytes from the database or the file fallback; null when absent or unreadable. */
+        public byte[] imageBytes() {
+            if (signatureImage != null && signatureImage.length > 0) return signatureImage;
+            if (signatureImagePath == null) return null;
+            try {
+                return Files.readAllBytes(Path.of(signatureImagePath));
+            } catch (Exception e) {
+                return null;
+            }
+        }
+
+        /** Signature block for a PDF, with the custom title or the localized role name. */
+        public PdfDocument.SignatureBlock toBlock(Messages messages, Locale locale) {
+            String roleLabel = title != null && !title.isBlank() ? title : messages.label(locale, "role", role);
+            return new PdfDocument.SignatureBlock(fullName(), roleLabel, imageBytes());
+        }
+    }
 }

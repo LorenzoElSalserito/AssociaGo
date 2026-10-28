@@ -1,4 +1,4 @@
-import LoadingIcon from "../assets/5.svg";
+import LoadingIcon from "../assets/brand-mark.png";
 import { useTranslation } from 'react-i18next';
 
 /**
@@ -11,7 +11,7 @@ import { useTranslation } from 'react-i18next';
  *
  * @param {string} message - Messaggio da mostrare sotto lo spinner
  */
-export default function SplashScreen({ message }) {
+export default function SplashScreen({ message, onRetry }) {
     const { t } = useTranslation();
     const displayMessage = message || t("Loading...");
 
@@ -20,15 +20,16 @@ export default function SplashScreen({ message }) {
             <div className="logout-content text-center">
                 <img
                     src={LoadingIcon}
-                    alt="AssociaGo Loading"
+                    alt=""
                     className="logout-logo mb-4"
-                    style={{ width: "500px", height: "500px" }}
+                    style={{ width: "120px", height: "120px" }}
                 />
                 <h4 className="fw-bold mb-3">AssociaGo</h4>
                 <div className="d-flex align-items-center justify-content-center gap-2 text-muted">
-                    <div className="spinner-border spinner-border-sm" role="status"></div>
+                    {!onRetry && <div className="spinner-border spinner-border-sm" role="status"></div>}
                     <span>{displayMessage}</span>
                 </div>
+                {onRetry && <button type="button" className="btn btn-primary mt-3" onClick={onRetry}>{t("Retry")}</button>}
             </div>
 
             <style>{`
@@ -38,7 +39,7 @@ export default function SplashScreen({ message }) {
                     left: 0;
                     width: 100vw;
                     height: 100vh;
-                    background: #f5f7fa; /* Colore neutro */
+                    background: var(--body-bg); /* Colore neutro */
                     display: flex;
                     align-items: center;
                     justify-content: center;

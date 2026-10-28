@@ -6,6 +6,7 @@ public record AttendanceRecordDTO(
         Long id,
         Long sessionId,
         Long memberId,
+        Long userId,
         String status,
         LocalTime checkInTime,
         String notes

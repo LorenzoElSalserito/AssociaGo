@@ -27,7 +27,7 @@ public class BackupController {
             String path = backupService.createBackup();
             return ResponseEntity.ok(Collections.singletonMap("path", path));
         } catch (IOException e) {
-            return ResponseEntity.internalServerError().body(Collections.singletonMap("error", e.getMessage()));
+            return ResponseEntity.internalServerError().body(Collections.singletonMap("message", e.getMessage()));
         }
     }
 }

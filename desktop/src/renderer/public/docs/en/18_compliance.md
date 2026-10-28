@@ -1,54 +1,55 @@
 # 18. Compliance and Audit
 
-The **Audit** section automatically records all sensitive operations performed on the platform, ensuring the complete traceability required by Third Sector (Terzo Settore) regulations.
+The compliance tools available today are in the **Settings › Registry** tab: the association's locations, institutional documents and deadlines.
 
-## 18.1 What Is the Audit Log
-The audit log is an immutable record that documents:
-- **Who** performed the operation (user).
-- **What** was done (action type).
-- **When** it occurred (precise timestamp).
-- **On which entity** the action was performed (member, transaction, event, etc.).
-- **Which values** changed (before/after, when available).
+**Audit log.** AssociaGo automatically records every **creation**, **change** and **deletion** of the main data: members and memberships, transactions and invoices, activities, events and participants, assemblies and motions, inventory and loans, volunteers, shifts and reimbursements, coupons, budgets, financial statements, certificates, communications, association profile, signatures and database settings.
 
-## 18.2 Tracked Operations
-The system automatically records the most relevant operations, including:
-- Creation, modification, and deletion of members.
-- Recording and modification of financial transactions.
-- Creation and sending of communications.
-- Approval of financial statements.
-- Issuance of certificates.
-- Changes to association settings.
-- Attendance management.
+To consult it open **Settings › Audit log**. The table, starting from the most recent entry, shows:
+- **Date and time** of the operation;
+- **Area** (for example Members, Finance, Events);
+- **Action**: Created, Updated or Deleted;
+- **Record**: the data type and its identification number;
+- **Details**: for changes, the names of the changed fields.
 
-## 18.3 Viewing the Log
+You can filter by **Area**, **Action** and date range (**From**, **To**); **Clear filters** goes back to the full list. Entries are split into pages of 25.
 
-### Access
-The audit log can be accessed through the system's APIs. Available information includes:
+What is **not** recorded:
+- field values, neither before nor after the change: only their names;
+- passwords, access codes, database credentials, logo and signature images;
+- who performed the operation: access is per association, not per individual user.
 
-### Available Filters
-- **By association**: View only the operations of a specific association.
-- **By entity**: Filter by entity type (e.g., "MEMBER", "TRANSACTION") and specific ID.
-- **By date**: Select a time range with start and end dates.
-- **By user**: Filter the actions of a specific user.
+> Each association sees only its own log. The log cannot be edited from the app and is deleted together with the association.
 
-### Pagination
-Results are paginated to handle large volumes of data. You can specify:
-- **Page**: Current page number.
-- **Size**: Number of records per page (default 50).
+## 18.1 Locations
 
-## 18.4 Operation Count
-An endpoint is available to retrieve the total count of recorded operations for an association, useful for dashboards and statistics.
+Fill in the row at the top and press **Add**:
+- type: **Registered office**, **Operational site** or **Project site**;
+- **Name**, **Address**, **City** and province (**Prov.**).
 
-## 18.5 Technical Characteristics
-- **Independent transaction**: Each audit entry is written in a separate transaction. Even if the main operation fails, the attempt is still recorded in the log.
-- **Immutability**: Audit entries cannot be modified or deleted.
-- **Indexing**: The log is indexed by association, entity, user, and date to ensure fast searches.
+The table shows **Type**, **Name**, **Address** and **Contacts**. The trash deletes the location.
 
-## 18.6 Importance for the Third Sector (Terzo Settore)
-Operation traceability is a fundamental requirement for:
-- **Legal audit**: Entities with revenue above certain thresholds are subject to audit.
-- **Tax inspections**: The Revenue Agency (Agenzia delle Entrate) may request detailed documentation.
-- **Transparency**: Members have the right to access association documents.
-- **GDPR compliance**: The log documents who performed operations on personal data.
+> The **Contacts** column stays empty: the form has no fields for the location's phone and email.
 
-> **Note**: The audit log is an internal security feature. Access to the log should be limited to association administrators and auditors.
+## 18.2 Documents
+
+To archive the statute, regulations and other deeds:
+1. choose the type: **Statute**, **Regulations** or **Attachment**;
+2. enter a **Title**;
+3. select the file and press **Upload**.
+
+The file is copied into AssociaGo's data folder. The table shows **Type**, **Title** and, in the **File** column, the path where it is stored. The trash deletes both the row and the copied file.
+
+> You cannot open or download the document from the app: to consult it, open the file from the path shown.
+
+## 18.3 Deadlines
+
+To track obligations such as insurance renewals, tax returns or mandatory assemblies:
+- **Title** and due date;
+- category: **Tax**, **Legal**, **Governance**, **Insurance** or **Other**;
+- a numeric field, preset to 30: the days of advance notice.
+
+Press **Add**. The table shows **Title**, **Due date**, **Category** and **Status**. When the obligation is fulfilled press **Mark completed**: the deadline becomes completed and the button disappears. The trash deletes it.
+
+> Deadlines are a reminder to check by hand. The advance notice days are saved, but the app sends no alerts or notifications, does not flag overdue deadlines and does not recreate recurring ones.
+
+> Deletions in this tab (locations, documents, deadlines) are immediate and ask for no confirmation.

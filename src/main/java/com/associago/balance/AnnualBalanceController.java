@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 
 @RestController
 @RequestMapping("/api/v1/balances")
@@ -69,7 +70,7 @@ public class AnnualBalanceController {
     }
 
     @GetMapping("/{id}/pdf")
-    public ResponseEntity<byte[]> downloadPdf(@PathVariable Long id) throws IOException {
+    public ResponseEntity<byte[]> downloadPdf(@PathVariable Long id, Locale locale) throws IOException {
         AnnualBalance balance = balanceService.findById(id);
         List<AnnualBalanceLine> lines = balanceService.getLines(id);
         var association = associationService.findById(balance.getAssociationId())
@@ -77,7 +78,7 @@ public class AnnualBalanceController {
         var signers = signatureResolver.resolveSigners(
                 balance.getAssociationId(), List.of("president", "secretary", "treasurer"));
 
-        byte[] pdf = balanceService.generatePdf(balance, lines, association, signers);
+        byte[] pdf = balanceService.generatePdf(balance, lines, association, signers, locale);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION,

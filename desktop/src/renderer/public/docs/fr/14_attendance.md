@@ -1,47 +1,34 @@
-# 14. Registre des Presences
+# 14. Registre des présences
 
-La section **Presences** permet d'enregistrer et de suivre la participation des membres aux activites de l'association.
+La page **Présences** enregistre les présences par session : pour chaque activité, vous créez les sessions (les cours ou rencontres individuels) et, dans chacune, vous indiquez le statut de chaque participant.
 
-## 14.1 Vue d'ensemble
-Le registre des presences est essentiel pour :
-- Documenter la participation effective aux activites.
-- Generer des attestations d'assiduite basees sur les presences reelles.
-- Respecter les obligations de tracabilite pour les organismes du secteur associatif.
-- Suivre l'engagement des membres.
+## 14.1 Sessions d'une activité
 
-## 14.2 Liste des Presences
-Le tableau principal affiche toutes les inscriptions de presence avec :
-- **Membre** : Prenom et nom du participant.
-- **Activite** : L'activite ou l'evenement auquel se rapporte la presence.
-- **Date** : Date et heure de l'enregistrement.
-- **Statut** : Present, Absent, Justifie.
+1. Choisissez l'**Activité** dans le menu en haut (la première est proposée).
+2. Le tableau affiche les sessions avec **Date**, **Heure de début**, **Heure de fin** et **Notes**.
 
-### Filtres
-Utilisez les filtres disponibles pour :
-- Filtrer par **activite** specifique.
-- Filtrer par **date** ou plage de dates.
-- Filtrer par **membre**.
+Les actions de chaque ligne sont **Gérer les présences** et l'icône **corbeille**, qui supprime la session et les présences associées après confirmation.
 
-## 14.3 Enregistrement des Presences
-### Enregistrement Individuel
-1. Cliquez sur **"Enregistrer une Presence"**.
-2. Selectionnez le **membre**.
-3. Selectionnez l'**activite**.
-4. Choisissez la **date**.
-5. Definissez le **statut** (Present/Absent/Justifie).
-6. Ajoutez d'eventuelles **notes**.
-7. Cliquez sur **"Enregistrer"**.
+## 14.2 Créer une session
 
-### Pointage Rapide
-Pour les activites en cours, il est possible d'effectuer un pointage rapide :
-1. Selectionnez l'activite en cours.
-2. Cochez les membres presents dans la liste des participants.
-3. Confirmez le pointage.
+1. Appuyez sur **Nouvelle session** (désactivé s'il n'y a aucune activité).
+2. Remplissez **Date** (obligatoire), **Heure de début**, **Heure de fin** et **Notes**. L'heure de fin doit être postérieure à l'heure de début.
+3. Appuyez sur **Enregistrer**. Le message **Enregistrement effectué.** apparaît.
 
-## 14.4 Rapports de Presences
-Le systeme genere des statistiques sur les presences :
-- **Taux de participation** par activite.
-- **Historique des presences** par membre.
-- **Activites les plus frequentees**.
+Après l'enregistrement, la liste des participants apparaît sur la même page. **Retour** ramène à la liste des sessions.
 
-> **Note** : Le registre des presences est particulierement important pour les Associations Sportives Amateurs, ou la documentation des presences est requise pour la couverture d'assurance et pour la validite des attestations de formation.
+## 14.3 Marquer les présences
+
+Ouvrez une session avec **Gérer les présences**. Vous pouvez corriger la date, les horaires et les notes, puis appuyer sur **Enregistrer**.
+
+Dans le tableau **Présences**, il y a une ligne pour chaque participant de l'activité inscrit en tant que membre. Pour chacun, choisissez le **Statut** :
+- **Présent**
+- **Absent**
+- **En retard**
+- **Excusé**
+
+Tant que vous ne choisissez rien, le statut est **Non enregistré**. Chaque choix est enregistré immédiatement, sans appuyer sur **Enregistrer**.
+
+Si le tableau est vide, ajoutez d'abord les participants dans la fiche de l'activité (chapitre 3). Les éventuelles présences issues de versions précédentes apparaissent dans un encadré **Présences historiques conservées**.
+
+> Il n'y a ni filtres par membre ou par période, ni rapports ou statistiques sur les présences. Les attestations ne tiennent pas compte des présences enregistrées.

@@ -1,54 +1,55 @@
 # 18. Conformità e Audit
 
-La sezione **Audit** registra automaticamente tutte le operazioni sensibili effettuate sulla piattaforma, garantendo la tracciabilità completa richiesta dalla normativa del Terzo Settore.
+Gli strumenti di conformità oggi disponibili sono nella scheda **Impostazioni › Anagrafica**: sedi, documenti istituzionali e scadenze dell'associazione.
 
-## 18.1 Cos'è l'Audit Log
-L'audit log è un registro immutabile che documenta:
-- **Chi** ha effettuato l'operazione (utente).
-- **Cosa** è stato fatto (tipo di azione).
-- **Quando** è avvenuto (timestamp preciso).
-- **Su quale entità** è stata effettuata l'azione (socio, transazione, evento, ecc.).
-- **Quali valori** sono cambiati (prima/dopo, quando disponibile).
+**Registro attività.** AssociaGo registra in automatico ogni **creazione**, **modifica** ed **eliminazione** dei dati principali: soci e iscrizioni, movimenti e fatture, attività, eventi e partecipanti, assemblee e mozioni, inventario e prestiti, volontari, turni e rimborsi, coupon, preventivi, rendiconti, attestati, comunicazioni, profilo associazione, firme e impostazioni del database.
 
-## 18.2 Operazioni Tracciate
-Il sistema registra automaticamente le operazioni più rilevanti, tra cui:
-- Creazione, modifica ed eliminazione di soci.
-- Registrazione e modifica di transazioni finanziarie.
-- Creazione e invio di comunicazioni.
-- Approvazione di bilanci.
-- Emissione di attestati.
-- Modifiche alle impostazioni dell'associazione.
-- Gestione delle presenze.
+Per consultarlo apri **Impostazioni › Registro attività**. La tabella, dalla voce più recente, mostra:
+- **Data e ora** dell'operazione;
+- **Area** (per esempio Soci, Finanze, Eventi);
+- **Azione**: Creazione, Modifica o Eliminazione;
+- **Record**: il tipo di dato e il suo numero identificativo;
+- **Dettaglio**: per le modifiche, i nomi dei campi cambiati.
 
-## 18.3 Consultazione del Log
+Puoi filtrare per **Area**, **Azione** e intervallo di date (**Dal**, **Al**); **Azzera filtri** torna all'elenco completo. Le voci sono divise in pagine da 25.
 
-### Accesso
-Il log di audit è consultabile tramite le API del sistema. Le informazioni disponibili includono:
+Cosa **non** viene registrato:
+- i valori dei campi, né prima né dopo la modifica: solo i loro nomi;
+- password, codici di accesso, credenziali del database, immagini di loghi e firme;
+- chi ha eseguito l'operazione: l'accesso è per associazione, non per singolo utente.
 
-### Filtri Disponibili
-- **Per associazione**: Visualizza solo le operazioni di una specifica associazione.
-- **Per entità**: Filtra per tipo di entità (es. "MEMBER", "TRANSACTION") e ID specifico.
-- **Per data**: Seleziona un intervallo temporale con date di inizio e fine.
-- **Per utente**: Filtra le azioni di un utente specifico.
+> Ogni associazione vede solo il proprio registro. Il registro non si modifica dall'app e viene cancellato insieme all'associazione.
 
-### Paginazione
-I risultati sono paginati per gestire grandi volumi di dati. È possibile specificare:
-- **Pagina**: Numero della pagina corrente.
-- **Dimensione**: Numero di record per pagina (default 50).
+## 18.1 Sedi
 
-## 18.4 Conteggio Operazioni
-È disponibile un endpoint per ottenere il conteggio totale delle operazioni registrate per un'associazione, utile per dashboard e statistiche.
+Compila la riga in alto e premi **Aggiungi**:
+- tipo: **Sede Legale**, **Sede Operativa** o **Sede Progetto**;
+- **Nome**, **Indirizzo**, **Città** e provincia (**Prov.**).
 
-## 18.5 Caratteristiche Tecniche
-- **Transazione indipendente**: Ogni voce di audit viene scritta in una transazione separata. Anche se l'operazione principale fallisce, il tentativo viene comunque registrato nel log.
-- **Immutabilità**: Le voci di audit non possono essere modificate o eliminate.
-- **Indicizzazione**: Il log è indicizzato per associazione, entità, utente e data per garantire ricerche rapide.
+La tabella mostra **Tipo**, **Nome**, **Indirizzo** e **Contatti**. Il cestino elimina la sede.
 
-## 18.6 Importanza per il Terzo Settore
-La tracciabilità delle operazioni è un requisito fondamentale per:
-- **Revisione legale**: Gli enti con ricavi superiori a determinati importi sono soggetti a revisione.
-- **Controlli fiscali**: L'Agenzia delle Entrate può richiedere documentazione dettagliata.
-- **Trasparenza**: I soci hanno diritto di accesso ai documenti associativi.
-- **Compliance GDPR**: Il log documenta chi ha effettuato operazioni sui dati personali.
+> La colonna **Contatti** resta vuota: il modulo non ha campi per telefono ed email della sede.
 
-> **Nota**: L'audit log è una funzionalità interna di sicurezza. L'accesso al log dovrebbe essere limitato agli amministratori dell'associazione e ai revisori dei conti.
+## 18.2 Documenti
+
+Per archiviare statuto, regolamenti e altri atti:
+1. scegli il tipo: **Statuto**, **Regolamento** o **Allegato**;
+2. scrivi un **Titolo**;
+3. seleziona il file e premi **Carica**.
+
+Il file viene copiato nella cartella dati di AssociaGo. La tabella mostra **Tipo**, **Titolo** e, nella colonna **File**, il percorso in cui è salvato. Il cestino elimina sia la riga sia il file copiato.
+
+> Dall'app non si può aprire o scaricare il documento: per consultarlo apri il file dal percorso indicato.
+
+## 18.3 Scadenze
+
+Per segnare adempimenti come rinnovi assicurativi, dichiarazioni o assemblee obbligatorie:
+- **Titolo** e data di scadenza;
+- categoria: **Fiscale**, **Legale**, **Governance**, **Assicurazioni** o **Altro**;
+- un campo numerico, preimpostato a 30: i giorni di preavviso.
+
+Premi **Aggiungi**. La tabella mostra **Titolo**, **Data Scadenza**, **Categoria** e **Stato**. Quando l'adempimento è fatto premi **Segna completata**: la scadenza passa a completata e il pulsante sparisce. Il cestino la elimina.
+
+> Le scadenze sono un promemoria da consultare a mano. I giorni di preavviso vengono salvati, ma l'app non manda avvisi né notifiche, non segnala le scadenze superate e non ricrea quelle ricorrenti.
+
+> Le eliminazioni in questa scheda (sedi, documenti, scadenze) sono immediate e non chiedono conferma.

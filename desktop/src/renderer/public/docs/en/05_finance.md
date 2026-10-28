@@ -1,46 +1,45 @@
-# 5. Finance and Accounting (Finance)
+# 5. Finance and Accounting
 
-The **Finance** section offers complete control over the association's accounting.
+The **Finance** section holds the association's income, expenses and fiscal documents.
 
-## 5.1 Financial Dashboard
-The main view shows:
-- **Total Income**: Sum of all incoming transactions.
-- **Total Expenses**: Sum of all outgoing transactions.
-- **Net Balance**: Difference between income and expenses.
-- **Year-over-Year Comparison**: Chart showing the trend compared to the previous year.
+## 5.1 Summary
 
-## 5.2 Transactions
-The transactions table lists every financial movement.
+At the top of the page you find:
+- **Total Income**, **Total Expenses** and **Net Balance**;
+- a chart comparing, month by month, the current year with the previous one;
+- the **Fiscal Dashboard** panel with the **Annual Report**: a PDF with the year's income, expenses and balance.
 
-### Advanced Filters
-You can filter by:
-- **Type**: Income/Expense.
-- **Category**: (Membership Fee, Donation, Event, Purchase, Rent, etc.).
-- **Date**: Time range.
+## 5.2 Recording a transaction
 
-### New Transaction
-The form allows you to register:
-- **Date and Amount**.
-- **Type and Category**.
-- **Description**.
-- **Payment Method**: (Cash, Bank Transfer, etc.).
-- **Linked Member**: Optional, to link the transaction to a member.
+Press **New Transaction** and fill in:
+- **Type**: Income or Expenses;
+- **Amount**, **Date** and **Description**;
+- **Category**: free text, for example "Fees", "Rent" or "Utilities";
+- **Payment Method**: one of the methods configured in Settings › Finance.
 
-### Actions
-- **Edit/Delete**: To correct errors.
-- **Receipt**: Instant generation of a PDF receipt for the transaction.
+If the method has a commission, the table shows it in the **Comm.** column.
 
-## 5.3 Custom Comparison
-This powerful feature allows you to analyze financial trends by comparing any two years of your choice.
-- **Year Selection**: Freely choose Year 1 and Year 2 to compare.
-- **Comparative Chart**: Visualize at a glance the differences in income and expenses between the two periods.
-- **Details**: Summary cards show totals and net balance for each year.
-- **PDF Export**: Download a professional report with the detailed comparison, ideal for board meetings or the members' assembly.
+### Membership renewal
+Tick **Is Membership Renewal** to link the transaction to a member. Then enter the **Member**, the **Period** (Monthly, Semiannual, Annual) and the **Year**.
 
-## 5.4 Payment Methods
-In the "Settings" tab (or accessible from the dashboard), you can configure accepted payment methods and any commissions (fixed or percentage) applied.
+### Rent
+**Record Rent** opens the form pre-filled as an expense in the rent category.
 
-## 5.5 Fiscal Reporting
-- **Annual Report**: Generates a complete PDF with the financial summary of the selected year.
-- **Expense Analysis**: Charts and tables to understand where funds are spent.
-- **CSV Export**: For external processing (e.g., Excel).
+## 5.3 List and filters
+
+In the **Transactions** tab you can filter by type (**All Types**, Income, Expenses) and by date range, with **Start Date** and **End Date**. Press **Apply Filters** to update the list and **Clear Filters** to return to the full view.
+
+Each row offers these actions:
+- **Edit** and **Delete**;
+- **Download Receipt**, which generates the receipt as a PDF;
+- **Send Email**, which opens your mail program with a pre-filled message.
+
+## 5.4 Journal entries and comparisons
+
+- **Journal Entries** shows the double-entry journal: account, debit and credit.
+- **Custom Comparison** compares any two years. **Export Comparison PDF** saves the result as a PDF.
+- **Export PDF Report**, at the top of the page, downloads the current year's report.
+
+## 5.5 Payment methods
+
+Payment methods, with any commissions, are configured in **Settings › Finance** (chapter 10).

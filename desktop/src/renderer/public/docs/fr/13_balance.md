@@ -1,39 +1,49 @@
-# 13. Bilan Financier Annuel
+# 13. Bilan financier annuel
 
-La section **Bilan Financier** genere le compte rendu financier annuel de l'association, conforme aux lignes directrices de la reglementation du secteur associatif.
+La page **Bilan Annuel** calcule le compte rendu financier d'une année à partir des mouvements enregistrés en comptabilité.
 
-## 13.1 Vue d'ensemble
-Le bilan financier est le document qui resume toutes les recettes et les depenses effectives d'un exercice. Dans AssociaGo, il est calcule automatiquement a partir des transactions enregistrees.
+## 13.1 Liste des bilans
 
-## 13.2 Calcul du Bilan
-1. Selectionnez l'**annee** de reference.
-2. Cliquez sur **"Calculer le Bilan"**.
-3. Le systeme analyse toutes les transactions de l'annee et genere le tableau avec :
-   - **Recettes** reparties par categorie.
-   - **Depenses** reparties par categorie.
-   - **Excedent/Deficit de gestion**.
-   - **Comparaison d'une annee sur l'autre** (variation en pourcentage par rapport a l'annee precedente).
+Le tableau affiche **Année**, **Titre**, **Statut** et **Résultat net** (vert s'il est positif, rouge s'il est négatif). Cliquez sur une ligne pour ouvrir le bilan. L'icône **corbeille** le supprime, après la confirmation **Êtes-vous sûr ?**.
 
-## 13.3 Verification des Signataires
-Avant d'approuver, le systeme verifie que les **signataires institutionnels** sont correctement configures. Cliquez sur **"Verifier les Signataires"** pour controler :
-- President (obligatoire)
-- Secretaire
-- Tresorier
+## 13.2 Calculer un bilan
 
-Si des signatures institutionnelles manquent, un avertissement s'affichera avec un lien direct vers Parametres > Signatures.
+1. Appuyez sur **Calculer le bilan**.
+2. Dans la fenêtre **Calculer le bilan annuel**, indiquez l'**Année**.
+3. Appuyez sur **Calculer**.
 
-## 13.4 Approbation
-1. Cliquez sur **"Approuver le Bilan"**.
-2. L'etat passe a **Approuve**.
-3. Le bilan approuve devient immuable et peut etre exporte en PDF.
+Le système prend les mouvements du 1er janvier au 31 décembre, les regroupe par catégorie (ceux sans catégorie vont dans « Autres recettes » ou « Autres dépenses ») et crée le bilan « Bilan annuel ANNÉE ». Le titre et les libellés génériques sont rédigés dans la langue de l'interface au moment du calcul.
 
-## 13.5 Exportation PDF
-Cliquez sur **"Telecharger le PDF"** pour generer le document officiel. Le PDF comprend :
-- En-tete avec le logo et les informations de l'association.
-- Tableau des recettes/depenses par categorie.
-- Totaux et solde.
-- Comparaison avec l'annee precedente (si disponible).
-- Signatures institutionnelles avec les images des signatures chargees.
-- Date d'approbation.
+> S'il existe déjà un bilan pour cette année, il est recalculé et écrasé, même s'il était approuvé, et revient à un état non approuvé.
 
-> **Note** : Le bilan financier est un acte obligatoire pour les organismes du secteur associatif. Sa redaction et son approbation en assemblee doivent respecter les delais legaux (generalement avant le 30 avril de l'annee suivante).
+## 13.3 Détail
+
+En haut, trois encadrés : **Revenus Totaux**, **Dépenses Totales** et **Résultat net**. En dessous, deux tableaux **Revenus** et **Dépenses** avec une ligne par catégorie et le total en gras (TOTAL DES RECETTES, TOTAL DES DÉPENSES).
+
+> La comparaison avec l'année précédente est calculée mais n'est affichée ni sur la page ni dans le PDF.
+
+## 13.4 Signataires
+
+À l'ouverture, le système vérifie de lui-même que **Président**, **Secrétaire** et **Trésorier** ont un nom dans **Paramètres › Signatures** ou dans l'**Organigramme** (**Paramètres › Profil de l'Association**). S'il en manque un, l'avertissement **Signataires manquants** apparaît, suivi des rôles sous forme de code anglais (president, secretary, treasurer).
+
+## 13.5 Approbation
+
+**Approuver** fait passer le bilan à l'état approuvé. Le bouton reste désactivé tant qu'il manque ne serait-ce qu'un des trois signataires ; après l'approbation, il disparaît.
+
+> L'approbation ne rend pas le bilan immuable : il peut encore être supprimé ou recalculé.
+
+## 13.6 PDF
+
+**Télécharger PDF** est disponible dans tous les états, même avant l'approbation, et enregistre le fichier `bilancio_ANNO.pdf` au format A4, dans la langue de l'interface (libellés, dates et montants). Il contient :
+- le nom, l'adresse, la ville et le code fiscal de l'association ;
+- le titre « BILAN ANNUEL ANNÉE » et la période ;
+- les recettes et les dépenses par catégorie avec les totaux ;
+- « EXCÉDENT » ou « DÉFICIT », le fonds initial et le fonds final ;
+- une section « Signatures » pour le Président, le Secrétaire et le Trésorier : image de la signature de **Paramètres › Signatures** (chapitre 16), nom et fonction ; sans signature enregistrée, le nom de l'Organigramme et une ligne vide ;
+- la date et l'heure de génération et le numéro de page.
+
+> Le PDF ne contient ni logo ni date d'approbation.
+
+À chaque téléchargement, une somme de contrôle SHA-256 du PDF est calculée. Ses 16 premiers caractères apparaissent à côté du statut après avoir quitté puis rouvert la page.
+
+> **Remarque** : le bilan financier annuel est obligatoire pour les organismes du Tiers Secteur et doit être approuvé par l'assemblée dans les délais légaux (en général avant le 30 avril de l'année suivante).

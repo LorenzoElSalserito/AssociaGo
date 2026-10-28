@@ -55,6 +55,8 @@ export const translateCompensationType = (value, t) =>
   enumMap({
     HOURLY: 'enum.compensationType.hourly',
     FLAT_RATE: 'enum.compensationType.flatRate',
+    FIXED: 'enum.compensationType.flatRate',
+    PERCENTAGE: 'enum.compensationType.percentage',
     VOLUNTEER: 'enum.compensationType.volunteer',
     hourly: 'enum.compensationType.hourly',
     flat_rate: 'enum.compensationType.flatRate',
@@ -65,6 +67,7 @@ export const translateCostCategory = (value, t) =>
   enumMap({
     EQUIPMENT: 'enum.costCategory.equipment',
     VENUE: 'enum.costCategory.venue',
+    RENT: 'enum.costCategory.venue',
     INSTRUCTOR: 'enum.costCategory.instructor',
     MARKETING: 'enum.costCategory.marketing',
     MATERIALS: 'enum.costCategory.materials',
@@ -86,7 +89,8 @@ export const translateCertificateType = (value, t) =>
     TRAINING: 'enum.certificateType.training',
     MEMBERSHIP: 'enum.certificateType.membership',
     COMPLETION: 'enum.certificateType.completion',
-    VOLUNTEER_HOURS: 'enum.certificateType.volunteerHours'
+    VOLUNTEER_HOURS: 'enum.certificateType.volunteerHours',
+    CUSTOM: 'enum.certificateType.custom'
   }, t)(value)
 
 export const translateEventType = (value, t) =>
@@ -96,6 +100,8 @@ export const translateEventType = (value, t) =>
     MEETING: 'enum.eventType.meeting',
     PARTY: 'enum.eventType.party',
     FUNDRAISER: 'enum.eventType.fundraiser',
+    CONGRESS: 'enum.eventType.congress',
+    CONFERENCE: 'enum.eventType.conference',
     OTHER: 'enum.eventType.other',
     workshop: 'enum.eventType.workshop',
     seminar: 'enum.eventType.seminar',
@@ -110,7 +116,8 @@ export const translateParticipantStatus = (value, t) =>
     REGISTERED: 'enum.participantStatus.registered',
     CHECKED_IN: 'enum.participantStatus.checkedIn',
     CANCELLED: 'enum.participantStatus.cancelled',
-    WAITLISTED: 'enum.participantStatus.waitlisted'
+    WAITLISTED: 'enum.participantStatus.waitlisted',
+    WAITLIST: 'enum.participantStatus.waitlisted'
   }, t)(value)
 
 export const translatePaymentStatus = (value, t) =>
@@ -135,11 +142,26 @@ export const translateBalanceStatus = (value, t) =>
     GENERATED: 'enum.balanceStatus.generated',
     APPROVED: 'enum.balanceStatus.approved',
     SIGNED: 'enum.balanceStatus.signed',
-    ARCHIVED: 'enum.balanceStatus.archived'
+    ARCHIVED: 'enum.balanceStatus.archived',
+    COMPUTED: 'enum.balanceStatus.computed'
   }, t)(value)
 
 export const translateBudgetSection = (value, t) =>
   enumMap({
     INCOME: 'enum.budgetSection.income',
     EXPENSE: 'enum.budgetSection.expense'
+  }, t)(value)
+
+export const translateMemberStatus = (value, t) =>
+  enumMap({
+    ACTIVE: 'enum.memberStatus.active',
+    EXPIRED: 'enum.memberStatus.expired',
+    SUSPENDED: 'enum.memberStatus.suspended',
+    RESIGNED: 'enum.memberStatus.resigned'
+  }, t)(value)
+
+export const translateOrientation = (value, t) =>
+  enumMap({
+    LANDSCAPE: 'enum.orientation.landscape',
+    PORTRAIT: 'enum.orientation.portrait'
   }, t)(value)

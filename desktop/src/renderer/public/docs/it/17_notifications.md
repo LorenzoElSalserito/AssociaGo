@@ -1,39 +1,31 @@
 # 17. Notifiche
 
-Il sistema di **Notifiche** di AssociaGo informa in tempo reale sugli eventi importanti dell'associazione.
+Le notifiche si consultano dalla **campanella** nell'intestazione, accanto al menu del profilo. Raccolgono quello che succede nell'associazione con cui hai effettuato l'accesso: ogni associazione vede solo le proprie.
 
-## 17.1 Campanella delle Notifiche
-Nell'intestazione della pagina, accanto al profilo utente, è presente l'icona della **campanella**:
-- Un **badge rosso** con il numero indica le notifiche non lette.
-- Cliccando sulla campanella si apre il pannello delle notifiche.
+## 17.1 La campanella
 
-## 17.2 Pannello Notifiche
-Il pannello mostra l'elenco delle notifiche ordinate dalla più recente:
+- Il **badge** sulla campanella indica quante notifiche non sono ancora lette (oltre 9 mostra **9+**).
+- Un clic, oppure **Invio** o **Spazio** quando la campanella ha il focus, apre il pannello **Notifiche**; un clic fuori o il tasto **Esc** lo chiude.
+- Il conteggio si aggiorna da solo ogni 30 secondi.
 
-Per ogni notifica vengono visualizzati:
-- **Titolo**: Descrizione breve dell'evento.
-- **Messaggio**: Dettaglio aggiuntivo.
-- **Data e Ora**: Quando è stata generata la notifica.
-- **Stato**: Letta (grigia) o Non letta (evidenziata).
+## 17.2 Il pannello
 
-### Azioni Disponibili
-- **Segna come letta**: Clicca sulla singola notifica per segnarla come letta.
-- **Segna tutte come lette**: Pulsante in alto nel pannello per segnare tutte le notifiche come lette in un'unica azione.
+Le ultime 50 notifiche sono in ordine dalla più recente. Ognuna mostra titolo, messaggio e quando è stata creata ("5 minuti fa", "2 ore fa"; dopo un giorno, la data). Quelle non lette hanno lo sfondo evidenziato e un pallino a destra.
 
-## 17.3 Tipi di Notifica
-Il sistema genera notifiche automatiche per diversi eventi:
+- Fai clic su una notifica (o selezionala con **Tab** e premi **Invio**): viene segnata come letta e si apre l'elemento collegato. Un evento apre la sua scheda nella sezione **Eventi**; una tessera apre la scheda del socio nella sezione **Soci**.
+- **Segna tutto come letto**, in alto, compare solo se ci sono notifiche non lette.
+- Se non ce n'è nessuna, il pannello mostra **Nessuna notifica**.
 
-| Tipo | Descrizione |
-|------|-------------|
-| **INFO** | Informazioni generali (es. "Nuovo socio registrato"). |
-| **WARNING** | Avvisi che richiedono attenzione (es. "Tessere in scadenza"). |
-| **ALERT** | Situazioni urgenti (es. "Scadenza fiscale imminente"). |
-| **REMINDER** | Promemoria programmati (es. "Assemblea domani"). |
+I testi delle notifiche seguono la lingua scelta nelle impostazioni. Le notifiche create da versioni precedenti di AssociaGo mantengono il testo originale.
 
-## 17.4 Aggiornamento Automatico
-Le notifiche vengono aggiornate automaticamente ogni **30 secondi** senza necessità di ricaricare la pagina. Il badge sulla campanella si aggiorna in tempo reale.
+## 17.3 Quando vengono create
 
-## 17.5 Notifiche Collegate
-Alcune notifiche sono collegate a entità specifiche (socio, evento, attività). Il sistema registra il tipo e l'ID dell'entità correlata per facilitare la navigazione diretta al contesto della notifica.
+| Notifica | Quando |
+|---|---|
+| Nuova iscrizione a un evento | un socio o un ospite viene aggiunto ai partecipanti di un evento |
+| Evento annullato | un evento viene annullato: una sola notifica con il numero di partecipanti da avvisare |
+| Tessera rinnovata | una tessera viene rinnovata |
+| Tessera scaduta | controllo notturno (ore 1:00): la tessera risulta scaduta |
+| Tessera in scadenza | controllo notturno (ore 1:00): mancano esattamente 7 giorni alla scadenza |
 
-> **Nota**: Le notifiche vengono generate automaticamente dal sistema in risposta ad azioni e scadenze. Non è attualmente possibile creare notifiche manuali.
+I controlli notturni avvengono solo se AssociaGo è aperto a quell'ora. Le notifiche servono all'associazione: non vengono inviate ai soci. Per scrivere ai soci usa le **Comunicazioni** (capitolo 15).

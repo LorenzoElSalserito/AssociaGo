@@ -1,70 +1,70 @@
-# 3. Gestión de Actividades (Activities)
+# 3. Gestión de Actividades
 
-La sección **Actividades** está diseñada para gestionar cursos, talleres, seminarios y cualquier otra iniciativa continua o a largo plazo.
+La página **Actividades y Cupones** tiene dos pestañas: **Actividades** (cursos, talleres, seminarios) y **Cupones** (consulta el capítulo 9).
 
-## 3.1 Lista de Actividades
-La tabla principal muestra:
-- **Nombre de la Actividad**
-- **Horario**: Un resumen de los horarios semanales (ej. "Lun/Mié 18-20").
-- **Participantes**: Número de socios inscritos.
-- **Estado**: (Activa, Archivada).
+## 3.1 Lista de actividades
 
-## 3.2 Crear una Nueva Actividad
-El formulario de creación es completo y permite definir cada aspecto:
+Para cada actividad la tabla muestra:
+- nombre y categoría;
+- periodo (fecha de inicio y de fin);
+- número máximo de participantes, o "Unlimited" si no hay límite;
+- estado.
 
-### Información Básica
-- **Nombre y Descripción**: Para identificar la actividad.
-- **Categoría**: (Curso, Taller, Seminario, Otro).
-- **Tipo de Suscripción**:
-    - **Pago Único**: Pago único.
-    - **Mensual**: Pago recurrente.
-    - **Anual**: Pago anual.
-- **Costo**: El importe base para la inscripción.
+**Buscar actividades...** filtra por nombre. Las acciones de cada fila son **Ver detalles**, **Editar** y **Eliminar**.
 
-### Detalles Operativos
-- **Fechas**: Inicio y fin (opcional).
-- **Horario**: Un campo de texto para describir los horarios.
-- **Ubicación**: Dónde se lleva a cabo la actividad.
-- **Máx. Participantes**: Límite máximo de inscritos.
+## 3.2 Crear una actividad
 
-### Opciones Avanzadas
-- **Requiere Inscripción**: Si no está marcado, la actividad es solo informativa.
-- **Generar Factura**: Si se selecciona, el sistema puede generar documentos fiscales.
-- **Rutas de Imagen/Documento**: Para adjuntar material visual o informativo.
+Pulsa **Añadir Actividad**.
 
-## 3.3 Detalle de la Actividad
-Al hacer clic en una actividad, se accede a un tablero dedicado con 4 pestañas:
+### Datos principales
+- **Nombre de la Actividad** y **Categoría** son obligatorios. Las categorías son Curso, Taller, Seminario y Otro.
+- **Descripción** y **Ubicación**.
+- **Fecha de Inicio** (obligatoria), **Fecha de Fin**, **Hora de Inicio** y **Hora de Fin**.
+- **Detalles de Horario**: nota libre, por ejemplo "Lun/Mié 18-20".
 
-### 1. Participantes
-- **Lista**: Lista de todos los socios inscritos.
-- **Añadir**: Permite inscribir a un socio en la actividad.
-- **Estado de Pago**: Indica si el participante ha pagado la cuota.
+### Inscripción y costes
+- **Costo** y **Tipo de Suscripción**: Pago Único, Mensual o Anual.
+- **Máx. Participantes**: déjalo vacío si no hay límite.
+- **Requiere Inscripción** y **Generar Factura**.
+- **Ruta/URL de Documento** y **Ruta/URL de Imagen**, para adjuntar material.
 
-### 2. Horario (Schedule)
-- **Lista**: Lista de los horarios semanales.
-- **Añadir**: Permite definir una nueva franja horaria con:
-    - Día de la semana.
-    - Hora de inicio y fin.
-    - Ubicación (si es diferente de la principal).
+Pulsa **Guardar Actividad** para confirmar.
 
-### 3. Instructores
-- **Lista**: Lista de los instructores asociados.
-- **Añadir**: Permite añadir un instructor con:
-    - Datos personales.
-    - Especialización.
-    - **Tipo de Compensación**: (Por Hora, Tarifa Fija, Voluntario).
-    - **Valor de Compensación**: El importe por hora o tarifa fija.
+## 3.3 Ficha de detalle
 
-### 4. Costos
-- **Lista**: Lista de los costos incurridos para la actividad (alquiler, materiales, etc.).
-- **Añadir**: Permite registrar un nuevo costo con:
-    - Descripción e Importe.
-    - Categoría (Equipamiento, Sede, Marketing, etc.).
-    - **Costo Recurrente**: Si el costo se repite (ej. alquiler mensual).
+Arriba hay cuatro indicadores: **Participantes**, **Ingresos**, **Costos** y **Beneficio Neto**. Debajo hay seis pestañas.
 
-## 3.4 Informe de Actividad
-Desde la página de detalle, es posible descargar un **informe PDF** completo que resume:
-- Datos de la actividad.
-- Lista de participantes.
-- Resumen financiero (ingresos vs costos).
-- Horario e instructores.
+### Participantes
+**Añadir Participante** abre la lista de socios (**Seleccionar Socio**) y un campo opcional **Código de cupón** (consulta 9.3). La cuota debida es el costo de la actividad, menos el posible descuento. La tabla muestra el estado y el pago de cada participante (Pagado, Pendiente) con el importe debido y, si se ha usado, el cupón con el descuento; también permite quitarlo.
+
+En los **Ingresos** las cuotas aún no pagadas cuentan por el importe debido, ya descontado.
+
+### Horarios
+**Añadir Horario** registra las clases recurrentes: día de la semana, hora de inicio y de fin, lugar (opcional).
+
+### Instructores
+**Añadir Instructor** registra:
+- nombre y apellido (obligatorios), correo, teléfono;
+- **Especialización** y **Certificaciones** (p. ej. CONI, FIGC);
+- **Tipo de compensación** (Por Hora, Tarifa fija o Porcentaje) e importe.
+
+### Costes
+**Añadir Costo** registra los gastos de la actividad:
+- descripción, importe y fecha (obligatorios);
+- categoría: Materiales, Equipamiento, Personal, Alquiler / Sede, Marketing, Otro;
+- proveedor, **Costo Recurrente** y notas.
+
+Los costes se tienen en cuenta en el Beneficio Neto.
+
+### Certificados
+Elige una plantilla y pulsa **Emisión masiva** para emitir un certificado a cada participante activo inscrito como socio. Las plantillas se crean en la sección Certificados (capítulo 11).
+
+### Importación CSV
+Importa los participantes desde un archivo CSV:
+1. descarga el formato de ejemplo;
+2. pulsa **Generar vista previa**, que muestra las filas válidas, omitidas y los errores;
+3. pulsa **Confirmar importación**.
+
+## 3.4 Informe
+
+El botón **Informe** descarga un PDF de resumen de la actividad: datos principales y número de participantes.

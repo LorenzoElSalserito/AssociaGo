@@ -1,47 +1,32 @@
 # 16. Firme Istituzionali
 
-La sezione **Firme** (accessibile da Impostazioni > Firme) permette di configurare le firme visive dei rappresentanti istituzionali dell'associazione.
+Le firme si gestiscono in **Impostazioni › Firme**. Ci sono tre schede, una per ruolo: **Presidente**, **Segretario** e **Tesoriere**.
 
-## 16.1 A Cosa Servono
-Le firme istituzionali vengono apposte automaticamente su:
-- **Bilanci consuntivi** (PDF)
-- **Attestati e certificati** (PDF)
-- **Verbali di assemblea** (quando generati)
-- Qualsiasi documento ufficiale prodotto dalla piattaforma.
+## 16.1 Nome e titolo
 
-## 16.2 Ruoli Disponibili
-AssociaGo gestisce tre ruoli firmatari:
-- **Presidente**: La firma principale dell'ente.
-- **Segretario**: La firma del segretario verbalizzante.
-- **Tesoriere**: La firma del responsabile finanziario.
+In ogni scheda:
+- **Nome**: nome e cognome di chi ricopre la carica;
+- **Titolo**: già compilato con il nome del ruolo, puoi cambiarlo (es. "Presidente del Consiglio Direttivo").
 
-## 16.3 Configurazione
+Appena modifichi un campo compare il pulsante **Salva**. Premilo: la conferma è "Firma salvata con successo.".
 
-### Per Ogni Ruolo
-Nella scheda Firme delle Impostazioni, troverai una card per ciascun ruolo con:
+## 16.2 Immagine della firma
 
-1. **Nome del Firmatario**: Il nome completo della persona che ricopre la carica (es. "Mario Rossi").
-2. **Titolo/Qualifica**: La denominazione ufficiale (es. "Presidente del Consiglio Direttivo").
-3. **Immagine della Firma**: Upload di un file PNG o JPG contenente la scansione della firma autografa.
+Il campo **Carica immagine firma** compare solo dopo aver salvato il nome almeno una volta (fino ad allora la scheda ricorda: "Salva prima il nome, poi carica l'immagine della firma.").
+1. Premi il campo e scegli un file PNG o JPG (consigliato lo sfondo trasparente).
+2. L'immagine viene caricata subito, senza altri pulsanti, e compare in anteprima.
 
-### Caricare una Firma
-1. Clicca su **"Carica Immagine"** nella card del ruolo desiderato.
-2. Seleziona un file immagine (PNG, JPG) contenente la firma.
-3. L'immagine viene caricata e visualizzata in anteprima.
-4. Clicca **"Salva"** per confermare.
+Per toglierla premi **Elimina** sotto l'anteprima. Se non c'è un'immagine la scheda mostra **Nessuna immagine firma**.
 
-### Rimuovere una Firma
-Clicca l'icona **cestino** accanto all'anteprima per rimuovere l'immagine della firma.
+Non esiste uno stato attiva/inattiva: una firma c'è oppure no.
 
-## 16.4 Stato delle Firme
-Le firme hanno due stati:
-- **Attiva**: La firma è disponibile per l'apposizione sui documenti.
-- **Inattiva**: La firma è archiviata e non viene utilizzata.
+## 16.3 Dove vengono usate
 
-## 16.5 Best Practice
-- Utilizzare immagini con **sfondo trasparente** (PNG) per un risultato migliore sui documenti.
-- La risoluzione consigliata è di almeno **300x100 pixel**.
-- Mantenere aggiornati nomi e titoli in caso di rinnovo delle cariche sociali.
-- Configurare le firme **prima** di generare bilanci, attestati o verbali ufficiali.
+Le firme salvate qui vengono stampate nei PDF: l'immagine, ridimensionata senza deformarla, sopra una riga con il nome e, sotto, la carica (il **Titolo** se compilato, altrimenti il nome del ruolo nella lingua dell'interfaccia).
+- **Bilancio consuntivo**: Presidente, Segretario e Tesoriere.
+- **Attestati**: i ruoli scelti nella scheda **Firmatari** del modello.
+- **Verbali di assemblea**: Presidente e Segretario. L'immagine compare solo se il nome indicato nell'assemblea coincide con quello della firma; altrimenti resta la riga vuota per la firma a mano.
 
-> **Importante**: Le firme configurate in questa sezione sono firme visive (immagini). Non hanno valore di firma digitale qualificata ai sensi del Regolamento eIDAS. Per documenti che richiedono firma digitale, utilizzare strumenti di firma elettronica certificata.
+Se per un ruolo non c'è una firma salvata, il PDF usa il nome indicato nell'**Organigramma** (Impostazioni › Profilo Associazione) e lascia la riga vuota. Anche un'immagine illeggibile viene ignorata senza bloccare il documento.
+
+> Le firme sono immagini: non hanno valore di firma digitale qualificata (eIDAS). Per i documenti che la richiedono usa uno strumento di firma elettronica certificata.

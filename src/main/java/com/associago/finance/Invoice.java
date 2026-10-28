@@ -6,7 +6,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "invoices")
+@Table(name = "invoices", uniqueConstraints = @UniqueConstraint(columnNames = {"association_id", "number"}))
 public class Invoice {
 
     @Id
@@ -16,7 +16,7 @@ public class Invoice {
     @Column(name = "association_id", nullable = false)
     private Long associationId;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String number;
 
     @Column(name = "user_association_id")

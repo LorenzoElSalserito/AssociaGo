@@ -63,6 +63,11 @@ public class AssemblyController {
         return ResponseEntity.ok(assemblyService.addParticipant(participant));
     }
 
+    @PutMapping("/participants/{participantId}")
+    public ResponseEntity<AssemblyParticipant> updateParticipant(@PathVariable Long participantId, @RequestBody AssemblyParticipant participant) {
+        return ResponseEntity.ok(assemblyService.updateParticipant(participantId, participant));
+    }
+
     @DeleteMapping("/participants/{participantId}")
     public ResponseEntity<Void> removeParticipant(@PathVariable Long participantId) {
         assemblyService.removeParticipant(participantId);
@@ -81,6 +86,23 @@ public class AssemblyController {
         motion.setAssemblyId(id);
         return ResponseEntity.ok(assemblyService.addMotion(motion));
     }
+
+    @PutMapping("/motions/{motionId}")
+    public ResponseEntity<AssemblyMotion> updateMotion(@PathVariable Long motionId, @RequestBody AssemblyMotion motion) {
+        return ResponseEntity.ok(assemblyService.updateMotion(motionId, motion));
+    }
+
+    @PutMapping("/motions/{motionId}/result")
+    public ResponseEntity<AssemblyMotion> recordVotes(@PathVariable Long motionId, @RequestBody MotionVotesRequest votes) {
+        return ResponseEntity.ok(assemblyService.recordVotes(motionId, votes.votesInFavor(), votes.votesAgainst(), votes.votesAbstain()));
+    }
+
+    @DeleteMapping("/motions/{motionId}/result")
+    public ResponseEntity<AssemblyMotion> clearVotes(@PathVariable Long motionId) {
+        return ResponseEntity.ok(assemblyService.clearVotes(motionId));
+    }
+
+    public record MotionVotesRequest(Integer votesInFavor, Integer votesAgainst, Integer votesAbstain) {}
 
     @DeleteMapping("/motions/{motionId}")
     public ResponseEntity<Void> deleteMotion(@PathVariable Long motionId) {

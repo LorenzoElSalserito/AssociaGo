@@ -6,3 +6,6 @@ out
 *.log*
 dist-electron
 scripts/.release-pending.json
+
+# Local UI verification artifacts
+/test-results/

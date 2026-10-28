@@ -102,6 +102,7 @@ local.properties
 # ==========================================
 # Local project docs, plans, scratch notes and agent workspace files:
 # do not commit product drafts, migration notes, planning docs or local AI-tool state
+/ui_reconstruction.md
 AssociaGo_PRD.md
 AssociaGo_PRD*
 *FIX*.md

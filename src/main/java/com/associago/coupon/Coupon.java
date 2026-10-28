@@ -2,6 +2,7 @@ package com.associago.coupon;
 
 import com.associago.activity.Activity;
 import com.associago.event.Event;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -91,7 +92,10 @@ public class Coupon {
     public void setMaxUses(Integer maxUses) { this.maxUses = maxUses; }
     public Integer getCurrentUses() { return currentUses; }
     public void setCurrentUses(Integer currentUses) { this.currentUses = currentUses; }
+    // The renderer reads and writes "isActive".
+    @JsonProperty("isActive")
     public boolean isActive() { return isActive; }
+    @JsonProperty("isActive")
     public void setActive(boolean active) { isActive = active; }
     public BigDecimal getMinAmount() { return minAmount; }
     public void setMinAmount(BigDecimal minAmount) { this.minAmount = minAmount; }

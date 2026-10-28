@@ -1,45 +1,80 @@
-# AssociaGo Benutzerhandbuch
+# 1. AssociaGo: Einführung, Anmeldung und Oberfläche
 
-Willkommen beim offiziellen Handbuch von **AssociaGo**, der kompletten Verwaltungsplattform für Vereine (APS, ASD, ODV, ETS).
-Dieser Leitfaden wurde verfasst, um den Benutzer Schritt für Schritt bei der Nutzung jeder einzelnen Funktion der Software zu begleiten.
+**AssociaGo** ist die Desktop-Verwaltungssoftware für Vereine (APS, ASD, ODV, ETS). Die Daten bleiben in einer lokalen SQLite-Datenbank oder in einer MariaDB-Datenbank Ihrer Organisation (siehe Kapitel 10).
 
-## 1. Das Haupt-Dashboard
+Dieses Handbuch beschreibt die Funktionen so, wie sie in der Anwendung vorhanden sind. Ist eine Funktion nur teilweise umgesetzt, wird darauf hingewiesen.
 
-Das **Dashboard** ist der Landepunkt nach der Anmeldung. Es ist so konzipiert, dass es einen sofortigen Überblick über den Gesundheitszustand des Vereins bietet.
+## 1.1 Erster Start und Anmeldung
 
-### 1.1 Kopfzeile (Header)
-Oben auf der Seite finden Sie:
-- **Vereinsname**: Der in den Einstellungen konfigurierte Name.
-- **Logo**: Das offizielle Logo des Vereins (falls hochgeladen).
-- **Aktuelles Datum**: Das heutige vollständige Datum.
+### Erster Start: Verein einrichten
+Gibt es auf dem Computer noch keinen Verein, öffnet AssociaGo das Formular **Neuen Verein einrichten**, das in zwei Abschnitte gegliedert ist:
 
-### 1.2 Key Performance Indicators (KPI)
-Unterhalb der Kopfzeile zeigen drei Hauptkarten wichtige Daten an:
+1. **Vereinsdaten**: *Vereinsname*, *Typ* (APS, ASD, ODV, ETS, Andere) und *Steuernummer (C.F.)*. Unter dem Feld wird das für die gewählte Sprache erwartete Format angezeigt: für Italienisch sind es 11 Ziffern.
+2. **Administratorzugang**: *Admin-E-Mail* und *Master-Passwort* mit mindestens 6 Zeichen. Das Augensymbol blendet das Passwort ein oder aus.
 
-1.  **Aktive Mitglieder (Active Members)**:
-    *   Zeigt die Gesamtzahl der Mitglieder, die eine aktive Mitgliedschaft haben (nicht abgelaufen) und mit den Zahlungen auf dem Laufenden sind.
-    *   Ein grüner Indikator zeigt an, wie viele neue Mitglieder im aktuellen Monat beigetreten sind.
-    *   *Hinweis*: Diese Daten sind grundlegend, um den Wachstumstrend des Vereins zu verstehen.
+Wählen Sie **Angemeldet bleiben**, wenn Sie bei den nächsten Starts automatisch angemeldet werden möchten, und klicken Sie dann auf **Datenbank initialisieren**. Fehlt ein Feld oder entspricht die Steuernummer nicht dem Format, erscheint ein Hinweis und es wird nichts angelegt. Anschließend gelangen Sie direkt in die Anwendung.
 
-2.  **Kassenbestand (Treasury Balance)**:
-    *   Zeigt den aktuellen Saldo an, der durch Summierung aller Einnahmen und Subtraktion aller im System erfassten Ausgaben berechnet wird.
-    *   Unterhalb des Saldos werden die Bewegungen des aktuellen Monats angezeigt:
-        *   **Grün**: Gesamteinnahmen des Monats.
-        *   **Rot**: Gesamtausgaben des Monats.
+### Anmeldung
+Bei den folgenden Starts sehen Sie **Verein auswählen** mit den Vereinen, die auf diesem Computer bereits verwendet wurden. Sie können sie mit der Maus oder mit der Tastatur auswählen (Tab, dann Enter).
 
-3.  **Kommende Veranstaltungen (Upcoming Events)**:
-    *   Gibt die Anzahl der für die Zukunft geplanten Veranstaltungen an.
-    *   Zeigt das sofortige Detail der **nächsten Veranstaltung** im Kalender (Titel und Datum), damit Sie keine wichtigen Termine verpassen.
+- Wählen Sie den Verein, geben Sie das Passwort ein und klicken Sie auf **Anmelden**.
+- **Angemeldet bleiben** speichert die Anmeldung: Beim nächsten Start gelangen Sie ohne Passwort hinein.
+- **Weiteren Verein hinzufügen** öffnet erneut das Einrichtungsformular.
+- Das Papierkorbsymbol entfernt den Verein nach einer Bestätigung aus der Liste dieses Computers. Die Daten in der Datenbank werden nicht gelöscht.
+- Oben rechts befindet sich die Sprachauswahl: IT, EN, ES, DE, FR.
 
-### 1.3 Letzte Aktivitäten
-Der mittlere Abschnitt listet chronologisch die neuesten auf der Plattform durchgeführten Operationen auf, wie z. B.:
-- Registrierung neuer Zahlungen.
-- Anmeldung neuer Mitglieder.
-- Erstellung neuer Veranstaltungen.
-Dieses Protokoll hilft Administratoren, den Überblick über die täglichen Operationen zu behalten.
+Beim Start prüft AssociaGo die Vereine in der Liste und entfernt diejenigen, die in der verwendeten Datenbank nicht mehr existieren, zum Beispiel nach dem Wechsel zu einer anderen Datenbank.
 
-### 1.4 Schnellaktionen (Quick Actions)
-Auf der rechten Seite bietet ein blaues Panel Verknüpfungen für die häufigsten Operationen, um das Navigieren durch Menüs zu vermeiden:
-- **Neues Mitglied registrieren**: Öffnet direkt das Anmeldeformular.
-- **Veranstaltung erstellen**: Öffnet das Formular zum Erstellen einer neuen Veranstaltung.
-- **Zahlung erfassen**: Führt Sie direkt zum Finanzbereich, um eine Transaktion einzugeben.
+### Passwort-Wiederherstellung
+Klicken Sie im Passwortbildschirm auf **Passwort vergessen?**. Der Ablauf öffnet sich auch automatisch nach zwei falschen Passworteingaben.
+
+1. **Gehören diese Vereine zu Ihnen?** Wählen Sie den Verein und bestätigen Sie mit **Ja**.
+2. Geben Sie die **Steuernummer des Vereins** ein, dann zweimal das neue Passwort (mindestens 6 Zeichen).
+3. **Passwort zurücksetzen** speichert das neue Passwort und meldet Sie sofort an.
+
+> Die Wiederherstellung beruht auf der hinterlegten Steuernummer. Wer Zugriff auf den Computer hat und die Steuernummer kennt, kann das Passwort zurücksetzen: Schützen Sie Ihr Betriebssystemkonto.
+
+## 1.2 Oberfläche
+
+### Navigation
+Die Seitenleiste gruppiert die Bereiche in *Übersicht*, *Personen*, *Aktivitäten*, *Verwaltung*, *Governance* und *Hilfe*. Die Schaltfläche unten klappt sie auf die Symbole zusammen und wieder auf. Ebenfalls unten finden Sie die Version der Anwendung. Wer mit der Tastatur arbeitet, kann beim Öffnen Tab drücken, um **Zum Inhalt** zu aktivieren.
+
+### Funktionssuche (Befehlspalette)
+Klicken Sie in der oberen Leiste auf **Funktion suchen** oder drücken Sie <kbd>Ctrl</kbd>+<kbd>K</kbd> (<kbd>⌘</kbd>+<kbd>K</kbd> unter macOS). Geben Sie den Namen eines Bereichs ein oder „Neues Mitglied“, um sofort das Anmeldeformular zu öffnen. Mit den Pfeiltasten bewegen Sie sich, mit Enter öffnen und mit Esc schließen Sie.
+
+### Helles und dunkles Thema
+Die Sonne/Mond-Schaltfläche in der oberen Leiste wechselt das Thema und merkt es sich. Sie können es auch unter **Einstellungen › Allgemein** wählen: Dort muss die Auswahl mit **Einstellungen speichern** bestätigt werden.
+
+### Vereinsmenü
+Der Kreis mit den Initialen oben rechts zeigt Name und E-Mail des Vereins. Er enthält:
+- **Einstellungen**;
+- **App-Info**: Version, Lizenz AGPLv3, Hinweise und die Schaltfläche **Mit einer Spende unterstützen**;
+- **Abmelden**, womit die Sitzung beendet wird. Hatten Sie *Angemeldet bleiben* gewählt, wird diese automatische Anmeldung entfernt.
+
+### Verbindung zur Daten-Engine
+AssociaGo verwendet eine lokale Engine, die zusammen mit der Anwendung startet.
+- Antwortet die Engine beim Start nicht, erscheint ein Bildschirm mit **Erneut versuchen**.
+- Bricht die Verbindung während der Arbeit ab, erscheint der Hinweis „Backend nicht erreichbar“ mit **Erneut versuchen**. Lesevorgänge werden wiederholt, Speichervorgänge nicht: Prüfen Sie vor dem erneuten Speichern, ob der Vorgang bereits erfolgreich war.
+
+## 1.3 Dashboard
+
+Das **Dashboard** ist die erste Seite nach der Anmeldung.
+
+### Wichtigste Kennzahlen
+Drei Karten, jeweils mit einem Link zum zugehörigen Bereich:
+1. **Aktive Mitglieder**: Anzahl der Mitglieder mit Status *aktiv* und Anzahl der neuen Mitglieder im laufenden Monat. Maßgeblich ist der bei der Mitgliedschaft hinterlegte Status: Das Ablaufdatum wird nicht automatisch erneut geprüft.
+2. **Kassenbestand**: in Finanzen erfasste Einnahmen minus Ausgaben, mit der Summe der Einnahmen (grün) und der Ausgaben (rot) des laufenden Monats.
+3. **Kommende Veranstaltungen**: künftige, nicht abgesagte Veranstaltungen, mit Name und Datum der nächsten.
+
+### Letzte Aktivitäten
+Zeigt die letzten 5 Vorgänge: neue Mitglieder, Zahlungen, Veranstaltungen. **Alle anzeigen** zeigt bis zu 20 an. Der Pfeil neben jeder Zeile öffnet den zugehörigen Bereich.
+
+### Schnellaktionen
+- **Neues Mitglied registrieren** öffnet das Anmeldeformular.
+- **Veranstaltung erstellen** öffnet das Formular für eine neue Veranstaltung.
+- **Zahlung erfassen** führt zu Finanzen.
+
+Lassen sich die Daten nicht laden, erscheint eine Meldung mit **Erneut versuchen**.
+
+### Handbuch
+Dieses Handbuch öffnen Sie über den Eintrag **Benutzerhandbuch** in der Seitenleiste; es folgt der Sprache der Oberfläche.

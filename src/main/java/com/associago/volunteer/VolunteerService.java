@@ -9,6 +9,7 @@ import com.associago.volunteer.repository.VolunteerShiftRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -33,6 +34,14 @@ public class VolunteerService {
 
     public Iterable<Volunteer> getAllVolunteers() {
         return volunteerRepository.findAll();
+    }
+
+    /** Hours recorded on the volunteer's shifts (Ore Lavorate). */
+    public BigDecimal totalHours(Long volunteerId) {
+        return shiftRepository.findByVolunteerId(volunteerId).stream()
+                .map(VolunteerShift::getHoursWorked)
+                .filter(java.util.Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     public Optional<Volunteer> getVolunteerById(Long id) {
@@ -106,20 +115,17 @@ public class VolunteerService {
     }
 
     @Transactional
-    public VolunteerExpense updateExpenseStatus(Long id, String status) {
+    public VolunteerExpense updateExpenseStatus(Long id, String status, Long associationId) {
         return expenseRepository.findById(id).map(expense -> {
             expense.setStatus(status);
             expense.setUpdatedAt(LocalDateTime.now());
             
             // If approved and paid, create financial transaction
             if ("PAID".equals(status) && expense.getTransactionId() == null) {
+                // Volunteers carry no association: the reimbursement belongs to the association in session.
+                if (associationId == null) throw new IllegalArgumentException("Association required to record the reimbursement");
                 Transaction transaction = new Transaction();
-                // Assuming we can get associationId from somewhere, or it's global context. 
-                // For now, we might need to fetch it from volunteer->member or pass it.
-                // Simplified: Assuming associationId 1 for MVP or fetched from context if available.
-                // Ideally, Volunteer entity should have associationId or linked Member has it.
-                // Let's assume we handle this association link properly in a real scenario.
-                transaction.setAssociationId(1L); // Placeholder
+                transaction.setAssociationId(associationId);
                 transaction.setDate(java.time.LocalDate.now());
                 transaction.setAmount(expense.getAmount());
                 transaction.setType(TransactionType.EXPENSE);

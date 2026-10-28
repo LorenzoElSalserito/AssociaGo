@@ -1,5 +1,6 @@
 package com.associago.app.exception;
 
+import com.associago.shared.i18n.Messages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -23,6 +24,12 @@ public class GlobalExceptionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
+    private final Messages messages;
+
+    public GlobalExceptionHandler(Messages messages) {
+        this.messages = messages;
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> handleValidationErrors(MethodArgumentNotValidException ex, WebRequest request) {
         List<Map<String, String>> validationErrors = ex.getBindingResult().getFieldErrors().stream()
@@ -34,14 +41,16 @@ public class GlobalExceptionHandler {
                 })
                 .collect(Collectors.toList());
 
-        Map<String, Object> body = buildBody(HttpStatus.BAD_REQUEST, "Validation failed", request);
+        // Field messages are already interpolated by Bean Validation in the request locale.
+        Map<String, Object> body = buildBody(HttpStatus.BAD_REQUEST, messages.get("error.validation"), request);
         body.put("validationErrors", validationErrors);
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Object> handleIllegalArgument(IllegalArgumentException ex, WebRequest request) {
-        Map<String, Object> body = buildBody(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
+        // LocalizedException is resolved from the bundles; other messages may be codes the renderer translates.
+        Map<String, Object> body = buildBody(HttpStatus.BAD_REQUEST, messages.describe(ex), request);
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 
@@ -53,21 +62,21 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<Object> handleAccessDenied(AccessDeniedException ex, WebRequest request) {
-        Map<String, Object> body = buildBody(HttpStatus.FORBIDDEN, "Access denied", request);
+        Map<String, Object> body = buildBody(HttpStatus.FORBIDDEN, messages.get("error.accessDenied"), request);
         return new ResponseEntity<>(body, HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Object> handleDataIntegrityViolation(DataIntegrityViolationException ex, WebRequest request) {
         logger.warn("Data integrity violation: {}", ex.getMostSpecificCause().getMessage());
-        Map<String, Object> body = buildBody(HttpStatus.CONFLICT, "Data integrity violation", request);
+        Map<String, Object> body = buildBody(HttpStatus.CONFLICT, messages.get("error.dataIntegrity"), request);
         return new ResponseEntity<>(body, HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleAllExceptions(Exception ex, WebRequest request) {
         logger.error("Unhandled exception at {}: {}", request.getDescription(false), ex.getMessage(), ex);
-        Map<String, Object> body = buildBody(HttpStatus.INTERNAL_SERVER_ERROR, "An internal error occurred", request);
+        Map<String, Object> body = buildBody(HttpStatus.INTERNAL_SERVER_ERROR, messages.get("error.internal"), request);
         return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 

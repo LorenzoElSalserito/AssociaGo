@@ -1,47 +1,34 @@
-# 14. Registro Presenze (Attendance)
+# 14. Registro Presenze
 
-La sezione **Presenze** consente di registrare e monitorare la partecipazione dei soci alle attività dell'associazione.
+La pagina **Presenze** registra le presenze per sessione: per ogni attività crei le sessioni (le singole lezioni o incontri) e in ciascuna segni lo stato di ogni partecipante.
 
-## 14.1 Panoramica
-Il registro presenze è fondamentale per:
-- Documentare la partecipazione effettiva alle attività.
-- Generare attestati di frequenza basati sulle presenze reali.
-- Rispettare gli obblighi di tracciabilità per enti del Terzo Settore.
-- Monitorare l'engagement dei soci.
+## 14.1 Sessioni di un'attività
 
-## 14.2 Lista Presenze
-La tabella principale mostra tutte le registrazioni di presenza con:
-- **Socio**: Nome e cognome del partecipante.
-- **Attività**: L'attività o evento a cui si riferisce la presenza.
-- **Data**: Data e ora della registrazione.
-- **Stato**: Presente, Assente, Giustificato.
+1. Scegli l'**Attività** dal menu in alto (viene proposta la prima).
+2. La tabella mostra le sessioni con **Data**, **Ora inizio**, **Ora fine** e **Note**.
 
-### Filtri
-Utilizza i filtri disponibili per:
-- Filtrare per **attività** specifica.
-- Filtrare per **data** o intervallo di date.
-- Filtrare per **socio**.
+Le azioni di ogni riga sono **Gestisci presenze** e l'icona **cestino**, che elimina la sessione e le relative presenze dopo la conferma.
 
-## 14.3 Registrazione Presenze
-### Registrazione Singola
-1. Clicca **"Registra Presenza"**.
-2. Seleziona il **socio**.
-3. Seleziona l'**attività**.
-4. Scegli la **data**.
-5. Imposta lo **stato** (Presente/Assente/Giustificato).
-6. Aggiungi eventuali **note**.
-7. Clicca **"Salva"**.
+## 14.2 Creare una sessione
 
-### Check-in Rapido
-Per le attività in corso, è possibile effettuare un check-in rapido:
-1. Seleziona l'attività corrente.
-2. Spunta i soci presenti dalla lista dei partecipanti.
-3. Conferma il check-in.
+1. Premi **Nuova sessione** (disattivato se non ci sono attività).
+2. Compila **Data** (obbligatoria), **Ora inizio**, **Ora fine** e **Note**. L'ora di fine deve essere successiva a quella di inizio.
+3. Premi **Salva**. Compare il messaggio **Salvataggio completato.**
 
-## 14.4 Report Presenze
-Il sistema genera statistiche sulle presenze:
-- **Tasso di partecipazione** per attività.
-- **Storico presenze** per singolo socio.
-- **Attività più frequentate**.
+Dopo il salvataggio, nella stessa pagina appare l'elenco dei partecipanti. **Indietro** torna all'elenco delle sessioni.
 
-> **Nota**: Il registro presenze è particolarmente importante per le Associazioni Sportive Dilettantistiche (ASD), dove la documentazione delle presenze è requisito per la copertura assicurativa e per la validità degli attestati formativi.
+## 14.3 Segnare le presenze
+
+Apri una sessione con **Gestisci presenze**. Puoi correggere data, orari e note e premere **Salva**.
+
+Nella tabella **Presenze** c'è una riga per ogni partecipante dell'attività iscritto come socio. Per ciascuno scegli lo **Stato**:
+- **Presente**
+- **Assente**
+- **In ritardo**
+- **Giustificato**
+
+Finché non scegli nulla lo stato è **Non registrato**. Ogni scelta viene salvata subito, senza premere **Salva**.
+
+Se la tabella è vuota, aggiungi prima i partecipanti nella scheda dell'attività (capitolo 3). Le eventuali presenze di versioni precedenti compaiono in un riquadro **Presenze storiche conservate**.
+
+> Non ci sono filtri per socio o per periodo, né report o statistiche sulle presenze. Gli attestati non tengono conto delle presenze registrate.

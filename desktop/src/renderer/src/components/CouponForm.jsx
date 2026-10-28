@@ -123,6 +123,7 @@ const CouponForm = ({ associationId, coupon, onSuccess, onCancel }) => {
             <option key={evt.id} value={evt.id}>{evt.name}</option>
           ))}
         </select>
+        <div className="form-text">{t('couponApply.scopeHint')}</div>
       </div>
 
       <div className="form-check mb-3">

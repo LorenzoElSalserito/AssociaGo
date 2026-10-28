@@ -1,46 +1,45 @@
-# 5. Finanze e Contabilità (Finance)
+# 5. Finanze e Contabilità
 
-La sezione **Finanze** offre un controllo completo sulla contabilità dell'associazione.
+La sezione **Finanze** contiene le entrate, le uscite e i documenti fiscali dell'associazione.
 
-## 5.1 Dashboard Finanziaria
-La vista principale mostra:
-- **Entrate Totali**: Somma di tutte le transazioni in entrata.
-- **Uscite Totali**: Somma di tutte le transazioni in uscita.
-- **Saldo Netto**: Differenza tra entrate e uscite.
-- **Confronto Annuale**: Grafico che mostra l'andamento rispetto all'anno precedente.
+## 5.1 Riepilogo
 
-## 5.2 Transazioni
-La tabella delle transazioni elenca ogni movimento finanziario.
+In cima alla pagina trovi:
+- **Entrate Totali**, **Uscite Totali** e **Saldo Netto**;
+- un grafico che confronta, mese per mese, l'anno in corso con quello precedente;
+- il pannello **Documenti Fiscali** con il **Report Annuale**: un PDF con entrate, uscite e saldo dell'anno.
 
-### Filtri Avanzati
-È possibile filtrare per:
-- **Tipo**: Entrata/Uscita.
-- **Categoria**: (Quota Associativa, Donazione, Evento, Acquisto, Affitto, etc.).
-- **Data**: Intervallo temporale.
+## 5.2 Registrare una transazione
 
-### Nuova Transazione
-Il modulo permette di registrare:
-- **Data e Importo**.
-- **Tipo e Categoria**.
-- **Descrizione**.
-- **Metodo di Pagamento**: (Contanti, Bonifico, etc.).
-- **Socio Collegato**: Opzionale, per legare la transazione a un membro.
+Premi **Nuova Transazione** e compila:
+- **Tipo**: Entrate o Uscite;
+- **Importo**, **Data** e **Descrizione**;
+- **Categoria**: un testo libero, per esempio "Quote", "Affitto" o "Utenze";
+- **Metodo di Pagamento**: uno dei metodi configurati in Impostazioni › Finanze.
 
-### Azioni
-- **Modifica/Elimina**: Per correggere errori.
-- **Ricevuta**: Generazione istantanea di una ricevuta PDF per la transazione.
+Se il metodo prevede una commissione, la tabella la mostra nella colonna **Comm.**
 
-## 5.3 Confronto Personalizzato
-Questa potente funzionalità permette di analizzare l'andamento finanziario confrontando due anni a scelta.
-- **Selezione Anni**: Scegli liberamente l'Anno 1 e l'Anno 2 da confrontare.
-- **Grafico Comparativo**: Visualizza a colpo d'occhio le differenze di entrate e uscite tra i due periodi.
-- **Dettagli**: Card riassuntive mostrano i totali e il saldo netto per ciascun anno.
-- **Esportazione PDF**: Scarica un report professionale con il confronto dettagliato, ideale per le riunioni del direttivo o l'assemblea dei soci.
+### Rinnovo quota
+Spunta **È un Rinnovo Quota** per collegare il movimento a un socio. Indica poi il **Socio**, il **Periodo** (Mensile, Semestrale, Annuale) e l'**Anno**.
 
-## 5.4 Metodi di Pagamento
-Nel tab "Impostazioni" (o accessibile dalla dashboard), è possibile configurare i metodi di pagamento accettati e le eventuali commissioni (fisse o percentuali) applicate.
+### Affitto
+**Registra Affitto** apre il modulo già compilato come uscita della categoria affitto.
 
-## 5.5 Reportistica Fiscale
-- **Bilancio Annuale**: Genera un PDF completo con il riepilogo finanziario dell'anno selezionato.
-- **Analisi Spese**: Grafici e tabelle per capire dove vengono spesi i fondi.
-- **Esportazione CSV**: Per elaborazioni esterne (es. Excel).
+## 5.3 Elenco e filtri
+
+Nella scheda **Transazioni** puoi filtrare per tipo (**Tutti i Tipi**, Entrate, Uscite) e per intervallo di date, con **Data Inizio** e **Data Fine**. Premi **Applica Filtri** per aggiornare l'elenco e **Pulisci Filtri** per tornare alla vista completa.
+
+Ogni riga offre queste azioni:
+- **Modifica** ed **Elimina**;
+- **Scarica Ricevuta**, che genera la ricevuta in PDF;
+- **Invia Email**, che apre il programma di posta con un messaggio già compilato.
+
+## 5.4 Registrazioni contabili e confronti
+
+- **Registrazioni Contabili** mostra la prima nota in partita doppia: conto, dare e avere.
+- **Confronto Personalizzato** confronta due anni a scelta. **Esporta PDF Confronto** salva il risultato in PDF.
+- **Esporta Report PDF**, in cima alla pagina, scarica il report dell'anno corrente.
+
+## 5.5 Metodi di pagamento
+
+I metodi di pagamento, con le eventuali commissioni, si configurano in **Impostazioni › Finanze** (capitolo 10).

@@ -5,8 +5,10 @@ import { useTranslation } from 'react-i18next';
 import { associago } from '../api';
 import { translateBalanceStatus } from '../utils/enumTranslations';
 
+const SIGNER_LABELS = { president: 'President', secretary: 'Secretary', treasurer: 'Treasurer' };
+
 const AnnualBalanceDashboard = ({ associationId, shell }) => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const [balances, setBalances] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedBalance, setSelectedBalance] = useState(null);
@@ -109,7 +111,7 @@ const AnnualBalanceDashboard = ({ associationId, shell }) => {
                 {missingSigners.length > 0 && (
                     <div className="alert alert-warning d-flex align-items-center mb-4">
                         <AlertTriangle size={18} className="me-2" />
-                        {t('Missing signers')}: {missingSigners.join(', ')}
+                        {t('Missing signers')}: {missingSigners.map(role => t(SIGNER_LABELS[String(role).toLowerCase()] || role)).join(', ')}
                     </div>
                 )}
 
@@ -117,20 +119,20 @@ const AnnualBalanceDashboard = ({ associationId, shell }) => {
                     <Col md={4}>
                         <Card className="border-0 shadow-sm text-center p-3">
                             <div className="text-muted small">{t('Total Income')}</div>
-                            <div className="fw-bold text-success fs-4">&euro; {(selectedBalance.totalIncome || 0).toLocaleString('it-IT', { minimumFractionDigits: 2 })}</div>
+                            <div className="fw-bold text-success fs-4">&euro; {(selectedBalance.totalIncome || 0).toLocaleString(i18n.language, { minimumFractionDigits: 2 })}</div>
                         </Card>
                     </Col>
                     <Col md={4}>
                         <Card className="border-0 shadow-sm text-center p-3">
                             <div className="text-muted small">{t('Total Expenses')}</div>
-                            <div className="fw-bold text-danger fs-4">&euro; {(selectedBalance.totalExpenses || 0).toLocaleString('it-IT', { minimumFractionDigits: 2 })}</div>
+                            <div className="fw-bold text-danger fs-4">&euro; {(selectedBalance.totalExpenses || 0).toLocaleString(i18n.language, { minimumFractionDigits: 2 })}</div>
                         </Card>
                     </Col>
                     <Col md={4}>
                         <Card className={`border-0 shadow-sm text-center p-3`}>
                             <div className="text-muted small">{t('Net Result')}</div>
                             <div className={`fw-bold fs-4 ${(selectedBalance.netResult || 0) >= 0 ? 'text-success' : 'text-danger'}`}>
-                                &euro; {(selectedBalance.netResult || 0).toLocaleString('it-IT', { minimumFractionDigits: 2 })}
+                                &euro; {(selectedBalance.netResult || 0).toLocaleString(i18n.language, { minimumFractionDigits: 2 })}
                             </div>
                         </Card>
                     </Col>
@@ -148,7 +150,7 @@ const AnnualBalanceDashboard = ({ associationId, shell }) => {
                                         {incomeLines.map(line => (
                                             <tr key={line.id} className={line.subtotal ? 'fw-bold bg-light' : ''}>
                                                 <td className="ps-4">{line.label}</td>
-                                                <td className="text-end pe-4">&euro; {(line.amount || 0).toLocaleString('it-IT', { minimumFractionDigits: 2 })}</td>
+                                                <td className="text-end pe-4">&euro; {(line.amount || 0).toLocaleString(i18n.language, { minimumFractionDigits: 2 })}</td>
                                             </tr>
                                         ))}
                                     </tbody>
@@ -167,7 +169,7 @@ const AnnualBalanceDashboard = ({ associationId, shell }) => {
                                         {expenseLines.map(line => (
                                             <tr key={line.id} className={line.subtotal ? 'fw-bold bg-light' : ''}>
                                                 <td className="ps-4">{line.label}</td>
-                                                <td className="text-end pe-4">&euro; {(line.amount || 0).toLocaleString('it-IT', { minimumFractionDigits: 2 })}</td>
+                                                <td className="text-end pe-4">&euro; {(line.amount || 0).toLocaleString(i18n.language, { minimumFractionDigits: 2 })}</td>
                                             </tr>
                                         ))}
                                     </tbody>
@@ -221,7 +223,7 @@ const AnnualBalanceDashboard = ({ associationId, shell }) => {
                                         <td>{b.title}</td>
                                         <td><Badge bg={b.status === 'APPROVED' ? 'success' : 'info'} className="fw-normal">{translateBalanceStatus(b.status, t)}</Badge></td>
                                         <td className={`text-end ${(b.netResult || 0) >= 0 ? 'text-success' : 'text-danger'}`}>
-                                            &euro; {(b.netResult || 0).toLocaleString('it-IT', { minimumFractionDigits: 2 })}
+                                            &euro; {(b.netResult || 0).toLocaleString(i18n.language, { minimumFractionDigits: 2 })}
                                         </td>
                                         <td className="text-end pe-4" onClick={e => e.stopPropagation()}>
                                             <Button variant="light" size="sm" className="text-danger" onClick={() => handleDelete(b.id)}>

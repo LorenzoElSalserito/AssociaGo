@@ -5,15 +5,15 @@ import com.associago.finance.Transaction;
 import com.associago.finance.TransactionType;
 import com.associago.finance.repository.TransactionRepository;
 import com.associago.shared.SignatureResolver;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.PDPageContentStream;
-import org.apache.pdfbox.pdmodel.font.PDType1Font;
-import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
+import com.associago.shared.i18n.Messages;
+import com.associago.shared.pdf.PdfDocument;
+import com.associago.shared.pdf.PdfText;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.ByteArrayOutputStream;
+import java.awt.Color;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -22,10 +22,10 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HexFormat;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -35,13 +35,16 @@ public class AnnualBalanceService {
     private final AnnualBalanceRepository balanceRepository;
     private final AnnualBalanceLineRepository lineRepository;
     private final TransactionRepository transactionRepository;
+    private final Messages messages;
 
     public AnnualBalanceService(AnnualBalanceRepository balanceRepository,
                                 AnnualBalanceLineRepository lineRepository,
-                                TransactionRepository transactionRepository) {
+                                TransactionRepository transactionRepository,
+                                Messages messages) {
         this.balanceRepository = balanceRepository;
         this.lineRepository = lineRepository;
         this.transactionRepository = transactionRepository;
+        this.messages = messages;
     }
 
     public List<AnnualBalance> findByAssociation(Long associationId) {
@@ -68,7 +71,7 @@ public class AnnualBalanceService {
 
         balance.setAssociationId(associationId);
         balance.setYear(year);
-        balance.setTitle("Bilancio Consuntivo " + year);
+        balance.setTitle(messages.get("balance.title", String.valueOf(year)));
         balance.setStatus("COMPUTED");
         balance.setComputedAt(LocalDateTime.now());
         balance.setUpdatedAt(LocalDateTime.now());
@@ -82,11 +85,11 @@ public class AnnualBalanceService {
         // Group by category and type
         Map<String, List<Transaction>> incomeByCategory = transactions.stream()
                 .filter(t -> t.getType() == TransactionType.INCOME)
-                .collect(Collectors.groupingBy(t -> t.getCategory() != null ? t.getCategory() : "Altre entrate"));
+                .collect(Collectors.groupingBy(t -> t.getCategory() != null ? t.getCategory() : messages.get("balance.otherIncome")));
 
         Map<String, List<Transaction>> expenseByCategory = transactions.stream()
                 .filter(t -> t.getType() == TransactionType.EXPENSE)
-                .collect(Collectors.groupingBy(t -> t.getCategory() != null ? t.getCategory() : "Altre uscite"));
+                .collect(Collectors.groupingBy(t -> t.getCategory() != null ? t.getCategory() : messages.get("balance.otherExpenses")));
 
         // Save balance first to get ID
         balance = balanceRepository.save(balance);
@@ -127,7 +130,7 @@ public class AnnualBalanceService {
         AnnualBalanceLine incomeSubtotal = new AnnualBalanceLine();
         incomeSubtotal.setBalanceId(balance.getId());
         incomeSubtotal.setSection("INCOME");
-        incomeSubtotal.setLabel("TOTALE ENTRATE");
+        incomeSubtotal.setLabel(messages.get("financial.totalIncome").toUpperCase(messages.current()));
         incomeSubtotal.setAmount(totalIncome);
         incomeSubtotal.setPreviousYearAmount(prevTotalIncome);
         incomeSubtotal.setVariance(totalIncome.subtract(prevTotalIncome));
@@ -160,7 +163,7 @@ public class AnnualBalanceService {
         AnnualBalanceLine expenseSubtotal = new AnnualBalanceLine();
         expenseSubtotal.setBalanceId(balance.getId());
         expenseSubtotal.setSection("EXPENSE");
-        expenseSubtotal.setLabel("TOTALE USCITE");
+        expenseSubtotal.setLabel(messages.get("financial.totalExpenses").toUpperCase(messages.current()));
         expenseSubtotal.setAmount(totalExpenses);
         expenseSubtotal.setPreviousYearAmount(prevTotalExpenses);
         expenseSubtotal.setVariance(totalExpenses.subtract(prevTotalExpenses));
@@ -201,159 +204,83 @@ public class AnnualBalanceService {
     }
 
     /**
-     * Genera il PDF del bilancio consuntivo con firme automatiche e checksum SHA-256.
+     * Genera il PDF A4 del bilancio consuntivo nella lingua richiesta, con firme (immagine sopra
+     * nome e carica) e checksum SHA-256.
      */
-    public byte[] generatePdf(AnnualBalance balance, List<AnnualBalanceLine> lines,
-                               Association association, List<SignatureResolver.SignerInfo> signers) throws IOException {
-        try (PDDocument document = new PDDocument()) {
-            PDPage page = new PDPage();
-            document.addPage(page);
+    public byte[] generatePdf(AnnualBalance balance, List<AnnualBalanceLine> lines, Association association,
+                              List<SignatureResolver.SignerInfo> signers, Locale locale) throws IOException {
+        int year = balance.getYear() == null ? LocalDate.now().getYear() : balance.getYear();
+        byte[] pdfBytes;
+        try (PdfDocument pdf = new PdfDocument(PDRectangle.A4, null)) {
+            float top = pdf.y();
+            pdf.text(pdf.left(), top - 16, association.getName() != null ? association.getName()
+                    : messages.get(locale, "pdf.associationFallback"), pdf.bold, 16);
+            List<String> address = new ArrayList<>();
+            if (association.getAddress() != null) address.add(association.getAddress());
+            if (association.getCity() != null) address.add(association.getCity());
+            String addressLine = String.join(", ", address);
+            if (association.getTaxCode() != null) {
+                addressLine += (addressLine.isEmpty() ? "" : " - ") + messages.get(locale, "pdf.taxCode", association.getTaxCode());
+            }
+            pdf.text(pdf.left(), top - 31, addressLine, pdf.regular, 10);
+            pdf.hLine(pdf.left(), pdf.right(), top - 42, Color.GRAY);
+            pdf.moveTo(top - 50);
 
-            try (PDPageContentStream cs = new PDPageContentStream(document, page)) {
-                PDType1Font bold = new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD);
-                PDType1Font normal = new PDType1Font(Standard14Fonts.FontName.HELVETICA);
-                PDType1Font italic = new PDType1Font(Standard14Fonts.FontName.HELVETICA_OBLIQUE);
+            pdf.heading(messages.get(locale, "balance.title", String.valueOf(year)).toUpperCase(locale), 14);
+            pdf.line(messages.get(locale, "balance.period", PdfText.date(LocalDate.of(year, 1, 1), locale),
+                    PdfText.date(LocalDate.of(year, 12, 31), locale)), pdf.regular, 10);
+            pdf.space(10);
 
-                // Header
-                cs.beginText();
-                cs.setFont(bold, 16);
-                cs.newLineAtOffset(50, 760);
-                cs.showText(association.getName() != null ? association.getName() : "Associazione");
-                cs.setFont(normal, 10);
-                cs.newLineAtOffset(0, -15);
-                String addr = "";
-                if (association.getAddress() != null) addr += association.getAddress();
-                if (association.getCity() != null) addr += ", " + association.getCity();
-                if (association.getTaxCode() != null) addr += " - C.F. " + association.getTaxCode();
-                cs.showText(addr);
-                cs.endText();
+            section(pdf, lines, "INCOME", messages.get(locale, "balance.income"),
+                    messages.get(locale, "financial.totalIncome"), locale);
+            pdf.space(8);
+            section(pdf, lines, "EXPENSE", messages.get(locale, "balance.expenses"),
+                    messages.get(locale, "financial.totalExpenses"), locale);
 
-                cs.moveTo(50, 735);
-                cs.lineTo(550, 735);
-                cs.stroke();
-
-                // Title
-                cs.beginText();
-                cs.setFont(bold, 14);
-                cs.newLineAtOffset(50, 710);
-                cs.showText("BILANCIO CONSUNTIVO " + balance.getYear());
-                cs.setFont(normal, 10);
-                cs.newLineAtOffset(0, -15);
-                cs.showText("Periodo: 01/01/" + balance.getYear() + " - 31/12/" + balance.getYear());
-                cs.endText();
-
-                int y = 675;
-
-                // Income section
-                cs.beginText();
-                cs.setFont(bold, 12);
-                cs.newLineAtOffset(50, y);
-                cs.showText("ENTRATE");
-                cs.endText();
-                y -= 18;
-
-                for (AnnualBalanceLine line : lines) {
-                    if ("INCOME".equals(line.getSection())) {
-                        cs.beginText();
-                        cs.setFont(line.isSubtotal() ? bold : normal, 10);
-                        cs.newLineAtOffset(60, y);
-                        cs.showText(line.getLabel());
-                        cs.newLineAtOffset(350, 0);
-                        cs.showText(String.format("€ %,.2f", line.getAmount()));
-                        cs.endText();
-                        y -= 14;
-                    }
-                }
-
-                y -= 10;
-
-                // Expense section
-                cs.beginText();
-                cs.setFont(bold, 12);
-                cs.newLineAtOffset(50, y);
-                cs.showText("USCITE");
-                cs.endText();
-                y -= 18;
-
-                for (AnnualBalanceLine line : lines) {
-                    if ("EXPENSE".equals(line.getSection())) {
-                        cs.beginText();
-                        cs.setFont(line.isSubtotal() ? bold : normal, 10);
-                        cs.newLineAtOffset(60, y);
-                        cs.showText(line.getLabel());
-                        cs.newLineAtOffset(350, 0);
-                        cs.showText(String.format("€ %,.2f", line.getAmount()));
-                        cs.endText();
-                        y -= 14;
-                    }
-                }
-
-                y -= 15;
-                cs.moveTo(50, y);
-                cs.lineTo(550, y);
-                cs.stroke();
-                y -= 18;
-
-                // Net result
-                cs.beginText();
-                cs.setFont(bold, 12);
-                cs.newLineAtOffset(60, y);
-                String resultLabel = balance.getNetResult().compareTo(BigDecimal.ZERO) >= 0
-                        ? "AVANZO DI GESTIONE" : "DISAVANZO DI GESTIONE";
-                cs.showText(resultLabel);
-                cs.newLineAtOffset(350, 0);
-                cs.showText(String.format("€ %,.2f", balance.getNetResult()));
-                cs.endText();
-                y -= 30;
-
-                // Signers
-                cs.beginText();
-                cs.setFont(bold, 10);
-                cs.newLineAtOffset(50, y);
-                cs.showText("Firme:");
-                cs.endText();
-                y -= 18;
-
-                for (SignatureResolver.SignerInfo signer : signers) {
-                    if (signer.firstName() != null) {
-                        cs.beginText();
-                        cs.setFont(normal, 10);
-                        cs.newLineAtOffset(60, y);
-                        cs.showText(signer.title() + ": " + signer.firstName() + " " + signer.lastName());
-                        cs.endText();
-                        y -= 14;
-                    }
-                }
-
-                y -= 20;
-
-                // Disclaimer (P11)
-                cs.beginText();
-                cs.setFont(italic, 7);
-                cs.setNonStrokingColor(100, 100, 100);
-                cs.newLineAtOffset(50, 50);
-                cs.showText("AssociaGo può commettere errori, controllare sempre gli output prima di inoltrare i documenti.");
-                cs.endText();
-
-                // Generation timestamp
-                cs.beginText();
-                cs.setFont(normal, 7);
-                cs.newLineAtOffset(50, 38);
-                cs.showText("Generato il " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
-                cs.endText();
+            pdf.space(6);
+            pdf.rule();
+            BigDecimal net = balance.getNetResult() == null ? BigDecimal.ZERO : balance.getNetResult();
+            amountRow(pdf, messages.get(locale, net.signum() >= 0 ? "balance.surplus" : "balance.deficit").toUpperCase(locale),
+                    net, pdf.bold, 12, locale);
+            if (balance.getOpeningFund() != null && balance.getClosingFund() != null) {
+                amountRow(pdf, messages.get(locale, "balance.openingFund"), balance.getOpeningFund(), pdf.regular, 10, locale);
+                amountRow(pdf, messages.get(locale, "balance.closingFund"), balance.getClosingFund(), pdf.regular, 10, locale);
             }
 
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            document.save(baos);
-            byte[] pdfBytes = baos.toByteArray();
+            pdf.space(30);
+            List<PdfDocument.SignatureBlock> blocks = (signers == null ? List.<SignatureResolver.SignerInfo>of() : signers).stream()
+                    .map(signer -> signer.toBlock(messages, locale))
+                    .toList();
+            pdf.signatures(messages.get(locale, "pdf.signatures"), blocks);
 
-            // Compute checksum
-            String checksum = computeChecksum(pdfBytes);
-            balance.setChecksum(checksum);
-            balanceRepository.save(balance);
-
-            return pdfBytes;
+            String generated = messages.get(locale, "pdf.generatedOn", PdfText.dateTime(LocalDateTime.now(), locale));
+            String disclaimer = messages.get(locale, "pdf.disclaimer");
+            pdfBytes = pdf.finish((doc, page, count) -> {
+                doc.text(doc.left(), 50, disclaimer, doc.italic, 7, PdfDocument.MUTED);
+                doc.text(doc.left(), 38, generated, doc.regular, 7, PdfDocument.MUTED);
+                doc.textRight(doc.right(), 38, messages.get(locale, "pdf.page", page, count), doc.regular, 7);
+            });
         }
+
+        balance.setChecksum(computeChecksum(pdfBytes));
+        balanceRepository.save(balance);
+        return pdfBytes;
+    }
+
+    private void section(PdfDocument pdf, List<AnnualBalanceLine> lines, String section, String title,
+                         String totalLabel, Locale locale) throws IOException {
+        pdf.heading(title.toUpperCase(locale), 12);
+        for (AnnualBalanceLine line : lines) {
+            if (!section.equals(line.getSection())) continue;
+            // Subtotal labels are stored in the language used when computing: show them in the PDF language.
+            String label = line.isSubtotal() ? totalLabel.toUpperCase(locale) : line.getLabel();
+            amountRow(pdf, label, line.getAmount(), line.isSubtotal() ? pdf.bold : pdf.regular, 10, locale);
+        }
+    }
+
+    private void amountRow(PdfDocument pdf, String label, BigDecimal amount, PDFont font, float size, Locale locale) throws IOException {
+        pdf.row(new float[]{pdf.left() + 10, pdf.right() - 130}, new String[]{label, PdfText.money(amount, locale)},
+                new boolean[]{false, true}, font, size);
     }
 
     private String computeChecksum(byte[] data) {

@@ -3,6 +3,7 @@ package com.associago.assembly;
 import com.associago.assembly.repository.*;
 import com.associago.member.repository.MemberRepository;
 import com.associago.stats.dto.AssemblyWithDetailsDTO;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,9 +11,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class AssemblyService {
+
+    private static final Set<String> PARTICIPATION_TYPES = Set.of("PRESENT", "PROXY", "ABSENT");
 
     private final AssemblyRepository assemblyRepository;
     private final AssemblyParticipantRepository participantRepository;
@@ -94,6 +98,20 @@ public class AssemblyService {
     }
 
     @Transactional
+    public AssemblyParticipant updateParticipant(Long participantId, AssemblyParticipant details) {
+        AssemblyParticipant participant = participantRepository.findById(participantId)
+                .orElseThrow(() -> new EntityNotFoundException("PARTICIPANT_NOT_FOUND"));
+        String type = details.getParticipationType();
+        if (!PARTICIPATION_TYPES.contains(type)) throw new IllegalArgumentException("PARTICIPANT_INVALID_TYPE");
+        if (details.getUserAssociationId() != null) participant.setUserAssociationId(details.getUserAssociationId());
+        participant.setParticipationType(type);
+        participant.setProxyReceiverId("PROXY".equals(type) ? details.getProxyReceiverId() : null);
+        participant.setRole(details.getRole());
+        participant.setNotes(details.getNotes());
+        return participantRepository.save(participant);
+    }
+
+    @Transactional
     public void removeParticipant(Long participantId) {
         participantRepository.deleteById(participantId);
     }
@@ -107,6 +125,71 @@ public class AssemblyService {
     @Transactional
     public AssemblyMotion addMotion(AssemblyMotion motion) {
         return motionRepository.save(motion);
+    }
+
+    @Transactional
+    public AssemblyMotion updateMotion(Long motionId, AssemblyMotion details) {
+        AssemblyMotion motion = findMotion(motionId);
+        if (details.getTitle() == null || details.getTitle().isBlank()) throw new IllegalArgumentException("MOTION_TITLE_REQUIRED");
+        motion.setTitle(details.getTitle());
+        motion.setDescription(details.getDescription());
+        motion.setVotingType(details.getVotingType());
+        motion.setOrderNumber(details.getOrderNumber());
+        motion.setPlanned(details.isPlanned());
+        motion.setDecisionSummary(details.getDecisionSummary());
+        motion.setNotes(details.getNotes());
+        if (motion.isVoteRecorded()) applyOutcome(motion);
+        motion.setUpdatedAt(LocalDateTime.now());
+        return motionRepository.save(motion);
+    }
+
+    /** Records the vote counts of a motion; the outcome is always computed here, never trusted from the client. */
+    @Transactional
+    public AssemblyMotion recordVotes(Long motionId, Integer favor, Integer against, Integer abstain) {
+        AssemblyMotion motion = findMotion(motionId);
+        if (favor == null || against == null || abstain == null) throw new IllegalArgumentException("MOTION_VOTES_REQUIRED");
+        if (favor < 0 || against < 0 || abstain < 0) throw new IllegalArgumentException("MOTION_VOTES_NEGATIVE");
+        long voters = participantRepository.findByAssemblyId(motion.getAssemblyId()).stream()
+                .filter(p -> "PRESENT".equals(p.getParticipationType()) || "PROXY".equals(p.getParticipationType()))
+                .count();
+        if (voters == 0) throw new IllegalArgumentException("MOTION_NO_VOTERS");
+        if ((long) favor + against + abstain > voters) throw new IllegalArgumentException("MOTION_VOTES_EXCEED_VOTERS");
+        motion.setVotesInFavor(favor);
+        motion.setVotesAgainst(against);
+        motion.setVotesAbstain(abstain);
+        motion.setValidVotes(favor + against + abstain);
+        applyOutcome(motion);
+        motion.setUpdatedAt(LocalDateTime.now());
+        return motionRepository.save(motion);
+    }
+
+    @Transactional
+    public AssemblyMotion clearVotes(Long motionId) {
+        AssemblyMotion motion = findMotion(motionId);
+        motion.setVotesInFavor(0);
+        motion.setVotesAgainst(0);
+        motion.setVotesAbstain(0);
+        motion.setValidVotes(0);
+        motion.setDecisionTaken(null);
+        motion.setApproved(false);
+        motion.setUpdatedAt(LocalDateTime.now());
+        return motionRepository.save(motion);
+    }
+
+    private AssemblyMotion findMotion(Long motionId) {
+        return motionRepository.findById(motionId)
+                .orElseThrow(() -> new EntityNotFoundException("MOTION_NOT_FOUND"));
+    }
+
+    private static void applyOutcome(AssemblyMotion motion) {
+        String outcome = AssemblyMotion.computeOutcome(motion.getVotingType(),
+                nz(motion.getVotesInFavor()), nz(motion.getVotesAgainst()), nz(motion.getVotesAbstain()));
+        motion.setDecisionTaken(outcome);
+        motion.setApproved(AssemblyMotion.OUTCOME_APPROVED.equals(outcome));
+    }
+
+    private static int nz(Integer value) {
+        return value == null ? 0 : value;
     }
 
     @Transactional

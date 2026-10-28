@@ -5,6 +5,7 @@ import com.associago.activity.repository.ActivityInstructorRepository;
 import com.associago.activity.repository.ActivityParticipantRepository;
 import com.associago.activity.repository.ActivityRepository;
 import com.associago.activity.repository.ActivityScheduleRepository;
+import com.associago.coupon.CouponService;
 import com.associago.stats.dto.ActivityFinancialSummaryDTO;
 import com.associago.stats.dto.ActivityWithDetailsDTO;
 import java.math.BigDecimal;
@@ -28,13 +29,14 @@ class ActivityServiceTests {
     @Mock private ActivityCostRepository costRepository;
     @Mock private ActivityInstructorRepository instructorRepository;
     @Mock private ActivityScheduleRepository scheduleRepository;
+    @Mock private CouponService couponService;
 
     private ActivityService service;
 
     @BeforeEach
     void setUp() {
         service = new ActivityService(activityRepository, participantRepository, costRepository,
-                instructorRepository, scheduleRepository);
+                instructorRepository, scheduleRepository, couponService);
     }
 
     @Test

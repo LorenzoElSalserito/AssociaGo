@@ -2,6 +2,8 @@ package com.associago.compliance;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,6 +55,24 @@ public class AuditService {
 
     public Page<AuditEntry> getByAssociation(Long associationId, int page, int size) {
         return repository.findByAssociationIdOrderByCreatedAtDesc(associationId, PageRequest.of(page, size));
+    }
+
+    /** Paged log of one association, newest first; area, action and the inclusive date range are optional. */
+    public Page<AuditEntry> search(Long associationId, String area, String action,
+                                   LocalDateTime from, LocalDateTime to, int page, int size) {
+        Specification<AuditEntry> spec = (root, query, cb) -> cb.equal(root.get("associationId"), associationId);
+        if (area != null && !area.isBlank()) {
+            List<String> types = AuditAreas.typesOf(area);
+            spec = spec.and((root, query, cb) -> types.isEmpty() ? cb.disjunction() : root.get("entityType").in(types));
+        }
+        if (action != null && !action.isBlank()) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("action"), action.toUpperCase(java.util.Locale.ROOT)));
+        }
+        if (from != null) spec = spec.and((root, query, cb) -> cb.greaterThanOrEqualTo(root.get("createdAt"), from));
+        if (to != null) spec = spec.and((root, query, cb) -> cb.lessThan(root.get("createdAt"), to));
+        int safeSize = Math.max(1, Math.min(size, 200));
+        return repository.findAll(spec, PageRequest.of(Math.max(0, page), safeSize,
+                Sort.by(Sort.Order.desc("createdAt"), Sort.Order.desc("id"))));
     }
 
     public List<AuditEntry> getByEntity(String entityType, Long entityId) {

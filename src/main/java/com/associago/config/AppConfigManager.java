@@ -49,6 +49,14 @@ public class AppConfigManager {
             Files.createDirectories(path);
         }
         config.setConfigured(true);
-        objectMapper.writeValue(new File(getConfigFilePath()), config);
+        Path target = Path.of(getConfigFilePath());
+        Path temporary = Files.createTempFile(path, "config-", ".json");
+        try {
+            try { Files.setPosixFilePermissions(temporary, java.nio.file.attribute.PosixFilePermissions.fromString("rw-------")); }
+            catch (UnsupportedOperationException ignored) { /* Windows uses inherited ACLs. */ }
+            objectMapper.writeValue(temporary.toFile(), config);
+            try { Files.move(temporary, target, java.nio.file.StandardCopyOption.ATOMIC_MOVE, java.nio.file.StandardCopyOption.REPLACE_EXISTING); }
+            catch (java.nio.file.AtomicMoveNotSupportedException e) { Files.move(temporary, target, java.nio.file.StandardCopyOption.REPLACE_EXISTING); }
+        } finally { Files.deleteIfExists(temporary); }
     }
 }

@@ -4,10 +4,11 @@ import { ArrowLeft, Plus, Trash2, Edit, MoreVertical, DollarSign, Users, Clock, 
 import { useTranslation } from 'react-i18next';
 import { associago } from '../api';
 import CsvImporter from './CsvImporter';
+import { CouponBadge } from './CouponField';
 import { translateActivityCategory, translateCompensationType, translateCostCategory, translateCertificateType } from '../utils/enumTranslations';
 
 const ActivityDetail = ({ activityId, shell, onBack }) => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const [details, setDetails] = useState(null);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('participants');
@@ -99,14 +100,14 @@ const ActivityDetail = ({ activityId, shell, onBack }) => {
                     <h2 className="fw-bold text-dark mb-0">{activity.name}</h2>
                     <div className="text-muted small">
                         <Badge bg="info" className="me-2">{translateActivityCategory(activity.category, t)}</Badge>
-                        {new Date(activity.startDate).toLocaleDateString()} - {activity.endDate ? new Date(activity.endDate).toLocaleDateString() : t('Ongoing')}
+                        {new Date(activity.startDate).toLocaleDateString(i18n.language)} - {activity.endDate ? new Date(activity.endDate).toLocaleDateString(i18n.language) : t('Ongoing')}
                     </div>
                 </div>
                 <div className="ms-auto d-flex gap-2">
                     <Button variant="outline-secondary" onClick={handleDownloadReport}>
                         <Download size={18} className="me-2" /> {t('Report')}
                     </Button>
-                    <Button variant="outline-primary" onClick={() => shell.openModal('activity-form', { associationId: activity.associationId, activity: activity, onSuccess: loadData })}>
+                    <Button variant="outline-primary" onClick={() => shell.openModal('activity-form', { associationId: activity.associationId, activityId: activity.id, onSuccess: loadData })}>
                         <Edit size={18} className="me-2" /> {t('Edit')}
                     </Button>
                 </div>
@@ -125,7 +126,7 @@ const ActivityDetail = ({ activityId, shell, onBack }) => {
                     <Card className="border-0 shadow-sm h-100">
                         <Card.Body>
                             <h6 className="text-muted text-uppercase small fw-bold">{t('Revenue')}</h6>
-                            <h3 className="fw-bold text-success mb-0">€ {details.totalRevenue?.toLocaleString()}</h3>
+                            <h3 className="fw-bold text-success mb-0">€ {details.totalRevenue?.toLocaleString(i18n.language)}</h3>
                         </Card.Body>
                     </Card>
                 </div>
@@ -133,7 +134,7 @@ const ActivityDetail = ({ activityId, shell, onBack }) => {
                     <Card className="border-0 shadow-sm h-100">
                         <Card.Body>
                             <h6 className="text-muted text-uppercase small fw-bold">{t('Costs')}</h6>
-                            <h3 className="fw-bold text-danger mb-0">€ {details.totalCosts?.toLocaleString()}</h3>
+                            <h3 className="fw-bold text-danger mb-0">€ {details.totalCosts?.toLocaleString(i18n.language)}</h3>
                         </Card.Body>
                     </Card>
                 </div>
@@ -142,7 +143,7 @@ const ActivityDetail = ({ activityId, shell, onBack }) => {
                         <Card.Body>
                             <h6 className="text-muted text-uppercase small fw-bold">{t('Net Profit')}</h6>
                             <h3 className={`fw-bold mb-0 ${details.netProfit >= 0 ? 'text-primary' : 'text-danger'}`}>
-                                € {details.netProfit?.toLocaleString()}
+                                € {details.netProfit?.toLocaleString(i18n.language)}
                             </h3>
                         </Card.Body>
                     </Card>
@@ -177,12 +178,15 @@ const ActivityDetail = ({ activityId, shell, onBack }) => {
                                                 {p.user ? `${p.user.firstName} ${p.user.lastName}` : `#${p.id}`}
                                             </td>
                                             <td>
-                                                <Badge bg={p.isPaid ? 'success' : 'warning'} text={p.isPaid ? 'white' : 'dark'}>
-                                                    {p.isPaid ? t('Paid') : t('Pending')}
+                                                <Badge bg={(p.paid ?? p.isPaid) ? 'success' : 'warning'} text={(p.paid ?? p.isPaid) ? 'white' : 'dark'}>
+                                                    {(p.paid ?? p.isPaid) ? t('Paid') : t('Pending')}
                                                 </Badge>
-                                                {p.amountPaid > 0 && <span className="ms-2 small text-muted">€ {p.amountPaid}</span>}
+                                                {p.amountPaid > 0
+                                                    ? <span className="ms-2 small text-muted">€ {p.amountPaid}</span>
+                                                    : p.amountDue != null && <span className="ms-2 small text-muted">€ {p.amountDue}</span>}
+                                                <CouponBadge code={p.couponCode} discount={p.discountAmount} />
                                             </td>
-                                            <td><Badge bg={p.isActive ? 'success' : 'secondary'}>{p.isActive ? t('Active') : t('Inactive')}</Badge></td>
+                                            <td><Badge bg={(p.active ?? p.isActive) !== false ? 'success' : 'secondary'}>{(p.active ?? p.isActive) !== false ? t('Active') : t('Inactive')}</Badge></td>
                                             <td className="text-end pe-4">
                                                 <Button variant="link" className="text-danger p-0" onClick={() => handleDeleteSubResource('participant', p.id)}><Trash2 size={16}/></Button>
                                             </td>
@@ -260,7 +264,7 @@ const ActivityDetail = ({ activityId, shell, onBack }) => {
                                 <tbody>
                                     {costs.map(c => (
                                         <tr key={c.id}>
-                                            <td className="ps-4">{c.description} <small className="text-muted d-block">{new Date(c.date).toLocaleDateString()}</small></td>
+                                            <td className="ps-4">{c.description} <small className="text-muted d-block">{new Date(c.date).toLocaleDateString(i18n.language)}</small></td>
                                             <td><Badge bg="light" text="dark" className="border">{translateCostCategory(c.category, t)}</Badge></td>
                                             <td className="text-danger">-€ {c.amount}</td>
                                             <td className="text-end pe-4">

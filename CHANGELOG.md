@@ -10,6 +10,59 @@ automaticamente nella nuova versione e le pubblica nel changelog Debian del `.de
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-10-28
+
+Rilascio funzionale: coupon applicati, check-in agli eventi, votazioni delle mozioni, campanella delle notifiche per associazione, registro attività, PDF localizzati con firme e interfaccia interamente tradotta in cinque lingue.
+
+- Added: Coupon applicati alle iscrizioni di attività ed eventi: verifica del codice con sconto e quota dovuta in anteprima, controllo lato server di validità, date, limite di utilizzi, importo minimo e ambito, contatore utilizzi aggiornato nella stessa transazione; quota dovuta e coupon visibili nell’elenco partecipanti ed entrate calcolate sugli importi scontati.
+- Added: Check-in dei partecipanti agli eventi con annullamento, orario di arrivo, ricerca nell’elenco e stato del pagamento modificabile dalla riga; indicatori Registrato/Presente/Tasso di presenza coerenti.
+- Added: Votazioni delle mozioni (favorevoli, contrari, astenuti) con esito calcolato secondo il tipo di votazione e anteprima, modifica di mozioni e partecipanti, nomi dei soci nell’elenco presenze.
+- Added: Registro attività (audit) delle operazioni su soci, finanze, attività, eventi, assemblee, inventario, volontari, coupon, budget, bilanci, attestati, comunicazioni, profilo, firme e database, con scheda in Impostazioni filtrabile per area, azione e date; nessun dato sensibile registrato.
+- Fixed: Campanella delle notifiche ora legata all’associazione: contatore non letti, apertura dell’elemento collegato, testi tradotti; prima restava vuota.
+- Changed: PDF (tessera, ricevuta, report annuale e di confronto, elenco soci, report di eventi e attività, verbale, bilancio, attestati) in formato A4 e nella lingua dell’interfaccia, con firme salvate in Impostazioni › Firme; il verbale riporta presenti e deleghe per nome, voti ed esito di ogni mozione.
+- Changed: Interfaccia, processo principale, schermata di avvio e messaggi del backend interamente tradotti nelle cinque lingue, con date e numeri nel formato della lingua scelta; test che impediscono testo fisso non tradotto.
+- Fixed: Stato attivo dei coupon e stato/pagamento dei partecipanti alle attività letti correttamente dall’interfaccia.
+- Removed: Servizio PDF finanziario inutilizzato con testi fissi.
+- Verified: 68 scenari E2E su SQLite e 68 su MariaDB; primo avvio (8), database remoto (8) e nuove funzioni (7, su SQLite e MariaDB: coupon, check-in, votazioni, notifiche, registro attività, lingua) superati; migrazioni V38–V40 SQLite e V2–V4 MariaDB applicate e convalidate.
+
+## [0.1.7] - 2026-10-28
+
+- Fixed: Comunicazioni email inviate con corpo vuoto: il contenuto dell’editor viene ora spedito come testo con paragrafi e a capo; destinatari presi dai soci dell’associazione (non da tutte le anagrafiche), senza duplicati se si ricalcola l’elenco; stato “Fallito” quando nessun invio riesce.
+- Fixed: Attestati emessi al destinatario corretto: emissione singola da elenco soci invece di un ID numerico, emissione in blocco ai partecipanti soci (prima usava l’ID del partecipante), nome del destinatario nell’elenco.
+- Fixed: Nessun PDF di report si generava (report annuale e di confronto, ricevute, verbali, report di attività ed eventi, elenco soci, tessera, bilancio consuntivo) per un colore del piè di pagina fuori scala; ora ogni documento è verificato da test e dagli E2E di download.
+- Fixed: Report PDF dell’attività scaricabile (percorso API errato); “Esci” disattiva anche “Resta connesso”, che altrimenti riapriva subito la sessione.
+- Fixed: Rimborsi volontari registrati nell’associazione in uso invece che sempre nella prima; data del prestito d’inventario rispettata; colonna ore e stato reali nell’elenco volontari; tipo di votazione visibile nelle mozioni.
+- Fixed: Stati, categorie e tipi mostrati con codici o chiavi tecniche (inventario, assemblee, volontari, bilanci, budget, attestati, eventi, scadenze) ora tradotti nelle cinque lingue; aggiunte le etichette mancanti e un test che verifica ogni etichetta usata dall’interfaccia.
+- Removed: Riquadro “Analisi Spese” con pulsante di download privo di funzione.
+- Changed: Manuale utente riscritto nelle cinque lingue sulla base del comportamento reale: primo avvio, accesso, recupero password, ricerca funzioni, tema, zoom, import/export soci, database MariaDB e backup; limiti delle funzioni parziali dichiarati. Titoli dei capitoli tradotti e test di coerenza tra lingue.
+- Verified: 68 scenari E2E su SQLite e 68 su MariaDB, primo avvio (8) e percorso database remoto (8) superati.
+- Verified: Percorso completo verso database remoto MariaDB (configurazione da Impostazioni, riapertura, primo avvio, persistenza e ritorno a SQLite) con E2E dedicato.
+- Changed: Wizard di primo avvio e accesso allineati al nuovo stile istituzionale, con intestazione in gradiente, sezioni numerate, scelte navigabili da tastiera e animazioni d’ingresso morbide che rispettano il movimento ridotto; verifica E2E dedicata al primo avvio.
+- Removed: Wizard database `SetupWizard` mai montato e relativo `SetupController` (`/api/setup/*`), che senza autenticazione permetteva di sovrascrivere la configurazione del database e di arrestare il backend; rimosse anche le traduzioni rimaste inutilizzate.
+- Verified: 67 scenari E2E su SQLite e 67 su MariaDB; riavvio, zoom nativo, immagini binarie, decimali e scambio JSON soci bidirezionale verificati su dati temporanei. Matrice e limiti documentati in `UI_VERIFICATION.md`.
+- Fixed: Chiavi esterne SQLite abilitate, cancellazione delle presenze associate alle sessioni, capienza di loghi/firme MariaDB e unicità delle fatture per associazione allineate.
+- Added: Esempi CSV/JSON generati al momento, export soci, anteprima e importazione atomica nella stessa anagrafica usata dalla UI, con duplicati saltati e protezione formule CSV.
+- Added: Zoom dell’interfaccia persistente dal 50% al 200%, a incrementi del 25%, nelle impostazioni.
+- Added: Pulsante “Sostieni Donando” in Info App, oltre al collegamento nelle impostazioni.
+- Changed: Animazioni più morbide per pannelli, navigazione e controlli, rispettando la preferenza di movimento ridotto.
+- Added: Configurazione MariaDB attiva con verifica lettura/scrittura, credenziali omesse dalle risposte, TLS verificato opzionale e migrazioni dedicate; il cambio database richiede riapertura e non trasferisce dati automaticamente.
+- Added: Snapshot logico JSON consistente per il backup MariaDB; backup SQLite nativo mantenuto.
+- Fixed: Allineamento delle colonne di turni volontari e lettura fatture per i controlli fiscali, mantenendo dati storici e riferimenti ai pagamenti.
+- Fixed: Dettaglio assemblee nuovamente accessibile grazie alle colonne mancanti delle mozioni, con migrazione che conserva voti e decisioni storiche.
+- Fixed: Selettori soci di prestiti e presenze assembleari collegati alle iscrizioni corrette; stato attivo dei metodi di pagamento salvato correttamente.
+- Fixed: Dashboard usa le iscrizioni effettive dell’associazione selezionata, filtra eventi e movimenti per associazione e mostra attività recenti reali, prima sempre vuote.
+- Fixed: In sviluppo Electron avvia il backend locale se quello esterno non risponde; il client segnala connessioni perse, rinnova la porta e offre riconnessione senza ripetere automaticamente operazioni di scrittura.
+- Fixed: Log azioni leggibili anche nel processo principale, senza `[object Object]` e codici CSS della console.
+- Added: Migrazione presenze compatibile con gli utenti delle attività e conservazione dei record storici; verifica automatica dei dati migrati.
+- Fixed: Modifica soci e attività carica e aggiorna il record esistente, invece di creare duplicati; endpoint di rinnovo tessera collegato al servizio già presente.
+- Added: Registro presenze operativo con selezione attività, creazione/modifica/eliminazione sessioni e registrazione dello stato dei partecipanti.
+- Fixed: Accesso a dettagli, turni e rimborsi volontari e azione di eliminazione; persistenza del tema nelle preferenze.
+- Fixed: Backup SQLite consistente dal datasource effettivo con `VACUUM INTO`, percorso reale e gestione degli errori, senza copia diretta di file aperti.
+- Fixed: Dashboard con riepilogo/espansione attività recenti, collegamenti ai moduli e aggiornamento dati dopo le azioni rapide.
+- Changed: Interfaccia istituzionale con navigazione blu profondo raggruppata, palette derivata dal marchio, superfici, tabelle, controlli e grafici coerenti nei temi chiaro e scuro.
+- Added: Ricerca visibile nella barra superiore, accesso a tutte le sezioni dalla palette comandi, cambio tema persistente e collegamento “Supporta AssociaGo” nelle impostazioni generali.
+- Fixed: Il comando “Nuovo socio” apre il modulo; il backup nelle impostazioni richiama il servizio reale invece di simulare un salvataggio.
+
 ## [0.1.6] - 2026-08-30
 
 - Maintenance release.

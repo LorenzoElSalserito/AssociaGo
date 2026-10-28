@@ -1,39 +1,31 @@
 # 17. Notifications
 
-The AssociaGo **Notifications** system provides real-time updates about important association events.
+You check notifications from the **bell** in the header, next to the profile menu. They collect what happens in the association you are logged in with: each association sees only its own.
 
-## 17.1 Notification Bell
-In the page header, next to the user profile, there is a **bell** icon:
-- A **red badge** with a number indicates unread notifications.
-- Clicking the bell opens the notifications panel.
+## 17.1 The bell
 
-## 17.2 Notifications Panel
-The panel shows the list of notifications ordered from most recent:
+- The **badge** on the bell shows how many notifications are still unread (above 9 it shows **9+**).
+- A click, or **Enter** or **Space** when the bell has focus, opens the **Notifications** panel; a click outside or the **Esc** key closes it.
+- The count updates on its own every 30 seconds.
 
-For each notification, the following is displayed:
-- **Title**: Brief description of the event.
-- **Message**: Additional details.
-- **Date and Time**: When the notification was generated.
-- **Status**: Read (grayed out) or Unread (highlighted).
+## 17.2 The panel
 
-### Available Actions
-- **Mark as read**: Click on an individual notification to mark it as read.
-- **Mark all as read**: Button at the top of the panel to mark all notifications as read in a single action.
+The latest 50 notifications are listed from the most recent. Each one shows title, message and when it was created ("5 minutes ago", "2 hours ago"; after a day, the date). Unread ones have a highlighted background and a dot on the right.
 
-## 17.3 Notification Types
-The system generates automatic notifications for various events:
+- Click a notification (or select it with **Tab** and press **Enter**): it is marked as read and the linked item opens. An event opens its detail page in the **Events** section; a membership opens the member's page in the **Members** section.
+- **Mark all as read**, at the top, appears only if there are unread notifications.
+- If there are none, the panel shows **No notifications**.
 
-| Type | Description |
-|------|-------------|
-| **INFO** | General information (e.g., "New member registered"). |
-| **WARNING** | Warnings requiring attention (e.g., "Membership cards expiring"). |
-| **ALERT** | Urgent situations (e.g., "Upcoming tax deadline"). |
-| **REMINDER** | Scheduled reminders (e.g., "Assembly tomorrow"). |
+Notification texts follow the language chosen in the settings. Notifications created by earlier versions of AssociaGo keep their original text.
 
-## 17.4 Automatic Refresh
-Notifications are automatically refreshed every **30 seconds** without the need to reload the page. The badge on the bell updates in real time.
+## 17.3 When they are created
 
-## 17.5 Linked Notifications
-Some notifications are linked to specific entities (member, event, activity). The system records the type and ID of the related entity to facilitate direct navigation to the notification's context.
+| Notification | When |
+|---|---|
+| New event registration | a member or a guest is added to an event's participants |
+| Event cancelled | an event is cancelled: a single notification with the number of participants to inform |
+| Membership renewed | a membership is renewed |
+| Membership expired | nightly check (1:00 am): the membership has expired |
+| Membership expiring | nightly check (1:00 am): exactly 7 days remain before expiry |
 
-> **Note**: Notifications are generated automatically by the system in response to actions and deadlines. It is not currently possible to create manual notifications.
+The nightly checks run only if AssociaGo is open at that time. Notifications are for the association: they are not sent to members. To write to members use **Communications** (chapter 15).

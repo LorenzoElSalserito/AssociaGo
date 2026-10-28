@@ -1,46 +1,52 @@
-# 12. Presupuesto (Budget)
+# 12. Presupuesto
 
-La sección **Presupuesto** permite planificar los ingresos y gastos previstos para el ejercicio, compararlos con los datos reales y mantener bajo control la sostenibilidad financiera de la asociación.
+La página **Presupuestos** sirve para planificar los ingresos y gastos de un año y compararlos con los movimientos registrados en la contabilidad.
 
-## 12.1 Descripción general
-El presupuesto es una herramienta obligatoria para muchas asociaciones del Tercer Sector. AssociaGo lo hace sencillo de elaborar y aprobar.
+## 12.1 Lista de presupuestos
 
-## 12.2 Creación del Presupuesto
-1. Haz clic en **"Nuevo Presupuesto"**.
-2. Introduce el **año de referencia** y una descripción opcional.
-3. Haz clic en **"Crear"**.
+La tabla muestra **Título**, **Año** y **Estado** (borrador o aprobado), del más reciente al más antiguo. Haz clic en una fila para abrir el presupuesto. El icono de la **papelera** lo elimina, tras la confirmación **¿Estás seguro?**.
 
-El presupuesto se crea en estado **Borrador**.
+## 12.2 Crear un presupuesto
 
-## 12.3 Gestión de las Líneas de Presupuesto
-Cada presupuesto está compuesto por **líneas** (partidas) de ingresos y gastos:
+Pulsa **Nuevo presupuesto** y rellena:
+- **Título**;
+- **Año** (se propone el actual);
+- **Notas**.
 
-### Añadir una Partida
-- Haz clic en **"Añadir Línea"**.
-- Completa:
-  - **Categoría**: Ingreso o Gasto.
-  - **Descripción**: (ej. "Cuotas de socios", "Alquiler de sede", "Material didáctico").
-  - **Importe Previsto**: La cantidad estimada.
+Pulsa **Crear**. El presupuesto nace como borrador.
 
-### Modificar una Partida
-Haz clic en la fila para modificar la descripción y el importe previsto.
+> El título, el año y las notas no se pueden modificar después de la creación.
 
-### Eliminar una Partida
-Haz clic en el icono de **papelera** para eliminar una fila.
+## 12.3 Líneas del presupuesto
+
+En el detalle pulsa **Añadir línea** y rellena:
+- **Categoría**: texto libre, por ejemplo "Cuotas de socios" o "Alquiler de la sede";
+- **Sección**: **Ingresos** o **Gasto**;
+- **Importe presupuestado**.
+
+Pulsa **Añadir**. Para cambiar una línea usa el icono del **lápiz** (**Editar línea** y después **Guardar**); para quitarla, el icono de la **papelera**, que elimina de inmediato sin confirmación.
+
+La tabla de líneas tiene estas columnas:
+- **Presupuestado** y **Real**;
+- **Variación**: real menos presupuestado, en verde si es positiva y en rojo si es negativa (el mismo criterio vale para ingresos y gastos);
+- **Progreso**: barra del real respecto al presupuestado, amarilla por encima del 80 % y roja por encima del 100 %.
 
 ## 12.4 Resumen
-En la parte superior de la página, un panel de resumen muestra:
-- **Total Ingresos Previstos**
-- **Total Gastos Previstos**
-- **Saldo Previsto** (diferencia)
 
-## 12.5 Sincronización con los Datos Reales
-Al hacer clic en **"Sincronizar Datos Reales"**, el sistema actualiza automáticamente los importes efectivos (columna "Datos Reales") leyendo las transacciones reales registradas en la contabilidad para el año de referencia. Esto permite comparar inmediatamente las previsiones con la realidad.
+Encima de la tabla hay cuatro recuadros: **Ingresos presupuestados**, **Ingresos Reales**, **Gastos presupuestados** y **Gastos Reales**.
+
+> No hay un saldo previsto: la diferencia entre ingresos y gastos se calcula a mano.
+
+## 12.5 Sincronizar los reales
+
+**Sincronizar reales** lee los movimientos de la asociación del 1 de enero al 31 de diciembre del año del presupuesto y actualiza la columna **Real**.
+
+> Las líneas creadas desde la interfaz no están vinculadas a una categoría contable. Por eso cada línea recibe el total de todos los movimientos de su sección: con tres líneas de gasto, las tres muestran el total de gastos del año. Los totales reales de los recuadros quedan, por tanto, multiplicados por el número de líneas.
 
 ## 12.6 Aprobación
-Cuando el presupuesto está completo:
-1. Haz clic en **"Aprobar"**.
-2. El estado pasa de **Borrador** a **Aprobado**.
-3. Un presupuesto aprobado ya no es modificable.
 
-> **Nota**: La aprobación del presupuesto es generalmente un acto asambleario. Asegúrense de que la aprobación en el sistema se realice solo después de la deliberación de la asamblea.
+**Aprobar** pasa el presupuesto al estado aprobado y registra quién lo aprobó y cuándo. Tras la aprobación el botón desaparece.
+
+> La aprobación no bloquea nada: las líneas siguen pudiéndose editar y eliminar, y el presupuesto se puede borrar.
+
+> **Nota**: la aprobación del presupuesto es normalmente un acto de la asamblea. Regístrala en el sistema después del acuerdo.

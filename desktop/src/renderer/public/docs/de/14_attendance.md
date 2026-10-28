@@ -1,47 +1,34 @@
 # 14. Anwesenheitsregister
 
-Der Bereich **Anwesenheiten** ermöglicht die Erfassung und Überwachung der Teilnahme von Mitgliedern an den Vereinsaktivitäten.
+Die Seite **Anwesenheiten** erfasst die Anwesenheit je Termin: Für jede Aktivität legen Sie die Termine an (die einzelnen Stunden oder Treffen) und markieren in jedem den Status jedes Teilnehmers.
 
-## 14.1 Überblick
-Das Anwesenheitsregister ist wichtig für:
-- Die Dokumentation der tatsächlichen Teilnahme an Aktivitäten.
-- Die Erstellung von Anwesenheitsbescheinigungen basierend auf den tatsächlichen Teilnahmen.
-- Die Einhaltung der Nachweispflichten für Organisationen des Dritten Sektors.
-- Die Überwachung des Engagements der Mitglieder.
+## 14.1 Termine einer Aktivität
 
-## 14.2 Anwesenheitsliste
-Die Haupttabelle zeigt alle Anwesenheitseinträge mit:
-- **Mitglied**: Vor- und Nachname des Teilnehmers.
-- **Aktivität**: Die Aktivität oder Veranstaltung, auf die sich die Anwesenheit bezieht.
-- **Datum**: Datum und Uhrzeit der Erfassung.
-- **Status**: Anwesend, Abwesend, Entschuldigt.
+1. Wählen Sie die **Aktivität** im Menü oben (vorgeschlagen wird die erste).
+2. Die Tabelle zeigt die Termine mit **Datum**, **Beginn**, **Ende** und **Notizen**.
 
-### Filter
-Nutzen Sie die verfügbaren Filter für:
-- Filtern nach bestimmter **Aktivität**.
-- Filtern nach **Datum** oder Zeitraum.
-- Filtern nach **Mitglied**.
+Die Aktionen jeder Zeile sind **Anwesenheit verwalten** und das **Papierkorb**-Symbol, das den Termin und die zugehörigen Anwesenheiten nach Bestätigung löscht.
 
-## 14.3 Anwesenheitserfassung
-### Einzelerfassung
-1. Klicken Sie auf **"Anwesenheit erfassen"**.
-2. Wählen Sie das **Mitglied** aus.
-3. Wählen Sie die **Aktivität** aus.
-4. Wählen Sie das **Datum**.
-5. Setzen Sie den **Status** (Anwesend/Abwesend/Entschuldigt).
-6. Fügen Sie optional **Anmerkungen** hinzu.
-7. Klicken Sie auf **"Speichern"**.
+## 14.2 Termin anlegen
 
-### Schnell-Check-in
-Für laufende Aktivitäten ist ein Schnell-Check-in möglich:
-1. Wählen Sie die aktuelle Aktivität aus.
-2. Markieren Sie die anwesenden Mitglieder in der Teilnehmerliste.
-3. Bestätigen Sie den Check-in.
+1. Klicken Sie auf **Neuer Termin** (deaktiviert, wenn es keine Aktivitäten gibt).
+2. Füllen Sie **Datum** (Pflicht), **Beginn**, **Ende** und **Notizen** aus. Das Ende muss nach dem Beginn liegen.
+3. Klicken Sie auf **Speichern**. Es erscheint die Meldung **Gespeichert.**
 
-## 14.4 Anwesenheitsberichte
-Das System erstellt Statistiken zu den Anwesenheiten:
-- **Teilnahmequote** pro Aktivität.
-- **Anwesenheitsverlauf** pro Mitglied.
-- **Am häufigsten besuchte Aktivitäten**.
+Nach dem Speichern erscheint auf derselben Seite die Teilnehmerliste. **Zurück** kehrt zur Terminliste zurück.
 
-> **Hinweis**: Das Anwesenheitsregister ist besonders wichtig für Amateursportvereine (ASD), bei denen die Dokumentation der Anwesenheiten Voraussetzung für den Versicherungsschutz und die Gültigkeit von Ausbildungsbescheinigungen ist.
+## 14.3 Anwesenheit markieren
+
+Öffnen Sie einen Termin mit **Anwesenheit verwalten**. Sie können Datum, Uhrzeiten und Notizen korrigieren und **Speichern** klicken.
+
+In der Tabelle **Anwesenheiten** gibt es eine Zeile für jeden als Mitglied eingeschriebenen Teilnehmer der Aktivität. Wählen Sie für jeden den **Status**:
+- **Anwesend**
+- **Abwesend**
+- **Verspätet**
+- **Entschuldigt**
+
+Solange Sie nichts auswählen, ist der Status **Nicht erfasst**. Jede Auswahl wird sofort gespeichert, ohne **Speichern** zu klicken.
+
+Ist die Tabelle leer, fügen Sie zuerst die Teilnehmer in der Detailansicht der Aktivität hinzu (Kapitel 3). Eventuelle Anwesenheiten aus früheren Versionen erscheinen in einem Feld **Erhaltene frühere Anwesenheiten**.
+
+> Es gibt keine Filter nach Mitglied oder Zeitraum und keine Berichte oder Statistiken zu den Anwesenheiten. Zertifikate berücksichtigen die erfassten Anwesenheiten nicht.

@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { associago } from '../api';
 
 const VolunteerDetail = ({ volunteerId, shell, onBack }) => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const [volunteer, setVolunteer] = useState(null);
     const [shifts, setShifts] = useState([]);
     const [expenses, setExpenses] = useState([]);
@@ -124,8 +124,8 @@ const VolunteerDetail = ({ volunteerId, shell, onBack }) => {
                                 <tbody>
                                     {shifts.map(s => (
                                         <tr key={s.id}>
-                                            <td className="ps-4">{new Date(s.startTime).toLocaleString()}</td>
-                                            <td>{new Date(s.endTime).toLocaleString()}</td>
+                                            <td className="ps-4">{new Date(s.startTime).toLocaleString(i18n.language)}</td>
+                                            <td>{new Date(s.endTime).toLocaleString(i18n.language)}</td>
                                             <td>{s.role}</td>
                                             <td>{s.hoursWorked}</td>
                                             <td><Badge bg="light" text="dark" className="border">{t(s.status)}</Badge></td>
@@ -160,7 +160,7 @@ const VolunteerDetail = ({ volunteerId, shell, onBack }) => {
                                 <tbody>
                                     {expenses.map(e => (
                                         <tr key={e.id}>
-                                            <td className="ps-4">{new Date(e.expenseDate).toLocaleDateString()}</td>
+                                            <td className="ps-4">{new Date(e.expenseDate).toLocaleDateString(i18n.language)}</td>
                                             <td>{e.description}</td>
                                             <td className="fw-bold">€ {e.amount}</td>
                                             <td>

@@ -2,10 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Card, Button, Form, Row, Col, Alert, Spinner, Nav, Image, Badge } from 'react-bootstrap';
 import { associago } from '../api';
 import { useTranslation } from 'react-i18next';
-import { Save, Database, Download, Globe, Moon, Sun, Building, Upload, Edit, X, FileText, CreditCard, Plus, Trash2, Bug, PenTool } from 'lucide-react';
+import { Save, Database, Download, Globe, Moon, Sun, Building, Upload, Edit, X, FileText, CreditCard, Plus, Trash2, Bug, PenTool, Heart, ExternalLink } from 'lucide-react';
+import MemberDataTransfer from './MemberDataTransfer';
 import PaymentMethodForm from './PaymentMethodForm';
 import AssociationRegistryPanel from './AssociationRegistryPanel';
 import SignaturePanel from './SignaturePanel';
+import AuditLogPanel from './AuditLogPanel';
+import { History } from 'lucide-react';
 import RowActions from './common/RowActions';
 
 const SettingsDashboard = ({ shell }) => {
@@ -87,16 +90,7 @@ const SettingsDashboard = ({ shell }) => {
             regolamento_path: assocData.regulationPath || '',
             data_fondazione: assocData.foundationDate || ''
         });
-        setDbConfig({
-            useRemoteDb: assocData.useRemoteDb || false,
-            dbType: assocData.dbType || 'sqlite',
-            dbHost: assocData.dbHost || '',
-            dbPort: assocData.dbPort || 3306,
-            dbName: assocData.dbName || '',
-            dbUser: assocData.dbUser || '',
-            dbPassword: assocData.dbPassword || '',
-            dbSsl: assocData.dbSsl || false
-        });
+        setDbConfig(await associago.database.get());
         const url = await associago.getLogoUrl(shell.currentAssociationId);
         setLogoUrl(url);
       }
@@ -183,8 +177,10 @@ const SettingsDashboard = ({ shell }) => {
   const handleBackup = async () => {
     setLoading(true);
     try {
-      await new Promise(r => setTimeout(r, 1500));
-      setBackupPath("/home/user/Documents/backup_2023.sqlite");
+      setBackupPath(null);
+      setMessage(null);
+      const backup = await associago.createBackup();
+      setBackupPath(backup.path);
       setMessage({ type: 'success', text: t('Backup created successfully.') });
     } catch (error) {
       setMessage({ type: 'error', text: error.message });
@@ -204,8 +200,8 @@ const SettingsDashboard = ({ shell }) => {
   };
 
   const handleReportBug = () => {
-      const subject = encodeURIComponent("[SEGNALAZIONE BUG] AssociaGo");
-      const body = encodeURIComponent(`Versione App: ${appVersion}\n\nDescrizione del problema:\n`);
+      const subject = encodeURIComponent(t('bugReport.subject'));
+      const body = encodeURIComponent(t('bugReport.body', { version: appVersion }));
       window.location.href = `mailto:commercial.lorenzodm@gmail.com?subject=${subject}&body=${body}`;
   };
 
@@ -243,8 +239,8 @@ const SettingsDashboard = ({ shell }) => {
                         <div className="border rounded bg-light d-flex align-items-center justify-content-center overflow-hidden"
                              style={{width: '100px', height: '100px'}}>
                             {logoUrl ? (
-                                <Image src={logoUrl} alt="Logo" style={{width: '100%', height: '100%', objectFit: 'cover'}}
-                                       onError={(e) => e.target.style.display = 'none'} />
+                                <Image src={logoUrl} alt={t('Association Logo')} style={{width: '100%', height: '100%', objectFit: 'cover'}}
+                                       onError={() => setLogoUrl(null)} />
                             ) : (
                                 <Building size={40} className="text-muted" />
                             )}
@@ -320,7 +316,7 @@ const SettingsDashboard = ({ shell }) => {
                     <Col md={12}>
                         <Form.Group className="mb-3">
                             <Form.Label>{t('Address')}</Form.Label>
-                            <Form.Control type="text" value={profile.indirizzo} onChange={e => setProfile({...profile, indirizzo: e.target.value})} placeholder="Via Roma 1" disabled={!isEditing} />
+                            <Form.Control type="text" value={profile.indirizzo} onChange={e => setProfile({...profile, indirizzo: e.target.value})} placeholder={t('memberForm.addressPlaceholder')} disabled={!isEditing} />
                         </Form.Group>
                     </Col>
                     <Col md={4}>
@@ -355,7 +351,7 @@ const SettingsDashboard = ({ shell }) => {
                             <Form.Label>{t('Statute Path/Link')}</Form.Label>
                             <div className="input-group">
                                 <span className="input-group-text bg-light"><FileText size={16} /></span>
-                                <Form.Control type="text" value={profile.statuto_path} onChange={e => setProfile({...profile, statuto_path: e.target.value})} placeholder="/path/to/statuto.pdf" disabled={!isEditing} />
+                                <Form.Control type="text" value={profile.statuto_path} onChange={e => setProfile({...profile, statuto_path: e.target.value})} placeholder={t('settingsUi.statutePlaceholder')} disabled={!isEditing} />
                             </div>
                         </Form.Group>
                     </Col>
@@ -364,7 +360,7 @@ const SettingsDashboard = ({ shell }) => {
                             <Form.Label>{t('Regulation Path/Link')}</Form.Label>
                             <div className="input-group">
                                 <span className="input-group-text bg-light"><FileText size={16} /></span>
-                                <Form.Control type="text" value={profile.regolamento_path} onChange={e => setProfile({...profile, regolamento_path: e.target.value})} placeholder="/path/to/regolamento.pdf" disabled={!isEditing} />
+                                <Form.Control type="text" value={profile.regolamento_path} onChange={e => setProfile({...profile, regolamento_path: e.target.value})} placeholder={t('settingsUi.regulationPlaceholder')} disabled={!isEditing} />
                             </div>
                         </Form.Group>
                     </Col>
@@ -437,10 +433,17 @@ const SettingsDashboard = ({ shell }) => {
 
   const renderGeneralTab = () => (
     <Row className="g-4">
+        <Col xs={12}><MemberDataTransfer associationId={shell.currentAssociationId} /></Col>
         <Col md={6}>
             <Card className="h-100 border-0 shadow-sm">
                 <Card.Body>
                     <h6 className="mb-3">{t('Appearance')}</h6>
+                    <Form.Group className="mb-3" controlId="interface-zoom">
+                        <Form.Label>{t('Interface zoom')}</Form.Label>
+                        <Form.Select value={shell.zoom} onChange={e => shell.setZoom(Number(e.target.value))}>
+                            {[50,75,100,125,150,175,200].map(value => <option key={value} value={value}>{value}%</option>)}
+                        </Form.Select>
+                    </Form.Group>
                     <Form.Group className="mb-3">
                         <Form.Label>{t('Language')}</Form.Label>
                         <Form.Select value={i18n.language} onChange={(e) => i18n.changeLanguage(e.target.value)}>
@@ -472,11 +475,24 @@ const SettingsDashboard = ({ shell }) => {
             <Card className="h-100 border-0 shadow-sm">
                 <Card.Body>
                     <h6 className="mb-3">{t('Data Management')}</h6>
-                    <p className="text-muted small">{t('Create a local backup of your data.')}</p>
+                    <p className="text-muted small">{t('backupScope')}</p>
                     <Button variant="info" className="text-white w-100 mb-3" onClick={handleBackup} disabled={loading}>
                         <Download size={18} className="me-2" /> {t('Backup Now')}
                     </Button>
                     {backupPath && <Alert variant="success" className="small py-2">{t('Saved to:')} {backupPath}</Alert>}
+                </Card.Body>
+            </Card>
+        </Col>
+        <Col md={12}>
+            <Card className="ag-support-panel">
+                <Card.Body className="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                    <div>
+                        <h6 className="mb-2"><Heart size={18} className="me-2 text-success" />{t('support.title')}</h6>
+                        <p className="text-muted mb-0 small">{t('support.description')}</p>
+                    </div>
+                    <Button as="a" href="https://www.paypal.com/paypalme/lorenzodemarco92" target="_blank" rel="noopener noreferrer" variant="outline-primary" data-testid="support-associago">
+                        {t('support.title')} <ExternalLink size={16} className="ms-2" />
+                    </Button>
                 </Card.Body>
             </Card>
         </Col>
@@ -497,6 +513,7 @@ const SettingsDashboard = ({ shell }) => {
                                     www.lorenzodm.it
                                 </a>
                             </p>
+                            <p><Button as="a" href="https://www.paypal.com/paypalme/lorenzodemarco92" target="_blank" rel="noopener noreferrer" variant="outline-primary">{t('Donate to support')}</Button></p>
                             <Alert variant="warning" className="small py-2 mb-0 d-inline-block">
                                 <strong>{t('Disclaimer')}:</strong> {t('AssociaGo may make errors, always check the outputs provided before forwarding them.')}
                             </Alert>
@@ -588,17 +605,8 @@ const SettingsDashboard = ({ shell }) => {
       setLoading(true);
       setMessage(null);
       try {
-          await associago.updateAssociationProfile(shell.currentAssociationId, {
-              useRemoteDb: dbConfig.useRemoteDb,
-              dbType: dbConfig.dbType,
-              dbHost: dbConfig.dbHost,
-              dbPort: dbConfig.dbPort ? parseInt(dbConfig.dbPort) : null,
-              dbName: dbConfig.dbName,
-              dbUser: dbConfig.dbUser,
-              dbPassword: dbConfig.dbPassword,
-              dbSsl: dbConfig.dbSsl
-          });
-          setMessage({ type: 'success', text: t('Database configuration saved.') });
+          await associago.database.save({...dbConfig, dbType: dbConfig.useRemoteDb ? 'MARIADB' : 'SQLITE', dbPort: String(dbConfig.dbPort)});
+          setMessage({ type: 'success', text: t('databaseUi.saved') });
       } catch (error) {
           setMessage({ type: 'error', text: error.message });
       } finally {
@@ -609,19 +617,19 @@ const SettingsDashboard = ({ shell }) => {
   const renderDatabaseTab = () => (
     <div>
         <Alert variant="warning" className="small mb-4">
-            {t('Changing database settings may require restarting the application.')}
+            {t('databaseUi.restartNotice')}
         </Alert>
         <div className="d-flex align-items-center gap-3 mb-4">
             <Form.Check
                 type="switch"
                 id="useRemoteDb"
                 label={t('Use Remote Database')}
-                checked={false}
-                disabled={true}
+                checked={dbConfig.useRemoteDb}
+                onChange={e => setDbConfig({...dbConfig, useRemoteDb:e.target.checked, dbType:e.target.checked ? "mariadb" : "sqlite"})}
                 className="mb-0"
             />
             <Badge bg="warning" text="dark" className="px-3 py-2" style={{ fontSize: '0.8rem' }}>
-                {t('Coming Soon')}
+                {t(dbConfig.activeType === 'mariadb' ? 'databaseUi.activeRemote' : 'databaseUi.activeLocal')}
             </Badge>
         </div>
         {dbConfig.useRemoteDb && (
@@ -632,39 +640,38 @@ const SettingsDashboard = ({ shell }) => {
                             <Form.Group className="mb-3">
                                 <Form.Label>{t('Database Type')}</Form.Label>
                                 <Form.Select value={dbConfig.dbType} onChange={e => setDbConfig({...dbConfig, dbType: e.target.value})}>
-                                    <option value="sqlite">SQLite</option>
-                                    <option value="mariadb">MariaDB / MySQL</option>
+                                    <option value="mariadb">MariaDB</option>
                                 </Form.Select>
                             </Form.Group>
                         </Col>
                         <Col md={6}>
                             <Form.Group className="mb-3">
                                 <Form.Label>{t('Host')}</Form.Label>
-                                <Form.Control type="text" value={dbConfig.dbHost} onChange={e => setDbConfig({...dbConfig, dbHost: e.target.value})} placeholder="localhost" />
+                                <Form.Control type="text" aria-label={t("databaseUi.dbHost")} name="dbHost" value={dbConfig.dbHost} onChange={e => setDbConfig({...dbConfig, dbHost: e.target.value})} placeholder="localhost" />
                             </Form.Group>
                         </Col>
                         <Col md={4}>
                             <Form.Group className="mb-3">
                                 <Form.Label>{t('Port')}</Form.Label>
-                                <Form.Control type="number" value={dbConfig.dbPort} onChange={e => setDbConfig({...dbConfig, dbPort: e.target.value})} placeholder="3306" />
+                                <Form.Control type="number" aria-label={t("databaseUi.dbPort")} name="dbPort" value={dbConfig.dbPort} onChange={e => setDbConfig({...dbConfig, dbPort: e.target.value})} placeholder="3306" />
                             </Form.Group>
                         </Col>
                         <Col md={8}>
                             <Form.Group className="mb-3">
                                 <Form.Label>{t('Database Name')}</Form.Label>
-                                <Form.Control type="text" value={dbConfig.dbName} onChange={e => setDbConfig({...dbConfig, dbName: e.target.value})} />
+                                <Form.Control type="text" aria-label={t("databaseUi.dbName")} name="dbName" value={dbConfig.dbName} onChange={e => setDbConfig({...dbConfig, dbName: e.target.value})} />
                             </Form.Group>
                         </Col>
                         <Col md={6}>
                             <Form.Group className="mb-3">
                                 <Form.Label>{t('Username')}</Form.Label>
-                                <Form.Control type="text" value={dbConfig.dbUser} onChange={e => setDbConfig({...dbConfig, dbUser: e.target.value})} />
+                                <Form.Control type="text" aria-label={t("databaseUi.dbUser")} name="dbUser" value={dbConfig.dbUser} onChange={e => setDbConfig({...dbConfig, dbUser: e.target.value})} />
                             </Form.Group>
                         </Col>
                         <Col md={6}>
                             <Form.Group className="mb-3">
                                 <Form.Label>{t('Password')}</Form.Label>
-                                <Form.Control type="password" value={dbConfig.dbPassword} onChange={e => setDbConfig({...dbConfig, dbPassword: e.target.value})} />
+                                <Form.Control type="password" aria-label={t("databaseUi.dbPassword")} name="dbPassword" value={dbConfig.dbPassword} onChange={e => setDbConfig({...dbConfig, dbPassword: e.target.value})} />
                             </Form.Group>
                         </Col>
                         <Col md={12}>
@@ -681,6 +688,12 @@ const SettingsDashboard = ({ shell }) => {
                 </Card.Body>
             </Card>
         )}
+        {dbConfig.useRemoteDb && <Button variant="outline-primary" className="me-2 mb-2" disabled={loading} onClick={async () => {
+            setLoading(true); setMessage(null);
+            try { await associago.database.test({...dbConfig, dbPort:String(dbConfig.dbPort)}); setMessage({type:'success',text:t('databaseUi.connected')}); }
+            catch(error) { setMessage({type:'error',text:error.message}); }
+            finally { setLoading(false); }
+        }}>{t('databaseUi.test')}</Button>}
         <Button variant="primary" onClick={handleSaveDbConfig} disabled={loading}>
             {loading ? <Spinner as="span" animation="border" size="sm" className="me-2" /> : <Save size={16} className="me-2" />}
             {t('Save Database Settings')}
@@ -739,6 +752,11 @@ const SettingsDashboard = ({ shell }) => {
                         <Database size={18} /> {t('Database')}
                     </Nav.Link>
                 </Nav.Item>
+                <Nav.Item>
+                    <Nav.Link eventKey="audit" className="d-flex align-items-center gap-2">
+                        <History size={18} /> {t('auditLog.tab')}
+                    </Nav.Link>
+                </Nav.Item>
             </Nav>
         </Card.Header>
         <Card.Body className="p-4">
@@ -748,6 +766,7 @@ const SettingsDashboard = ({ shell }) => {
             {activeTab === 'registry' && <AssociationRegistryPanel associationId={shell.currentAssociationId} />}
             {activeTab === 'signatures' && <SignaturePanel associationId={shell.currentAssociationId} />}
             {activeTab === 'database' && renderDatabaseTab()}
+            {activeTab === 'audit' && <AuditLogPanel associationId={shell.currentAssociationId} />}
         </Card.Body>
       </Card>
     </div>

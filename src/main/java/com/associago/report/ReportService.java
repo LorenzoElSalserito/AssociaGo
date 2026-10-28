@@ -8,519 +8,396 @@ import com.associago.association.Association;
 import com.associago.event.Event;
 import com.associago.finance.Transaction;
 import com.associago.member.Member;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.PDPageContentStream;
-import org.apache.pdfbox.pdmodel.font.PDType1Font;
-import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
-import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
+import com.associago.shared.SignatureResolver;
+import com.associago.shared.i18n.Messages;
+import com.associago.shared.pdf.PdfDocument;
+import com.associago.shared.pdf.PdfText;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.time.format.DateTimeFormatter;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
+/** PDFs downloadable from the UI, localized in the request language (A4, Helvetica/WinAnsi). */
 @Service
 public class ReportService {
 
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+    private final Messages messages;
 
-    private void addHeader(PDDocument document, PDPage page, Association association) throws IOException {
-        try (PDPageContentStream contentStream = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, true, true)) {
-            // Logo
-            if (association.getLogo() != null && association.getLogo().length > 0) {
-                try {
-                    PDImageXObject pdImage = PDImageXObject.createFromByteArray(document, association.getLogo(), "logo");
-                    // Scale image to fit in 50x50 box
-                    float scale = Math.min(50f / pdImage.getWidth(), 50f / pdImage.getHeight());
-                    contentStream.drawImage(pdImage, 50, 730, pdImage.getWidth() * scale, pdImage.getHeight() * scale);
-                } catch (Exception e) {
-                    // Ignore image errors, just don't draw it
-                }
-            }
-
-            // Association Name
-            contentStream.beginText();
-            contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 14);
-            contentStream.newLineAtOffset(110, 760); // Offset from logo
-            contentStream.showText(association.getName() != null ? association.getName() : "Associazione");
-            contentStream.endText();
-            
-            // Separator line
-            contentStream.moveTo(50, 720);
-            contentStream.lineTo(550, 720);
-            contentStream.stroke();
-        }
+    public ReportService(Messages messages) {
+        this.messages = messages;
     }
 
-    private void addFooter(PDDocument document, PDPage page, Association association) throws IOException {
-        try (PDPageContentStream contentStream = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, true, true)) {
-            contentStream.beginText();
-            contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 8);
-            contentStream.setNonStrokingColor(100, 100, 100); // Gray
-            contentStream.newLineAtOffset(50, 30);
-            
-            String footerText = association.getName() != null ? association.getName() : "";
-            if (association.getAddress() != null) footerText += " - " + association.getAddress();
-            if (association.getCity() != null) footerText += ", " + association.getCity();
-            if (association.getTaxCode() != null) footerText += " - C.F. " + association.getTaxCode();
-            if (association.getVatNumber() != null) footerText += " - P.IVA " + association.getVatNumber();
-            if (association.getEmail() != null) footerText += " - " + association.getEmail();
+    // --- Shared layout ---
 
-            contentStream.showText(footerText);
-            contentStream.endText();
-        }
+    private PdfDocument open(Association association, Locale locale) throws IOException {
+        return new PdfDocument(PDRectangle.A4, pdf -> header(pdf, association, locale));
     }
 
-    private BigDecimal getSafeAmount(Map<String, BigDecimal> summary, String key) {
+    private void header(PdfDocument pdf, Association association, Locale locale) throws IOException {
+        float top = pdf.height() - PdfDocument.MARGIN;
+        boolean logo = association.getLogo() != null
+                && pdf.image(association.getLogo(), "logo", pdf.left(), top - 50, 50, 50);
+        float textX = logo ? pdf.left() + 60 : pdf.left();
+        String name = Objects.requireNonNullElse(association.getName(), msg(locale, "pdf.associationFallback"));
+        pdf.text(textX, top - 22, pdf.fit(name, pdf.bold, 14, pdf.right() - textX), pdf.bold, 14);
+        String city = association.getCity() == null ? "" : association.getCity();
+        if (!city.isBlank()) pdf.text(textX, top - 38, city, pdf.regular, 9, PdfDocument.MUTED);
+        pdf.hLine(pdf.left(), pdf.right(), top - 60, java.awt.Color.LIGHT_GRAY);
+        pdf.moveTo(top - 75);
+    }
+
+    private PdfDocument.FooterPainter footer(Association association, Locale locale) {
+        List<String> parts = new ArrayList<>();
+        if (association.getName() != null) parts.add(association.getName());
+        if (association.getAddress() != null) {
+            parts.add(association.getAddress() + (association.getCity() != null ? ", " + association.getCity() : ""));
+        }
+        if (association.getTaxCode() != null) parts.add(msg(locale, "pdf.taxCode", association.getTaxCode()));
+        if (association.getVatNumber() != null) parts.add(msg(locale, "pdf.vatNumber", association.getVatNumber()));
+        if (association.getEmail() != null) parts.add(association.getEmail());
+        String text = String.join(" - ", parts);
+        return (pdf, page, count) -> {
+            String pageLabel = msg(locale, "pdf.page", page, count);
+            float pageWidth = pdf.textWidth(pageLabel, pdf.regular, 8);
+            pdf.hLine(pdf.left(), pdf.right(), 42, java.awt.Color.LIGHT_GRAY);
+            pdf.text(pdf.left(), 30, pdf.fit(text, pdf.regular, 8, pdf.contentWidth() - pageWidth - 20),
+                    pdf.regular, 8, PdfDocument.MUTED);
+            pdf.text(pdf.right() - pageWidth, 30, pageLabel, pdf.regular, 8, PdfDocument.MUTED);
+        };
+    }
+
+    private String msg(Locale locale, String code, Object... args) {
+        return messages.get(locale, code, args);
+    }
+
+    private String orNa(Locale locale, Object value) {
+        return value == null || value.toString().isBlank() ? msg(locale, "pdf.notAvailable") : value.toString();
+    }
+
+    private static String fullName(String first, String last) {
+        return ((first == null ? "" : first) + " " + (last == null ? "" : last)).trim();
+    }
+
+    private static BigDecimal amount(Map<String, BigDecimal> summary, String key) {
         if (summary == null) return BigDecimal.ZERO;
-        BigDecimal value = summary.get(key);
-        return value != null ? value : BigDecimal.ZERO;
+        return Objects.requireNonNullElse(summary.get(key), BigDecimal.ZERO);
     }
 
-    public byte[] generateMembershipCard(Member member, Association association) throws IOException {
-        try (PDDocument document = new PDDocument()) {
-            PDPage page = new PDPage();
-            document.addPage(page);
+    // --- Documents ---
 
-            addHeader(document, page, association);
-
-            try (PDPageContentStream contentStream = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, true, true)) {
-                contentStream.beginText();
-                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 18);
-                contentStream.newLineAtOffset(50, 650);
-                contentStream.showText("Tessera Associativa");
-                contentStream.endText();
-
-                contentStream.beginText();
-                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 12);
-                contentStream.newLineAtOffset(50, 600);
-                contentStream.showText("Nome: " + member.getFirstName() + " " + member.getLastName());
-                contentStream.newLineAtOffset(0, -20);
-                contentStream.showText("Codice Fiscale: " + (member.getFiscalCode() != null ? member.getFiscalCode() : "N/D"));
-                contentStream.newLineAtOffset(0, -20);
-                contentStream.showText("Stato: " + member.getMembershipStatus());
-                contentStream.endText();
-            }
-
-            addFooter(document, page, association);
-
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            document.save(baos);
-            return baos.toByteArray();
+    public byte[] generateMembershipCard(Member member, Association association, Locale locale) throws IOException {
+        try (PdfDocument pdf = open(association, locale)) {
+            pdf.heading(msg(locale, "card.title"), 18);
+            pdf.space(6);
+            pdf.field(msg(locale, "label.name"), fullName(member.getFirstName(), member.getLastName()));
+            pdf.field(msg(locale, "label.fiscalCode"), orNa(locale, member.getFiscalCode()));
+            pdf.field(msg(locale, "label.status"), orNa(locale, messages.label(locale, "enum.memberStatus", member.getMembershipStatus())));
+            return pdf.finish(footer(association, locale));
         }
     }
 
-    public byte[] generateTransactionReceipt(Transaction transaction, Member member, Association association) throws IOException {
-        try (PDDocument document = new PDDocument()) {
-            PDPage page = new PDPage();
-            document.addPage(page);
-
-            addHeader(document, page, association);
-
-            try (PDPageContentStream contentStream = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, true, true)) {
-                contentStream.beginText();
-                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 18);
-                contentStream.newLineAtOffset(50, 650);
-                contentStream.showText("Ricevuta di Pagamento");
-                contentStream.endText();
-
-                contentStream.beginText();
-                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 12);
-                contentStream.newLineAtOffset(50, 600);
-                contentStream.showText("Data: " + transaction.getDate().format(DATE_FORMATTER));
-                contentStream.newLineAtOffset(0, -20);
-                contentStream.showText("Descrizione: " + (transaction.getDescription() != null ? transaction.getDescription() : ""));
-                contentStream.newLineAtOffset(0, -20);
-                contentStream.showText("Importo: " + transaction.getAmount() + " EUR");
-                contentStream.newLineAtOffset(0, -20);
-                contentStream.showText("Metodo: " + (transaction.getPaymentMethod() != null ? transaction.getPaymentMethod() : "N/D"));
-                
-                if (member != null) {
-                    contentStream.newLineAtOffset(0, -30);
-                    contentStream.showText("Intestato a: " + member.getFirstName() + " " + member.getLastName());
-                    contentStream.newLineAtOffset(0, -20);
-                    contentStream.showText("C.F.: " + (member.getFiscalCode() != null ? member.getFiscalCode() : "N/D"));
-                }
-                
-                contentStream.endText();
+    public byte[] generateTransactionReceipt(Transaction transaction, Member member, Association association, Locale locale) throws IOException {
+        try (PdfDocument pdf = open(association, locale)) {
+            pdf.heading(msg(locale, "receipt.title"), 18);
+            pdf.space(6);
+            pdf.field(msg(locale, "label.date"), orNa(locale, PdfText.date(transaction.getDate(), locale)));
+            pdf.field(msg(locale, "label.description"), Objects.requireNonNullElse(transaction.getDescription(), ""));
+            pdf.field(msg(locale, "label.amount"), PdfText.money(transaction.getAmount(), locale));
+            pdf.field(msg(locale, "label.paymentMethod"), orNa(locale, transaction.getPaymentMethod()));
+            if (member != null) {
+                pdf.space(10);
+                pdf.field(msg(locale, "label.issuedTo"), fullName(member.getFirstName(), member.getLastName()));
+                pdf.field(msg(locale, "label.fiscalCode"), orNa(locale, member.getFiscalCode()));
             }
-
-            addFooter(document, page, association);
-
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            document.save(baos);
-            return baos.toByteArray();
+            pdf.space(30);
+            pdf.signatures(null, List.of(new PdfDocument.SignatureBlock(
+                    Objects.requireNonNullElse(association.getName(), ""), msg(locale, "pdf.signature"), null)));
+            return pdf.finish(footer(association, locale));
         }
     }
 
-    public byte[] generateFinancialReport(int year, Map<String, BigDecimal> summary, List<Transaction> transactions, Association association) throws IOException {
-        try (PDDocument document = new PDDocument()) {
-            PDPage page = new PDPage();
-            document.addPage(page);
+    /**
+     * Totals come from {@code summary} (incomeCurrent/expenseCurrent); the table lists the given
+     * transactions of {@code year} that belong to the association.
+     */
+    public byte[] generateFinancialReport(int year, Map<String, BigDecimal> summary, List<Transaction> transactions,
+                                          Association association, Locale locale) throws IOException {
+        BigDecimal income = amount(summary, "incomeCurrent");
+        BigDecimal expense = amount(summary, "expenseCurrent");
+        try (PdfDocument pdf = open(association, locale)) {
+            pdf.heading(msg(locale, "financial.title", String.valueOf(year)), 18);
+            pdf.space(6);
+            pdf.field(msg(locale, "financial.totalIncome"), PdfText.money(income, locale));
+            pdf.field(msg(locale, "financial.totalExpenses"), PdfText.money(expense, locale));
+            pdf.field(msg(locale, "financial.net"), PdfText.money(income.subtract(expense), locale));
 
-            addHeader(document, page, association);
-
-            try (PDPageContentStream contentStream = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, true, true)) {
-                contentStream.beginText();
-                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 18);
-                contentStream.newLineAtOffset(50, 650);
-                contentStream.showText("Bilancio Finanziario " + year);
-                contentStream.endText();
-
-                BigDecimal income = getSafeAmount(summary, "incomeCurrent");
-                BigDecimal expense = getSafeAmount(summary, "expenseCurrent");
-
-                contentStream.beginText();
-                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 12);
-                contentStream.newLineAtOffset(50, 600);
-                contentStream.showText("Entrate Totali: " + income + " EUR");
-                contentStream.newLineAtOffset(0, -20);
-                contentStream.showText("Uscite Totali: " + expense + " EUR");
-                contentStream.newLineAtOffset(0, -20);
-                contentStream.showText("Saldo Netto: " + income.subtract(expense) + " EUR");
-                contentStream.endText();
-                
-                contentStream.beginText();
-                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_OBLIQUE), 10);
-                contentStream.newLineAtOffset(50, 530);
-                contentStream.showText("(Dettaglio transazioni omesso per brevità in questa versione)");
-                contentStream.endText();
-            }
-
-            addFooter(document, page, association);
-
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            document.save(baos);
-            return baos.toByteArray();
-        }
-    }
-
-    public byte[] generateComparisonReport(int year1, int year2, Map<String, BigDecimal> summary, Association association) throws IOException {
-        try (PDDocument document = new PDDocument()) {
-            PDPage page = new PDPage();
-            document.addPage(page);
-
-            addHeader(document, page, association);
-
-            try (PDPageContentStream contentStream = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, true, true)) {
-                contentStream.beginText();
-                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 18);
-                contentStream.newLineAtOffset(50, 650);
-                contentStream.showText("Confronto Finanziario " + year1 + " vs " + year2);
-                contentStream.endText();
-
-                BigDecimal income1 = getSafeAmount(summary, "incomeYear1");
-                BigDecimal expense1 = getSafeAmount(summary, "expenseYear1");
-                BigDecimal income2 = getSafeAmount(summary, "incomeYear2");
-                BigDecimal expense2 = getSafeAmount(summary, "expenseYear2");
-
-                contentStream.beginText();
-                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 12);
-                contentStream.newLineAtOffset(50, 600);
-                contentStream.showText("Anno " + year1);
-                contentStream.endText();
-
-                contentStream.beginText();
-                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 12);
-                contentStream.newLineAtOffset(50, 580);
-                contentStream.showText("Entrate: " + income1 + " EUR");
-                contentStream.newLineAtOffset(0, -15);
-                contentStream.showText("Uscite: " + expense1 + " EUR");
-                contentStream.newLineAtOffset(0, -15);
-                contentStream.showText("Saldo: " + income1.subtract(expense1) + " EUR");
-                contentStream.endText();
-
-                contentStream.beginText();
-                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 12);
-                contentStream.newLineAtOffset(300, 600);
-                contentStream.showText("Anno " + year2);
-                contentStream.endText();
-
-                contentStream.beginText();
-                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 12);
-                contentStream.newLineAtOffset(300, 580);
-                contentStream.showText("Entrate: " + income2 + " EUR");
-                contentStream.newLineAtOffset(0, -15);
-                contentStream.showText("Uscite: " + expense2 + " EUR");
-                contentStream.newLineAtOffset(0, -15);
-                contentStream.showText("Saldo: " + income2.subtract(expense2) + " EUR");
-                contentStream.endText();
-            }
-
-            addFooter(document, page, association);
-
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            document.save(baos);
-            return baos.toByteArray();
-        }
-    }
-
-    public byte[] generateMemberList(List<Member> members, Association association) throws IOException {
-        try (PDDocument document = new PDDocument()) {
-            PDPage page = new PDPage();
-            document.addPage(page);
-            addHeader(document, page, association);
-
-            try (PDPageContentStream cs = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, true, true)) {
-                cs.beginText();
-                cs.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 16);
-                cs.newLineAtOffset(50, 680);
-                cs.showText("Elenco Soci");
-                cs.endText();
-
-                // Table header
-                int y = 650;
-                cs.beginText();
-                cs.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 9);
-                cs.newLineAtOffset(50, y);
-                cs.showText("N.");
-                cs.newLineAtOffset(25, 0);
-                cs.showText("Cognome");
-                cs.newLineAtOffset(110, 0);
-                cs.showText("Nome");
-                cs.newLineAtOffset(100, 0);
-                cs.showText("Codice Fiscale");
-                cs.newLineAtOffset(120, 0);
-                cs.showText("Email");
-                cs.newLineAtOffset(120, 0);
-                cs.showText("Stato");
-                cs.endText();
-                y -= 5;
-                cs.moveTo(50, y);
-                cs.lineTo(550, y);
-                cs.stroke();
-                y -= 12;
-
-                cs.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 8);
-                int num = 1;
-                for (Member m : members) {
-                    if (y < 60) {
-                        // New page
-                        cs.close();
-                        page = new PDPage();
-                        document.addPage(page);
-                        y = 750;
-                        PDPageContentStream csAppend = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, true, true);
-                        csAppend.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 8);
-                    }
-                    cs.beginText();
-                    cs.newLineAtOffset(50, y);
-                    cs.showText(String.valueOf(num++));
-                    cs.newLineAtOffset(25, 0);
-                    cs.showText(truncate(m.getLastName(), 18));
-                    cs.newLineAtOffset(110, 0);
-                    cs.showText(truncate(m.getFirstName(), 16));
-                    cs.newLineAtOffset(100, 0);
-                    cs.showText(m.getFiscalCode() != null ? m.getFiscalCode() : "");
-                    cs.newLineAtOffset(120, 0);
-                    cs.showText(truncate(m.getEmail(), 22));
-                    cs.newLineAtOffset(120, 0);
-                    cs.showText(m.getMembershipStatus() != null ? m.getMembershipStatus() : "");
-                    cs.endText();
-                    y -= 12;
+            List<Transaction> rows = transactions == null ? List.of() : transactions.stream()
+                    .filter(t -> t.getDate() != null && t.getDate().getYear() == year)
+                    .filter(t -> association.getId() == null || t.getAssociationId() == null
+                            || association.getId().equals(t.getAssociationId()))
+                    .sorted((a, b) -> a.getDate().compareTo(b.getDate()))
+                    .toList();
+            pdf.space(14);
+            pdf.heading(msg(locale, "financial.transactions"), 13);
+            if (rows.isEmpty()) {
+                pdf.line(msg(locale, "financial.noTransactions"), pdf.italic, 10);
+            } else {
+                float[] columns = {pdf.left(), pdf.left() + 80, pdf.left() + 330, pdf.left() + 400};
+                boolean[] numeric = {false, false, false, true};
+                pdf.row(columns, new String[]{msg(locale, "label.date"), msg(locale, "label.description"),
+                        msg(locale, "label.type"), msg(locale, "label.amount")}, numeric, pdf.bold, 9);
+                pdf.rule();
+                for (Transaction t : rows) {
+                    pdf.row(columns, new String[]{
+                            PdfText.date(t.getDate(), locale),
+                            Objects.requireNonNullElse(t.getDescription(), ""),
+                            t.getType() == null ? "" : messages.label(locale, "enum.transactionType", t.getType().name()),
+                            PdfText.money(t.getAmount(), locale)}, numeric, pdf.regular, 9);
                 }
             }
-
-            addFooter(document, page, association);
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            document.save(baos);
-            return baos.toByteArray();
+            return pdf.finish(footer(association, locale));
         }
     }
 
-    public byte[] generateEventReport(Event event, int participantCount, Association association) throws IOException {
-        try (PDDocument document = new PDDocument()) {
-            PDPage page = new PDPage();
-            document.addPage(page);
-            addHeader(document, page, association);
+    public byte[] generateComparisonReport(int year1, int year2, Map<String, BigDecimal> summary,
+                                           Association association, Locale locale) throws IOException {
+        BigDecimal income1 = amount(summary, "incomeYear1");
+        BigDecimal expense1 = amount(summary, "expenseYear1");
+        BigDecimal income2 = amount(summary, "incomeYear2");
+        BigDecimal expense2 = amount(summary, "expenseYear2");
+        try (PdfDocument pdf = open(association, locale)) {
+            pdf.heading(msg(locale, "comparison.title", String.valueOf(year1), String.valueOf(year2)), 18);
+            pdf.space(8);
+            float[] columns = {pdf.left(), pdf.left() + 170, pdf.left() + 280, pdf.left() + 390};
+            boolean[] numeric = {false, true, true, true};
+            pdf.row(columns, new String[]{"", msg(locale, "comparison.year", String.valueOf(year1)),
+                    msg(locale, "comparison.year", String.valueOf(year2)), msg(locale, "comparison.difference")}, numeric, pdf.bold, 10);
+            pdf.rule();
+            comparisonRow(pdf, columns, numeric, msg(locale, "comparison.income"), income1, income2, locale);
+            comparisonRow(pdf, columns, numeric, msg(locale, "comparison.expenses"), expense1, expense2, locale);
+            comparisonRow(pdf, columns, numeric, msg(locale, "comparison.balance"),
+                    income1.subtract(expense1), income2.subtract(expense2), locale);
+            return pdf.finish(footer(association, locale));
+        }
+    }
 
-            try (PDPageContentStream cs = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, true, true)) {
-                cs.beginText();
-                cs.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 16);
-                cs.newLineAtOffset(50, 680);
-                cs.showText("Report Evento");
-                cs.endText();
+    private void comparisonRow(PdfDocument pdf, float[] columns, boolean[] numeric, String label,
+                               BigDecimal first, BigDecimal second, Locale locale) throws IOException {
+        pdf.row(columns, new String[]{label, PdfText.money(first, locale), PdfText.money(second, locale),
+                PdfText.money(second.subtract(first), locale)}, numeric, pdf.regular, 10);
+    }
 
-                cs.beginText();
-                cs.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 12);
-                cs.newLineAtOffset(50, 640);
-                cs.showText("Nome: " + (event.getName() != null ? event.getName() : ""));
-                cs.newLineAtOffset(0, -18);
-                cs.showText("Tipo: " + (event.getType() != null ? event.getType() : "N/D"));
-                cs.newLineAtOffset(0, -18);
-                cs.showText("Luogo: " + (event.getLocation() != null ? event.getLocation() : "N/D"));
-                cs.newLineAtOffset(0, -18);
-                cs.showText("Inizio: " + (event.getStartDatetime() != null ? event.getStartDatetime().format(DATE_TIME_FORMATTER) : "N/D"));
-                cs.newLineAtOffset(0, -18);
-                cs.showText("Fine: " + (event.getEndDatetime() != null ? event.getEndDatetime().format(DATE_TIME_FORMATTER) : "N/D"));
-                cs.newLineAtOffset(0, -18);
-                cs.showText("Stato: " + (event.getStatus() != null ? event.getStatus() : "N/D"));
-                cs.newLineAtOffset(0, -18);
-                cs.showText("Posti max: " + (event.getMaxParticipants() != null ? event.getMaxParticipants() : "Illimitati"));
-                cs.newLineAtOffset(0, -18);
-                cs.showText("Partecipanti iscritti: " + participantCount);
-                cs.newLineAtOffset(0, -18);
-                cs.showText("Costo soci: " + (event.getCostMember() != null ? event.getCostMember() + " EUR" : "Gratuito"));
-                cs.newLineAtOffset(0, -18);
-                cs.showText("Costo non soci: " + (event.getCostNonMember() != null ? event.getCostNonMember() + " EUR" : "Gratuito"));
-                cs.newLineAtOffset(0, -30);
-                cs.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 12);
-                cs.showText("Descrizione:");
-                cs.endText();
+    public byte[] generateMemberList(List<Member> members, Association association, Locale locale) throws IOException {
+        try (PdfDocument pdf = open(association, locale)) {
+            pdf.heading(msg(locale, "members.title"), 16);
+            pdf.line(msg(locale, "members.total", PdfText.number(members.size(), locale)), pdf.regular, 10);
+            pdf.space(6);
+            float[] columns = {pdf.left(), pdf.left() + 25, pdf.left() + 135, pdf.left() + 235, pdf.left() + 350, pdf.left() + 445};
+            String[] headers = {msg(locale, "label.number"), msg(locale, "label.lastName"), msg(locale, "label.firstName"),
+                    msg(locale, "label.fiscalCode"), msg(locale, "label.email"), msg(locale, "label.status")};
+            pdf.row(columns, headers, null, pdf.bold, 9);
+            pdf.rule();
+            int number = 1;
+            for (Member m : members) {
+                if (pdf.y() - 14 < 60) {
+                    pdf.newPage();
+                    pdf.row(columns, headers, null, pdf.bold, 9);
+                    pdf.rule();
+                }
+                pdf.row(columns, new String[]{String.valueOf(number++), m.getLastName(), m.getFirstName(),
+                        Objects.requireNonNullElse(m.getFiscalCode(), ""), Objects.requireNonNullElse(m.getEmail(), ""),
+                        messages.label(locale, "enum.memberStatus", m.getMembershipStatus())}, null, pdf.regular, 8);
+            }
+            return pdf.finish(footer(association, locale));
+        }
+    }
 
-                if (event.getDescription() != null && !event.getDescription().isEmpty()) {
-                    cs.beginText();
-                    cs.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 10);
-                    cs.newLineAtOffset(50, 420);
-                    cs.showText(truncate(event.getDescription(), 90));
-                    cs.endText();
+    public byte[] generateEventReport(Event event, int participantCount, Association association, Locale locale) throws IOException {
+        try (PdfDocument pdf = open(association, locale)) {
+            pdf.heading(msg(locale, "event.reportTitle"), 18);
+            pdf.space(6);
+            pdf.field(msg(locale, "label.name"), Objects.requireNonNullElse(event.getName(), ""));
+            pdf.field(msg(locale, "label.type"), orNa(locale, messages.label(locale, "enum.eventType", event.getType())));
+            pdf.field(msg(locale, "label.location"), orNa(locale, event.getLocation()));
+            pdf.field(msg(locale, "label.start"), orNa(locale, PdfText.dateTime(event.getStartDatetime(), locale)));
+            pdf.field(msg(locale, "label.end"), orNa(locale, PdfText.dateTime(event.getEndDatetime(), locale)));
+            pdf.field(msg(locale, "label.status"), orNa(locale, messages.label(locale, "enum.eventStatus", event.getStatus())));
+            pdf.field(msg(locale, "label.maxParticipants"), event.getMaxParticipants() != null
+                    ? PdfText.number(event.getMaxParticipants(), locale) : msg(locale, "pdf.unlimited"));
+            pdf.field(msg(locale, "label.registeredParticipants"), PdfText.number(participantCount, locale));
+            pdf.field(msg(locale, "label.costMember"), price(event.getCostMember(), locale));
+            pdf.field(msg(locale, "label.costNonMember"), price(event.getCostNonMember(), locale));
+            if (event.getDescription() != null && !event.getDescription().isBlank()) {
+                pdf.space(12);
+                pdf.heading(msg(locale, "label.description"), 12);
+                pdf.paragraph(pdf.left(), event.getDescription(), pdf.regular, 10);
+            }
+            return pdf.finish(footer(association, locale));
+        }
+    }
+
+    public byte[] generateActivityReport(Activity activity, int participantCount, Association association, Locale locale) throws IOException {
+        try (PdfDocument pdf = open(association, locale)) {
+            pdf.heading(msg(locale, "activity.reportTitle"), 18);
+            pdf.space(6);
+            pdf.field(msg(locale, "label.name"), Objects.requireNonNullElse(activity.getName(), ""));
+            pdf.field(msg(locale, "label.category"), orNa(locale, messages.label(locale, "enum.activityCategory", activity.getCategory())));
+            pdf.field(msg(locale, "label.location"), orNa(locale, activity.getLocation()));
+            pdf.field(msg(locale, "label.start"), orNa(locale, PdfText.date(activity.getStartDate(), locale)));
+            pdf.field(msg(locale, "label.end"), orNa(locale, PdfText.date(activity.getEndDate(), locale)));
+            pdf.field(msg(locale, "label.schedule"), orNa(locale, activity.getScheduleDetails()));
+            pdf.field(msg(locale, "label.cost"), price(activity.getCost(), locale));
+            pdf.field(msg(locale, "label.maxParticipants"), activity.getMaxParticipants() != null
+                    ? PdfText.number(activity.getMaxParticipants(), locale) : msg(locale, "pdf.unlimited"));
+            pdf.field(msg(locale, "label.registeredParticipants"), PdfText.number(participantCount, locale));
+            pdf.field(msg(locale, "label.status"), msg(locale, activity.isActive() ? "activity.active" : "activity.inactive"));
+            return pdf.finish(footer(association, locale));
+        }
+    }
+
+    private String price(BigDecimal value, Locale locale) {
+        return value == null || value.signum() == 0 ? msg(locale, "pdf.free") : PdfText.money(value, locale);
+    }
+
+    /**
+     * Assembly minutes: details, quorum, present and proxy participants by name, each motion with
+     * voting type, votes and outcome, then the chair and secretary signatures.
+     *
+     * @param memberNames display names keyed by user_associations id (participants and proxy holders)
+     * @param signers     president and secretary from {@link SignatureResolver}; their image is drawn only
+     *                    when the signer is the person named as chair/secretary of this assembly
+     */
+    public byte[] generateAssemblyMinutes(Assembly assembly, List<AssemblyParticipant> participants,
+                                          Map<Long, String> memberNames, List<AssemblyMotion> motions,
+                                          List<SignatureResolver.SignerInfo> signers,
+                                          Association association, Locale locale) throws IOException {
+        List<AssemblyParticipant> all = participants == null ? List.of() : participants;
+        Map<Long, String> names = memberNames == null ? Map.of() : memberNames;
+        try (PdfDocument pdf = open(association, locale)) {
+            pdf.heading(msg(locale, "minutes.title"), 18);
+            pdf.space(4);
+            pdf.field(msg(locale, "label.title"), Objects.requireNonNullElse(assembly.getTitle(), ""));
+            if (assembly.getType() != null) {
+                pdf.field(msg(locale, "label.type"), messages.label(locale, "enum.assemblyType", assembly.getType()));
+            }
+            pdf.field(msg(locale, "label.date"), orNa(locale, PdfText.dateTime(assembly.getDate(), locale)));
+            pdf.field(msg(locale, "label.location"), orNa(locale, assembly.getLocation()));
+            pdf.field(msg(locale, "minutes.chair"), orNa(locale, assembly.getPresident()));
+            pdf.field(msg(locale, "minutes.secretary"), orNa(locale, assembly.getSecretary()));
+
+            pdf.space(10);
+            pdf.heading(msg(locale, "minutes.quorum"), 13);
+            if (assembly.getFirstCallQuorum() != null) {
+                pdf.line(msg(locale, "minutes.quorumFirstCall", percent(assembly.getFirstCallQuorum(), locale)), pdf.regular, 10);
+            }
+            if (assembly.getSecondCallQuorum() != null) {
+                pdf.line(msg(locale, "minutes.quorumSecondCall", percent(assembly.getSecondCallQuorum(), locale)), pdf.regular, 10);
+            }
+            pdf.line(msg(locale, assembly.isQuorumReached() ? "minutes.quorumReached" : "minutes.quorumNotReached"), pdf.bold, 10);
+
+            pdf.space(10);
+            pdf.heading(msg(locale, "minutes.participants"), 13);
+            List<String> present = new ArrayList<>();
+            List<String> proxies = new ArrayList<>();
+            for (AssemblyParticipant p : all) {
+                String name = nameOf(names, p.getUserAssociationId(), locale);
+                if ("PRESENT".equals(p.getParticipationType())) {
+                    present.add(name);
+                } else if ("PROXY".equals(p.getParticipationType())) {
+                    proxies.add(p.getProxyReceiverId() != null
+                            ? msg(locale, "minutes.proxyHolder", name, nameOf(names, p.getProxyReceiverId(), locale))
+                            : name);
+                }
+            }
+            participantList(pdf, msg(locale, "minutes.present", PdfText.number(present.size(), locale)), present, locale);
+            participantList(pdf, msg(locale, "minutes.proxies", PdfText.number(proxies.size(), locale)), proxies, locale);
+
+            pdf.space(10);
+            pdf.heading(msg(locale, "minutes.motions"), 13);
+            List<AssemblyMotion> ordered = motions == null ? List.of() : motions.stream()
+                    .sorted((a, b) -> Integer.compare(Objects.requireNonNullElse(a.getOrderNumber(), 0),
+                            Objects.requireNonNullElse(b.getOrderNumber(), 0)))
+                    .toList();
+            if (ordered.isEmpty()) pdf.line(msg(locale, "minutes.noMotions"), pdf.italic, 10);
+            for (AssemblyMotion motion : ordered) {
+                pdf.ensureSpace(70);
+                pdf.space(4);
+                String number = motion.getOrderNumber() != null ? motion.getOrderNumber() + ". " : "- ";
+                pdf.paragraph(pdf.left(), number + Objects.requireNonNullElse(motion.getTitle(), ""), pdf.bold, 11);
+                if (motion.getDescription() != null && !motion.getDescription().isBlank()) {
+                    pdf.paragraph(pdf.left() + 14, motion.getDescription(), pdf.regular, 9);
+                }
+                String votingType = motion.getVotingType() == null ? "SIMPLE" : motion.getVotingType();
+                pdf.line(pdf.left() + 14, msg(locale, "minutes.votingType",
+                        messages.label(locale, "enum.votingType", votingType)), pdf.regular, 10);
+                if (motion.isVoteRecorded() && !AssemblyMotion.OUTCOME_NOTED.equals(motion.getOutcome())) {
+                    pdf.line(pdf.left() + 14, msg(locale, "minutes.votes",
+                            PdfText.number(Objects.requireNonNullElse(motion.getVotesInFavor(), 0), locale),
+                            PdfText.number(Objects.requireNonNullElse(motion.getVotesAgainst(), 0), locale),
+                            PdfText.number(Objects.requireNonNullElse(motion.getVotesAbstain(), 0), locale)), pdf.regular, 10);
+                }
+                pdf.line(pdf.left() + 14, msg(locale, "minutes.outcome",
+                        messages.label(locale, "enum.outcome", motion.getOutcome())), pdf.bold, 10);
+                if (motion.getDecisionSummary() != null && !motion.getDecisionSummary().isBlank()) {
+                    pdf.paragraph(pdf.left() + 14, msg(locale, "minutes.decision", motion.getDecisionSummary()), pdf.italic, 10);
                 }
             }
 
-            addFooter(document, page, association);
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            document.save(baos);
-            return baos.toByteArray();
+            pdf.space(20);
+            pdf.signatures(msg(locale, "pdf.signatures"), List.of(
+                    minutesSigner(assembly.getPresident(), "minutes.chair", find(signers, "president"), locale),
+                    minutesSigner(assembly.getSecretary(), "minutes.secretary", find(signers, "secretary"), locale)));
+            return pdf.finish(footer(association, locale));
         }
     }
 
-    public byte[] generateActivityReport(Activity activity, int participantCount, Association association) throws IOException {
-        try (PDDocument document = new PDDocument()) {
-            PDPage page = new PDPage();
-            document.addPage(page);
-            addHeader(document, page, association);
-
-            try (PDPageContentStream cs = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, true, true)) {
-                cs.beginText();
-                cs.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 16);
-                cs.newLineAtOffset(50, 680);
-                cs.showText("Report Attività");
-                cs.endText();
-
-                cs.beginText();
-                cs.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 12);
-                cs.newLineAtOffset(50, 640);
-                cs.showText("Nome: " + (activity.getName() != null ? activity.getName() : ""));
-                cs.newLineAtOffset(0, -18);
-                cs.showText("Categoria: " + (activity.getCategory() != null ? activity.getCategory() : "N/D"));
-                cs.newLineAtOffset(0, -18);
-                cs.showText("Luogo: " + (activity.getLocation() != null ? activity.getLocation() : "N/D"));
-                cs.newLineAtOffset(0, -18);
-                cs.showText("Inizio: " + (activity.getStartDate() != null ? activity.getStartDate().format(DATE_FORMATTER) : "N/D"));
-                cs.newLineAtOffset(0, -18);
-                cs.showText("Fine: " + (activity.getEndDate() != null ? activity.getEndDate().format(DATE_FORMATTER) : "N/D"));
-                cs.newLineAtOffset(0, -18);
-                cs.showText("Orario: " + (activity.getScheduleDetails() != null ? activity.getScheduleDetails() : "N/D"));
-                cs.newLineAtOffset(0, -18);
-                cs.showText("Costo: " + (activity.getCost() != null ? activity.getCost() + " EUR" : "Gratuito"));
-                cs.newLineAtOffset(0, -18);
-                cs.showText("Posti max: " + (activity.getMaxParticipants() != null ? activity.getMaxParticipants() : "Illimitati"));
-                cs.newLineAtOffset(0, -18);
-                cs.showText("Partecipanti iscritti: " + participantCount);
-                cs.newLineAtOffset(0, -18);
-                cs.showText("Stato: " + (activity.isActive() ? "Attiva" : "Non attiva"));
-                cs.endText();
-            }
-
-            addFooter(document, page, association);
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            document.save(baos);
-            return baos.toByteArray();
-        }
+    private String nameOf(Map<Long, String> names, Long id, Locale locale) {
+        String name = id == null ? null : names.get(id);
+        return name == null || name.isBlank() ? "#" + (id == null ? "?" : id) : name;
     }
 
-    private String truncate(String s, int max) {
-        if (s == null) return "";
-        return s.length() <= max ? s : s.substring(0, max - 1) + "…";
+    private void participantList(PdfDocument pdf, String title, Collection<String> names, Locale locale) throws IOException {
+        pdf.line(title, pdf.bold, 10);
+        String text = names.isEmpty() ? msg(locale, "minutes.none") : String.join(", ", names.stream().sorted().toList());
+        pdf.paragraph(pdf.left() + 14, text, pdf.regular, 10);
     }
 
-    public byte[] generateAssemblyMinutes(Assembly assembly, List<AssemblyParticipant> participants, List<AssemblyMotion> motions, Association association) throws IOException {
-        try (PDDocument document = new PDDocument()) {
-            PDPage page = new PDPage();
-            document.addPage(page);
+    private static String percent(Double value, Locale locale) {
+        DecimalFormat format = new DecimalFormat("0.##", DecimalFormatSymbols.getInstance(locale));
+        return format.format(value);
+    }
 
-            addHeader(document, page, association);
+    private static SignatureResolver.SignerInfo find(List<SignatureResolver.SignerInfo> signers, String role) {
+        if (signers == null) return null;
+        return signers.stream().filter(s -> role.equalsIgnoreCase(s.role())).findFirst().orElse(null);
+    }
 
-            try (PDPageContentStream contentStream = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, true, true)) {
-                // Header
-                contentStream.beginText();
-                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 18);
-                contentStream.newLineAtOffset(50, 650);
-                contentStream.showText("Verbale di Assemblea");
-                contentStream.endText();
-
-                // Details
-                contentStream.beginText();
-                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 12);
-                contentStream.newLineAtOffset(50, 620);
-                contentStream.showText("Titolo: " + (assembly.getTitle() != null ? assembly.getTitle() : ""));
-                contentStream.newLineAtOffset(0, -15);
-                contentStream.showText("Data: " + (assembly.getDate() != null ? assembly.getDate().format(DATE_TIME_FORMATTER) : "N/D"));
-                contentStream.newLineAtOffset(0, -15);
-                contentStream.showText("Luogo: " + (assembly.getLocation() != null ? assembly.getLocation() : "N/D"));
-                contentStream.newLineAtOffset(0, -15);
-                contentStream.showText("Presidente: " + (assembly.getPresident() != null ? assembly.getPresident() : "N/D"));
-                contentStream.newLineAtOffset(0, -15);
-                contentStream.showText("Segretario: " + (assembly.getSecretary() != null ? assembly.getSecretary() : "N/D"));
-                contentStream.endText();
-
-                // Participants Summary
-                contentStream.beginText();
-                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 14);
-                contentStream.newLineAtOffset(50, 530);
-                contentStream.showText("Partecipanti");
-                contentStream.endText();
-
-                contentStream.beginText();
-                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 12);
-                contentStream.newLineAtOffset(50, 510);
-                long present = participants != null ? participants.stream().filter(p -> "PRESENT".equals(p.getParticipationType())).count() : 0;
-                long proxy = participants != null ? participants.stream().filter(p -> "PROXY".equals(p.getParticipationType())).count() : 0;
-                contentStream.showText("Presenti: " + present + " - Deleghe: " + proxy);
-                contentStream.endText();
-
-                // Motions
-                int yOffset = 480;
-                contentStream.beginText();
-                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 14);
-                contentStream.newLineAtOffset(50, yOffset);
-                contentStream.showText("Mozioni e Votazioni");
-                contentStream.endText();
-                yOffset -= 20;
-
-                if (motions != null) {
-                    for (AssemblyMotion motion : motions) {
-                        if (yOffset < 100) { // Simple check to avoid writing off page
-                            break; 
-                        }
-                        
-                        contentStream.beginText();
-                        contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 12);
-                        contentStream.newLineAtOffset(50, yOffset);
-                        contentStream.showText("- " + (motion.getTitle() != null ? motion.getTitle() : ""));
-                        contentStream.endText();
-                        yOffset -= 15;
-
-                        contentStream.beginText();
-                        contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 10);
-                        contentStream.newLineAtOffset(60, yOffset);
-                        contentStream.showText("Esito: " + (motion.isApproved() ? "APPROVATA" : "RESPINTA"));
-                        contentStream.endText();
-                        yOffset -= 20;
-                    }
-                }
-            }
-
-            addFooter(document, page, association);
-
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            document.save(baos);
-            return baos.toByteArray();
+    /**
+     * The assembly may be chaired by someone other than the association officer: the stored signature
+     * is used only when it belongs to the person named in the minutes (or no one is named).
+     */
+    private PdfDocument.SignatureBlock minutesSigner(String assemblyName, String roleKey,
+                                                     SignatureResolver.SignerInfo signer, Locale locale) {
+        String role = msg(locale, roleKey);
+        boolean named = assemblyName != null && !assemblyName.isBlank();
+        if (signer == null || !signer.hasName()) {
+            return new PdfDocument.SignatureBlock(named ? assemblyName : "", role, null);
         }
+        boolean samePerson = !named || normalize(assemblyName).equals(normalize(signer.fullName()));
+        return new PdfDocument.SignatureBlock(named ? assemblyName : signer.fullName(), role,
+                samePerson ? signer.imageBytes() : null);
+    }
+
+    private static String normalize(String name) {
+        return name.trim().replaceAll("\\s+", " ").toLowerCase(Locale.ROOT);
     }
 }

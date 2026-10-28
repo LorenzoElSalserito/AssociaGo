@@ -16,6 +16,12 @@ public class AttendanceRecord {
     @Column(name = "member_id")
     private Long memberId;
     
+    @Column(name = "user_id")
+    private Long userId;
+
+    public Long getUserId() { return userId; }
+    public void setUserId(Long userId) { this.userId = userId; }
+
     private String status; // PRESENT, ABSENT, LATE, EXCUSED
     
     @Column(name = "check_in_time")

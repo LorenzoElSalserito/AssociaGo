@@ -1,6 +1,8 @@
 package com.associago.activity;
 
 import com.associago.activity.repository.*;
+import com.associago.coupon.Coupon;
+import com.associago.coupon.CouponService;
 import com.associago.stats.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,18 +23,21 @@ public class ActivityService {
     private final ActivityCostRepository costRepository;
     private final ActivityInstructorRepository instructorRepository;
     private final ActivityScheduleRepository scheduleRepository;
+    private final CouponService couponService;
 
     @Autowired
     public ActivityService(ActivityRepository activityRepository,
                            ActivityParticipantRepository participantRepository,
                            ActivityCostRepository costRepository,
                            ActivityInstructorRepository instructorRepository,
-                           ActivityScheduleRepository scheduleRepository) {
+                           ActivityScheduleRepository scheduleRepository,
+                           CouponService couponService) {
         this.activityRepository = activityRepository;
         this.participantRepository = participantRepository;
         this.costRepository = costRepository;
         this.instructorRepository = instructorRepository;
         this.scheduleRepository = scheduleRepository;
+        this.couponService = couponService;
     }
 
     // --- Basic CRUD Methods ---
@@ -63,7 +68,32 @@ public class ActivityService {
 
     @Transactional
     public ActivityParticipant registerParticipant(ActivityParticipant participant) {
+        if (participant.getId() == null) applyPricing(participant);
         return participantRepository.save(participant);
+    }
+
+    /** Server-side pricing: client-sent amounts are ignored and any coupon is re-validated and redeemed. */
+    private void applyPricing(ActivityParticipant participant) {
+        Activity activity = activityRepository.findById(participant.getActivityId())
+                .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("Activity not found"));
+        BigDecimal base = CouponService.activityPrice(activity);
+        String code = participant.getCouponCode() != null ? participant.getCouponCode().trim() : "";
+        participant.setOriginalAmount(base);
+        participant.setCouponId(null);
+        participant.setCouponCode(null);
+        participant.setDiscountType(null);
+        participant.setDiscountAmount(BigDecimal.ZERO);
+        participant.setAmountDue(base);
+        if (code.isEmpty()) return;
+
+        CouponService.CouponQuote quote = couponService.quoteForActivity(activity.getId(), code);
+        Coupon coupon = quote.coupon();
+        couponService.redeem(coupon.getId());
+        participant.setCouponId(coupon.getId());
+        participant.setCouponCode(coupon.getCode());
+        participant.setDiscountType(coupon.getDiscountType());
+        participant.setDiscountAmount(quote.discount());
+        participant.setAmountDue(quote.finalAmount());
     }
 
     @Transactional
@@ -191,6 +221,7 @@ public class ActivityService {
         BigDecimal pendingRevenue = participants.stream()
                 .filter(p -> !p.isPaid())
                 .map(p -> {
+                    if (p.getAmountDue() != null) return p.getAmountDue();
                     BigDecimal cost = activity.getCost() != null ? activity.getCost() : BigDecimal.ZERO;
                     BigDecimal discount = p.getDiscountAmount() != null ? p.getDiscountAmount() : BigDecimal.ZERO;
                     return cost.subtract(discount);

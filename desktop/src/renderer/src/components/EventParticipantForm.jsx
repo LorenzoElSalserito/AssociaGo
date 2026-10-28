@@ -3,11 +3,14 @@ import { useForm } from 'react-hook-form';
 import { associago } from '../api';
 import { useTranslation } from 'react-i18next';
 import { Form } from 'react-bootstrap';
+import CouponField from './CouponField';
+import { couponErrorMessage } from '../utils/couponErrors';
 
 const EventParticipantForm = ({ eventId, onSuccess, onCancel }) => {
   const { t } = useTranslation();
   const { register, handleSubmit, watch, formState: { errors, isSubmitting } } = useForm();
   const [members, setMembers] = useState([]);
+  const [couponCode, setCouponCode] = useState('');
   const type = watch('type', 'MEMBER');
 
   useEffect(() => {
@@ -19,7 +22,8 @@ const EventParticipantForm = ({ eventId, onSuccess, onCancel }) => {
       const payload = {
         status: 'REGISTERED',
         paymentStatus: 'PENDING',
-        registrationDate: new Date().toISOString()
+        registrationDate: new Date().toISOString(),
+        couponCode: couponCode.trim() || null
       };
 
       if (data.type === 'MEMBER') {
@@ -33,7 +37,7 @@ const EventParticipantForm = ({ eventId, onSuccess, onCancel }) => {
       onSuccess();
     } catch (error) {
       console.error('Error adding participant:', error);
-      alert(t('Error adding participant') + ': ' + error.message);
+      alert(t('Error adding participant') + ': ' + (couponErrorMessage(error.message, t) || error.message));
     }
   };
 
@@ -94,6 +98,12 @@ const EventParticipantForm = ({ eventId, onSuccess, onCancel }) => {
               </div>
           </>
       )}
+
+      <CouponField
+        target={{ eventId: Number(eventId), member: type === 'MEMBER' }}
+        code={couponCode}
+        onCodeChange={setCouponCode}
+      />
 
       <div className="d-flex justify-content-end gap-2 mt-4">
         <button type="button" onClick={onCancel} className="btn btn-secondary">

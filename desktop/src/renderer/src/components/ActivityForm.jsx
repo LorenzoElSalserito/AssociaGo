@@ -1,17 +1,26 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { associago } from '../api';
 import { useTranslation } from 'react-i18next';
 
-const ActivityForm = ({ associationId, onSuccess, onCancel }) => {
+const ActivityForm = ({ associationId, activityId, onSuccess, onCancel }) => {
   const { t } = useTranslation();
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm();
+  const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm();
 
+  const [loaded, setLoaded] = useState(!activityId);
+  const [loadError, setLoadError] = useState(null);
+  useEffect(() => {
+    if (!activityId) return;
+    let active = true;
+    associago.activities.getById(activityId).then(data => { if (active) { reset(data); setLoaded(true); } })
+      .catch(error => { if (active) setLoadError(error.message); });
+    return () => { active = false; };
+  }, [activityId, reset]);
   const onSubmit = async (data) => {
     try {
       const baseUrl = await associago.getApiUrl();
-      const response = await fetch(`${baseUrl}/v1/activities`, {
-        method: 'POST',
+      const response = await fetch(`${baseUrl}/v1/activities${activityId ? `/${activityId}` : ''}`, {
+        method: activityId ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           associationId: associationId,
@@ -25,7 +34,7 @@ const ActivityForm = ({ associationId, onSuccess, onCancel }) => {
           location: data.location,
           maxParticipants: data.maxParticipants ? parseInt(data.maxParticipants) : null,
           cost: data.cost ? parseFloat(data.cost) : 0,
-          active: true,
+          isActive: data.isActive ?? true,
           // New fields
           subscriptionType: data.subscriptionType,
           scheduleDetails: data.scheduleDetails,
@@ -36,15 +45,16 @@ const ActivityForm = ({ associationId, onSuccess, onCancel }) => {
         }),
       });
 
-      if (!response.ok) throw new Error('Failed to create activity');
+      if (!response.ok) throw new Error(t('errors.http', { status: response.status }));
 
       onSuccess();
     } catch (error) {
       console.error('Error creating activity:', error);
-      alert('Failed to create activity: ' + error.message);
+      alert(t('activityForm.saveFailed', { error: error.message }));
     }
   };
 
+  if (!loaded) return <div role={loadError ? 'alert' : 'status'}>{loadError || t('Loading...')}</div>;
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="p-2">
       <div className="mb-3">

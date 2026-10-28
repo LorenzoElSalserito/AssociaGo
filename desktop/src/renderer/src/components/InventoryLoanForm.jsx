@@ -9,7 +9,7 @@ const InventoryLoanForm = ({ itemId, onSuccess, onCancel }) => {
   const [members, setMembers] = useState([]);
 
   useEffect(() => {
-    associago.members.getAll().then(setMembers).catch(console.error);
+    associago.memberships.getByAssociation().then(setMembers).catch(console.error);
   }, []);
 
   const onSubmit = async (data) => {
@@ -17,8 +17,8 @@ const InventoryLoanForm = ({ itemId, onSuccess, onCancel }) => {
       await associago.inventory.createLoan({
         itemId: itemId,
         userAssociationId: data.memberId,
-        loanDate: data.loanDate,
-        expectedReturnDate: data.expectedReturnDate,
+        loanDate: `${data.loanDate}T00:00:00`,
+        expectedReturnDate: data.expectedReturnDate ? `${data.expectedReturnDate}T00:00:00` : null,
         conditionOnLoan: data.conditionOnLoan || null,
         notes: data.notes,
         status: 'ACTIVE'
@@ -41,7 +41,7 @@ const InventoryLoanForm = ({ itemId, onSuccess, onCancel }) => {
           <option value="">{t('Select...')}</option>
           {members.map(m => (
             <option key={m.id} value={m.id}>
-              {m.firstName} {m.lastName}
+              {m.user?.firstName} {m.user?.lastName}
             </option>
           ))}
         </select>

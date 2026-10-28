@@ -1,46 +1,52 @@
-# 12. Haushaltsplan (Budget)
+# 12. Haushaltsplan
 
-Der Bereich **Haushaltsplan** ermöglicht die Planung der voraussichtlichen Einnahmen und Ausgaben für das Geschäftsjahr, den Vergleich mit den tatsächlichen Daten und die Kontrolle über die finanzielle Nachhaltigkeit des Vereins.
+Die Seite **Budget** dient dazu, Einnahmen und Ausgaben eines Jahres zu planen und mit den in der Buchhaltung erfassten Buchungen zu vergleichen.
 
-## 12.1 Überblick
-Der Haushaltsplan ist ein für viele Vereine des Dritten Sektors verpflichtendes Instrument. AssociaGo macht seine Erstellung und Genehmigung einfach.
+## 12.1 Budgetliste
 
-## 12.2 Budget erstellen
-1. Klicken Sie auf **"Neues Budget"**.
-2. Geben Sie das **Bezugsjahr** und eine optionale Beschreibung ein.
-3. Klicken Sie auf **"Erstellen"**.
+Die Tabelle zeigt **Titel**, **Jahr** und **Status** (Entwurf oder genehmigt), vom neuesten an. Klicken Sie auf eine Zeile, um das Budget zu öffnen. Das **Papierkorb**-Symbol löscht es nach der Bestätigung **Sind Sie sicher?**.
 
-Das Budget wird im Status **Entwurf** erstellt.
+## 12.2 Budget anlegen
 
-## 12.3 Verwaltung der Budgetposten
-Jedes Budget besteht aus **Posten** (Positionen) für Einnahmen und Ausgaben:
+Klicken Sie auf **Neues Budget** und füllen Sie aus:
+- **Titel**;
+- **Jahr** (vorgeschlagen wird das laufende);
+- **Notizen**.
 
-### Einen Posten hinzufügen
-- Klicken Sie auf **"Posten hinzufügen"**.
-- Füllen Sie aus:
-  - **Kategorie**: Einnahme oder Ausgabe.
-  - **Beschreibung**: (z. B. "Mitgliedsbeiträge", "Raummiete", "Lehrmaterial").
-  - **Geplanter Betrag**: Der geschätzte Betrag.
+Klicken Sie auf **Erstellen**. Das Budget wird als Entwurf angelegt.
 
-### Einen Posten bearbeiten
-Klicken Sie auf die Zeile, um Beschreibung und geplanten Betrag zu bearbeiten.
+> Titel, Jahr und Notizen können nach dem Anlegen nicht geändert werden.
 
-### Einen Posten löschen
-Klicken Sie auf das **Papierkorb**-Symbol, um eine Zeile zu entfernen.
+## 12.3 Budgetzeilen
 
-## 12.4 Zusammenfassung
-Am oberen Rand der Seite zeigt ein Übersichtsfeld:
-- **Geplante Gesamteinnahmen**
-- **Geplante Gesamtausgaben**
-- **Geplanter Saldo** (Differenz)
+Klicken Sie in der Detailansicht auf **Zeile hinzufügen** und füllen Sie aus:
+- **Kategorie**: freier Text, zum Beispiel „Mitgliedsbeiträge“ oder „Miete Vereinsräume“;
+- **Abschnitt**: **Einnahmen** oder **Ausgabe**;
+- **Budgetierter Betrag**.
 
-## 12.5 Synchronisierung mit dem Ist-Ergebnis
-Durch Klicken auf **"Ist-Ergebnis synchronisieren"** aktualisiert das System automatisch die tatsächlichen Beträge (Spalte "Ist-Ergebnis") anhand der in der Buchhaltung erfassten realen Transaktionen für das Bezugsjahr. So können Planung und Realität sofort verglichen werden.
+Klicken Sie auf **Hinzufügen**. Um eine Zeile zu ändern, verwenden Sie das **Stift**-Symbol (**Zeile bearbeiten**, dann **Speichern**); zum Entfernen das **Papierkorb**-Symbol, das sofort ohne Bestätigung löscht.
+
+Die Tabelle der Zeilen hat diese Spalten:
+- **Budgetiert** und **Tatsächlich**;
+- **Abweichung**: tatsächlich minus budgetiert, grün wenn positiv und rot wenn negativ (dasselbe Kriterium gilt für Einnahmen und Ausgaben);
+- **Fortschritt**: Balken des tatsächlichen im Verhältnis zum budgetierten Betrag, gelb über 80 % und rot über 100 %.
+
+## 12.4 Übersicht
+
+Über der Tabelle stehen vier Felder: **Budgetierte Einnahmen**, **Tatsächliche Einnahmen**, **Budgetierte Ausgaben** und **Tatsächliche Ausgaben**.
+
+> Es gibt keinen geplanten Saldo: Die Differenz zwischen Einnahmen und Ausgaben muss von Hand berechnet werden.
+
+## 12.5 Istwerte synchronisieren
+
+**Istwerte synchronisieren** liest die Buchungen des Vereins vom 1. Januar bis 31. Dezember des Budgetjahres und aktualisiert die Spalte **Tatsächlich**.
+
+> Die über die Oberfläche angelegten Zeilen sind mit keiner Buchhaltungskategorie verknüpft. Deshalb erhält jede Zeile die Summe aller Buchungen ihres Abschnitts: Bei drei Ausgabenzeilen zeigen alle drei die Summe der Ausgaben des Jahres. Die tatsächlichen Summen in den Feldern sind daher mit der Anzahl der Zeilen multipliziert.
 
 ## 12.6 Genehmigung
-Wenn der Haushaltsplan vollständig ist:
-1. Klicken Sie auf **"Genehmigen"**.
-2. Der Status wechselt von **Entwurf** zu **Genehmigt**.
-3. Ein genehmigter Haushaltsplan ist nicht mehr änderbar.
 
-> **Hinweis**: Die Genehmigung des Haushaltsplans ist in der Regel ein Beschluss der Mitgliederversammlung. Stellen Sie sicher, dass die Genehmigung im System erst nach dem Beschluss der Versammlung erfolgt.
+**Genehmigen** setzt das Budget auf den Status genehmigt und erfasst, wer es wann genehmigt hat. Nach der Genehmigung verschwindet die Schaltfläche.
+
+> Die Genehmigung sperrt nichts: Die Zeilen bleiben bearbeitbar und löschbar, und das Budget kann gelöscht werden.
+
+> **Hinweis**: Die Genehmigung des Haushaltsplans ist in der Regel ein Beschluss der Versammlung. Erfassen Sie sie im System nach dem Beschluss.

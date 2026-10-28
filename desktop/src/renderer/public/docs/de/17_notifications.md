@@ -1,39 +1,31 @@
 # 17. Benachrichtigungen
 
-Das **Benachrichtigungssystem** von AssociaGo informiert in Echtzeit über wichtige Ereignisse des Vereins.
+Benachrichtigungen rufen Sie über die **Glocke** in der Kopfzeile auf, neben dem Profilmenü. Sie sammeln, was in dem Verein geschieht, mit dem Sie angemeldet sind: Jeder Verein sieht nur seine eigenen.
 
-## 17.1 Benachrichtigungsglocke
-In der Kopfzeile der Seite befindet sich neben dem Benutzerprofil das **Glockensymbol**:
-- Ein **rotes Badge** mit einer Zahl zeigt die ungelesenen Benachrichtigungen an.
-- Durch Klicken auf die Glocke öffnet sich das Benachrichtigungsfeld.
+## 17.1 Die Glocke
 
-## 17.2 Benachrichtigungsfeld
-Das Feld zeigt die Liste der Benachrichtigungen sortiert nach Aktualität:
+- Das **Abzeichen** auf der Glocke zeigt an, wie viele Benachrichtigungen noch ungelesen sind (über 9 zeigt es **9+**).
+- Ein Klick, oder **Enter** bzw. **Leertaste**, wenn die Glocke den Fokus hat, öffnet den Bereich **Benachrichtigungen**; ein Klick außerhalb oder die Taste **Esc** schließt ihn.
+- Die Anzahl aktualisiert sich alle 30 Sekunden selbst.
 
-Für jede Benachrichtigung werden angezeigt:
-- **Titel**: Kurzbeschreibung des Ereignisses.
-- **Nachricht**: Zusätzliche Details.
-- **Datum und Uhrzeit**: Wann die Benachrichtigung erstellt wurde.
-- **Status**: Gelesen (grau) oder Ungelesen (hervorgehoben).
+## 17.2 Der Bereich
 
-### Verfügbare Aktionen
-- **Als gelesen markieren**: Klicken Sie auf eine einzelne Benachrichtigung, um sie als gelesen zu markieren.
-- **Alle als gelesen markieren**: Schaltfläche oben im Feld, um alle Benachrichtigungen mit einer einzigen Aktion als gelesen zu markieren.
+Die letzten 50 Benachrichtigungen sind nach Aktualität sortiert, die neueste zuerst. Jede zeigt Titel, Nachricht und wann sie erzeugt wurde („vor 5 Minuten“, „vor 2 Stunden“; nach einem Tag das Datum). Ungelesene haben einen hervorgehobenen Hintergrund und rechts einen Punkt.
 
-## 17.3 Benachrichtigungstypen
-Das System erzeugt automatische Benachrichtigungen für verschiedene Ereignisse:
+- Klicken Sie auf eine Benachrichtigung (oder wählen Sie sie mit **Tab** aus und drücken Sie **Enter**): Sie wird als gelesen markiert und das verknüpfte Element öffnet sich. Eine Veranstaltung öffnet ihre Detailansicht im Bereich **Veranstaltungen**; ein Mitgliedsausweis öffnet die Detailansicht des Mitglieds im Bereich **Mitglieder**.
+- **Alle als gelesen markieren** oben erscheint nur, wenn es ungelesene Benachrichtigungen gibt.
+- Gibt es keine, zeigt der Bereich **Keine Benachrichtigungen**.
 
-| Typ | Beschreibung |
-|-----|-------------|
-| **INFO** | Allgemeine Informationen (z. B. "Neues Mitglied registriert"). |
-| **WARNING** | Hinweise, die Aufmerksamkeit erfordern (z. B. "Mitgliedsausweise laufen ab"). |
-| **ALERT** | Dringende Situationen (z. B. "Bevorstehende steuerliche Frist"). |
-| **REMINDER** | Geplante Erinnerungen (z. B. "Versammlung morgen"). |
+Die Texte der Benachrichtigungen folgen der in den Einstellungen gewählten Sprache. Benachrichtigungen aus früheren Versionen von AssociaGo behalten ihren ursprünglichen Text.
 
-## 17.4 Automatische Aktualisierung
-Die Benachrichtigungen werden automatisch alle **30 Sekunden** aktualisiert, ohne dass die Seite neu geladen werden muss. Das Badge auf der Glocke wird in Echtzeit aktualisiert.
+## 17.3 Wann sie erzeugt werden
 
-## 17.5 Verknüpfte Benachrichtigungen
-Einige Benachrichtigungen sind mit bestimmten Entitäten verknüpft (Mitglied, Veranstaltung, Aktivität). Das System erfasst den Typ und die ID der zugehörigen Entität, um die direkte Navigation zum Kontext der Benachrichtigung zu erleichtern.
+| Benachrichtigung | Wann |
+|---|---|
+| Neue Veranstaltungsanmeldung | ein Mitglied oder ein Gast wird zu den Teilnehmern einer Veranstaltung hinzugefügt |
+| Veranstaltung abgesagt | eine Veranstaltung wird abgesagt: eine einzige Benachrichtigung mit der Zahl der zu informierenden Teilnehmer |
+| Mitgliedschaft verlängert | eine Mitgliedschaft wird erneuert |
+| Mitgliedschaft abgelaufen | nächtliche Prüfung (1:00 Uhr): die Mitgliedschaft ist abgelaufen |
+| Mitgliedschaft läuft ab | nächtliche Prüfung (1:00 Uhr): bis zum Ablauf sind es genau 7 Tage |
 
-> **Hinweis**: Benachrichtigungen werden vom System automatisch als Reaktion auf Aktionen und Fristen erzeugt. Es ist derzeit nicht möglich, manuelle Benachrichtigungen zu erstellen.
+Die nächtlichen Prüfungen finden nur statt, wenn AssociaGo zu dieser Zeit geöffnet ist. Die Benachrichtigungen dienen dem Verein: Sie werden nicht an die Mitglieder gesendet. Um den Mitgliedern zu schreiben, verwenden Sie die **Kommunikation** (Kapitel 15).

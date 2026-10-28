@@ -165,7 +165,7 @@ const AssociationRegistryPanel = ({ associationId }) => {
                   <td>{translateDeadlineCategory(deadline.category, t)}</td>
                   <td><Badge bg={deadline.status === 'completed' ? 'success' : 'warning'} text={deadline.status === 'completed' ? 'white' : 'dark'}>{translateDeadlineStatus(deadline.status, t)}</Badge></td>
                   <td className="text-end d-flex justify-content-end gap-2">
-                    {deadline.status !== 'completed' && <Button size="sm" variant="outline-success" onClick={() => associago.completeDeadline(associationId, deadline.id).then(loadData)}>{t('registry.complete')}</Button>}
+                    {deadline.status !== 'completed' && <Button size="sm" variant="outline-success" onClick={() => associago.completeDeadline(associationId, deadline.id).then(loadData)}>{t('registry.markComplete')}</Button>}
                     <Button variant="link" className="text-danger p-0" onClick={() => associago.deleteDeadline(associationId, deadline.id).then(loadData)}><Trash2 size={14} /></Button>
                   </td>
                 </tr>

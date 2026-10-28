@@ -47,7 +47,7 @@ public final class CurrentUserUtils {
     public static Long requireUserId() {
         return principal()
                 .map(AssociaGoPrincipal::getLocalUserId)
-                .orElseThrow(() -> new IllegalStateException("Utente non autenticato (AssociaGo)"));
+                .orElseThrow(() -> new IllegalStateException("User not authenticated (AssociaGo)"));
     }
 
     /**
